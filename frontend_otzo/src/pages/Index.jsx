@@ -14,7 +14,7 @@ export function Index() {
       </div>
       <div className="p-4 gap-4 flex flex-col items-center flex-wrap md:justify-center md:flex-row">
         <Card title={"Módulo de inventario"} image={"inventario.png"} />
-        <Card title={"Módulo de ventas"} image={"carro.png"}/>
+        <Card title={"Módulo de ventas"} image={"carro.png"} route={"/sales"}/>
         <Card title={"Módulo de atención al cliente"} />
         <Card title={"Módulo de reportes y análisis"} />
         <Card title={"Módulo de administración"} />
