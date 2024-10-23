@@ -5,7 +5,6 @@ export function Index() {
   return(
     <>
       <div className="bg-gradient-to-l from-red-400 to-orange-500 w-full h-full overflow-x-hidden fixed -z-10"></div>
-      
       <Navbar />
       <div className="relative">
         <h1 className="text-white font-bold text-7xl lg:text-8xl text-center">Otzo</h1>
