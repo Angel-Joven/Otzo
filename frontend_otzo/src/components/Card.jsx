@@ -1,9 +1,10 @@
 import React from 'react';
+import { easeInOut, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 export function Card({ title, image, route }) {
   return (
-    <div className="min-w-72 max-w-72 min-h-48 max-h-48 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800/50 dark:border-gray-700/50 overflow-hidden">
+    <motion.div initial={{opacity: 0, y: 20}} animate={{opacity: 1, y: 0, transition:{delay: 0.8, duration: 0.5, ease: easeInOut}}} className="min-w-72 max-w-72 min-h-48 max-h-48 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800/50 dark:border-gray-700/50 overflow-hidden">
       <img src={image} alt="" className="h-16 m-auto" />
       <h5 className="mb-2 text-2xl text-center font-bold tracking-tight text-gray-900 dark:text-white overflow-hidden text-ellipsis whitespace-nowrap">
         {title}
@@ -31,6 +32,6 @@ export function Card({ title, image, route }) {
           </svg>
         </Link>
       </div>
-    </div>
+    </motion.div>
   );
 }
