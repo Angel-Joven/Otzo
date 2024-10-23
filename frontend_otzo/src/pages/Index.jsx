@@ -20,7 +20,7 @@ export function Index() {
         <Card title={"Módulo de administración"} />
         <Card title={"Módulo de lógistica y reabastecimiento"} />
         <Card title={"Módulo de control de calidad y auditoria"} />
-        <Card title={"Módulo de fidelización y marketing"} />
+        <Card title={"Módulo de fidelización y marketing"} image={"fidelizacion.png"} route={"/fidelizacion"}/>
       </div>
     </>
   );
