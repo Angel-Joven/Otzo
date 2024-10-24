@@ -17,11 +17,12 @@ export function Navbar() {
 
   useEffect(() => {
     console.log('La ruta actual es:', location.pathname);
+    setIsNavbarVisible(false);
   }, [location.pathname]);
 
   return (
   <>
-    <motion.nav initial={{opacity: 0}} animate={{opacity: 1, transition: {delay: 0.1}}} className="bg-gray-900 h-20">
+    <motion.nav className="bg-gray-900 h-20">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <motion.a initial={{scale: 0}} animate={{scale: 1, transition: {delay: 0.8}}} href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
             <img src="store.png" className="h-12" alt="" />
@@ -33,16 +34,16 @@ export function Navbar() {
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15"/>
             </svg>
         </button>
-        <div className={`${isNavbarVisible ? "block" : "hidden"} w-full md:block md:w-auto`} id="navbar-default">
-          <ul className="font-medium flex flex-col p-4 md:p-2 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0  bg-gray-800/20 md:bg-gray-900/20 border-gray-700/20">
+        <div className={`${isNavbarVisible ? "block" : "hidden"} w-full md:block md:w-auto z-10`} id="navbar-default">
+          <ul className="font-medium flex flex-col p-4 md:p-2 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 bg-gray-800 md:bg-gray-900 border-gray-700 w-full">
             <li>
-              <Link to={"/"} className="block py-2 px-3 text-white bg-orange-600 rounded md:bg-transparent md:p-0 md:text-white" aria-current="page">Inicio</Link>
+              <Link to={"/"} className={`block py-2 px-3 ${location.pathname == "/" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-orange-600 rounded md:bg-transparent md:p-0`} aria-current="page">Inicio</Link>
             </li>
             <li>
-              <Link to={"/sales"} className="block py-2 px-3 text-white bg-green-600 rounded md:bg-transparent md:p-0 md:text-white" aria-current="page">Ventas</Link>
+              <Link to={"/sales"} className={`block py-2 px-3 ${location.pathname == "/sales" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-green-600 rounded md:bg-transparent md:p-0`} aria-current="page">Ventas</Link>
             </li>
             <li>
-              <Link to={"/fidelizacion"} className="block py-2 px-3 text-white bg-purple-600 rounded md:bg-transparent md:p-0 md:text-white" aria-current="page">Fidelización</Link>
+              <Link to={"/fidelizacion"} className={`block py-2 px-3 ${location.pathname == "/fidelizacion" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-purple-600 rounded md:bg-transparent md:p-0`} aria-current="page">Fidelización</Link>
             </li>
           </ul>
         </div>
