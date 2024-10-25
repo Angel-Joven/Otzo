@@ -13,7 +13,7 @@ export function Index() {
         <div className="p-4 gap-4 flex flex-col items-center flex-wrap md:justify-center md:flex-row">
           <Card title={"Módulo de inventario"} image={"inventario.png"} animation_delay={0.8} />
           <Card title={"Módulo de ventas"} image={"carro.png"} route={"/sales"} animation_delay={0.9} />
-          <Card title={"Módulo de atención al cliente"} animation_delay={1} />
+          <Card title={"Módulo de atención al cliente"} image={"customer-service.png"} route={"/atencion"} animation_delay={1} />
           <Card title={"Módulo de reportes y análisis"} animation_delay={1.1} />
           <Card title={"Módulo de administración"} animation_delay={1.2} />
           <Card title={"Módulo de lógistica y reabastecimiento"} animation_delay={1.3} />

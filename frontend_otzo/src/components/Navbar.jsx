@@ -45,6 +45,9 @@ export function Navbar() {
             <li>
               <Link to={"/fidelizacion"} className={`block py-2 px-3 ${location.pathname == "/fidelizacion" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-purple-600 rounded md:bg-transparent md:p-0`} aria-current="page">Fidelización</Link>
             </li>
+            <li>
+              <Link to={"/atencion"} className={`block py-2 px-3 ${location.pathname == "/atencion" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-green-600 rounded md:bg-transparent md:p-0`} aria-current="page">Atención al Cliente</Link>
+            </li>
           </ul>
         </div>
       </div>
