@@ -6,7 +6,7 @@ export function Sales() {
     <>
       <div className='bg-gradient-to-r from-lime-400 to-lime-500 w-full h-full min-h-[calc(100vh-5rem)] z-0 relative'>
         <div>
-          <motion.h1 initial={{scale: 0}} animate={{scale: 1, transition: {delay: 0.5}}} className='text-center text-white text-8xl font-bold'>Ventas</motion.h1>
+          <motion.h1 initial={{scale: 0}} animate={{scale: 1, transition: {delay: 0.5}}} className='text-center text-white text-6xl md:text-8xl font-bold'>Ventas</motion.h1>
         </div>
         <div className='grid grid-cols-1 grid-rows-1 gap-x-2.5 md:grid-cols-2'>
           <div className='w-full h-full p-4'>
