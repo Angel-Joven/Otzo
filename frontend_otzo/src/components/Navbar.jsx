@@ -37,16 +37,16 @@ export function Navbar() {
         <div className={`${isNavbarVisible ? "block" : "hidden"} w-full md:block md:w-auto z-10`} id="navbar-default">
           <ul className="font-medium flex flex-col p-4 md:p-2 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 bg-gray-800 md:bg-gray-900 border-gray-700 w-full">
             <li>
-              <Link to={"/"} className={`block py-2 px-3 ${location.pathname == "/" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-orange-600 rounded md:bg-transparent md:p-0`} aria-current="page">Inicio</Link>
+              <Link to={"/"} className={`block py-2 px-3 mb-2 ${location.pathname == "/" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-orange-600 rounded md:bg-transparent md:p-0`} aria-current="page">Inicio</Link>
             </li>
             <li>
-              <Link to={"/sales"} className={`block py-2 px-3 ${location.pathname == "/sales" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-green-600 rounded md:bg-transparent md:p-0`} aria-current="page">Ventas</Link>
+              <Link to={"/sales"} className={`block py-2 px-3 mb-2 ${location.pathname == "/sales" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-green-600 rounded md:bg-transparent md:p-0`} aria-current="page">Ventas</Link>
             </li>
             <li>
-              <Link to={"/fidelizacion"} className={`block py-2 px-3 ${location.pathname == "/fidelizacion" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-purple-600 rounded md:bg-transparent md:p-0`} aria-current="page">Fidelización</Link>
+              <Link to={"/fidelizacion"} className={`block py-2 px-3 mb-2 ${location.pathname == "/fidelizacion" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-purple-600 rounded md:bg-transparent md:p-0`} aria-current="page">Fidelización</Link>
             </li>
             <li>
-              <Link to={"/atencion"} className={`block py-2 px-3 ${location.pathname == "/atencion" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-green-600 rounded md:bg-transparent md:p-0`} aria-current="page">Atención al Cliente</Link>
+              <Link to={"/atencion"} className={`block py-2 px-3 ${location.pathname == "/atencion" ? "text-black font-bold md:text-blue-500 underline" : "text-white"} bg-blue-600 rounded md:bg-transparent md:p-0`} aria-current="page">Atención al Cliente</Link>
             </li>
           </ul>
         </div>
