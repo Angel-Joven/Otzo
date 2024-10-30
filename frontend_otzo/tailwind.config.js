@@ -8,7 +8,7 @@ export default {
     extend: {
       zIndex: {
         '-1': '-1'
-      }
+      },
     },
   },
   plugins: [],
