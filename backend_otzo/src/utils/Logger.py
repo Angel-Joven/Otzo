@@ -6,9 +6,14 @@ import traceback
 class Logger:
 
     def __set_logger(self):
+        # Definir el directorio y nombre del archivo de log
         log_directory = "src/utils/log"
         log_filename = "app.log"
 
+        # Crear el directorio si no existe
+        os.makedirs(log_directory, exist_ok=True)
+
+        # Configurar el logger
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.DEBUG)
 
@@ -21,6 +26,7 @@ class Logger:
         )
         file_handler.setFormatter(formatter)
 
+        # Limpiar handlers anteriores si ya existen
         if logger.hasHandlers():
             logger.handlers.clear()
 

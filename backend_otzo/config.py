@@ -13,5 +13,7 @@ class ProductionConfig(Config):
     DEBUG = False
 
 
-config = {"development": DevelopmentConfig}
-config = {"production": ProductionConfig}
+config = {
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+}
