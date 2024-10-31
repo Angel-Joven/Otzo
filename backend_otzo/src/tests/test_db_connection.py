@@ -9,6 +9,6 @@ def test_connection():
             with connection.cursor() as cursor:
                 cursor.execute("SELECT DATABASE()")
                 result = cursor.fetchone()
-                print("Conectado a la base de datos:", result)
+                print("Conectado a la base de datos:", result[0])
         finally:
             connection.close()
