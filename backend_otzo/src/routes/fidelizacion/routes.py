@@ -1,6 +1,10 @@
 from flask import request, jsonify
 from . import fidelizacion_bp  # Importa el Blueprint de ventas
 
+@fidelizacion_bp.route("/", methods=["GET"])
+def index():
+    return jsonify({"mensaje": "Hola - Fidelizacion"})
+
 @fidelizacion_bp.route("/calcularptscompra", methods=["POST"])
 def calcularPuntosCompra():
     # Lógica para calcular los puntos de una compra
