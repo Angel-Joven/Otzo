@@ -7,7 +7,7 @@ class Logger:
 
     def __set_logger(self):
         # Definir el directorio y nombre del archivo de log
-        log_directory = "Otzo/backend_otzo/srclogs/utils/log"
+        log_directory = "srclogs/utils/log"
         log_filename = "app.log"
 
         # Crear el directorio si no existe
