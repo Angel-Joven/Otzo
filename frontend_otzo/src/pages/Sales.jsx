@@ -110,7 +110,7 @@ export function Sales() {
           <motion.h1
             initial={{ scale: 0 }}
             animate={{ scale: 1, transition: { delay: 0.5 } }}
-            className="text-center text-white text-6xl md:text-8xl font-bold"
+            className="text-center text-white text-3xl md:text-6xl font-bold"
           >
             Ventas
           </motion.h1>
