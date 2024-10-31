@@ -2,6 +2,11 @@ from flask import request, jsonify
 from . import ventas_bp  # Importa el Blueprint de ventas
 
 
+@ventas_bp.route("/", methods=["GET"])
+def index():
+    return jsonify({"mensaje": "hola"})
+
+
 @ventas_bp.route("/add", methods=["POST"])
 def add_sale():
     # Lógica para agregar una nueva venta
