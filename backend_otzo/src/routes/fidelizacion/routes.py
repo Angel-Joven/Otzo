@@ -4,6 +4,8 @@ from . import fidelizacion_bp  # Importa el Blueprint de ventas
 from src.db import get_connection
 from src.utils.Logger import Logger
 
+from pymysql.cursors import DictCursor
+
 @fidelizacion_bp.route("/", methods=["GET"])
 def index():
     return jsonify({"mensaje": "Hola - Fidelizacion"})
@@ -95,7 +97,7 @@ def obtenerPuntos(id_cliente=1):
         return 0
 
     try:
-        with connection.cursor() as cursor:
+        with connection.cursor(DictCursor) as cursor:
             query = "SELECT total_puntos FROM puntos WHERE idclientes_puntos = %s"
             cursor.execute(query, (id_cliente,))
             result = cursor.fetchone()
@@ -105,3 +107,85 @@ def obtenerPuntos(id_cliente=1):
         return 0
     finally:
         connection.close()
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+# Test para ver si hay registros en la tabla 'clientes' - BORRAR O COMENTAR EN PRODUCCION
+@fidelizacion_bp.route("/obtcli", methods=["GET"])
+def obtcli():
+    connection = get_connection()
+    if not connection:
+        Logger.add_to_log("error", "No se pudo obtener la conexión a la base de datos.")
+        return jsonify({"error": "No se pudo obtener la conexión a la base de datos."}), 500
+
+    try:
+        with connection.cursor(DictCursor) as cursor:
+            query = "SELECT * FROM clientes"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            
+            if result:
+                return jsonify({"Clientes": result})
+            else:
+                return jsonify({"message": "No se encontraron clientes", "Clientes": []}), 200
+
+    except Exception as ex:
+        Logger.add_to_log("error", f"Error al obtener los clientes: {str(ex)}")
+        return jsonify({"error": f"Error al obtener los clientes: {str(ex)}"}), 500
+
+    finally:
+        connection.close()
+
+# Test para ver si hay registros en la tabla 'puntos' - BORRAR O COMENTAR EN PRODUCCION
+@fidelizacion_bp.route("/obtpts", methods=["GET"])
+def obtpts():
+    connection = get_connection()
+    if not connection:
+        Logger.add_to_log("error", "No se pudo obtener la conexión a la base de datos.")
+        return jsonify({"error": "No se pudo obtener la conexión a la base de datos."}), 500
+
+    try:
+        with connection.cursor(DictCursor) as cursor:
+            query = "SELECT * FROM puntos"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            
+            if result:
+                return jsonify({"Puntos": result})
+            else:
+                return jsonify({"message": "No se encontraron puntos", "Puntos": []}), 200
+
+    except Exception as ex:
+        Logger.add_to_log("error", f"Error al obtener los puntos: {str(ex)}")
+        return jsonify({"error": f"Error al obtener los puntos: {str(ex)}"}), 500
+
+    finally:
+        connection.close()
+
+# Test para ver si hay registros en la tabla 'rangos' - BORRAR O COMENTAR EN PRODUCCION
+@fidelizacion_bp.route("/obtrng", methods=["GET"])
+def obtrng():
+    connection = get_connection()
+    if not connection:
+        Logger.add_to_log("error", "No se pudo obtener la conexión a la base de datos.")
+        return jsonify({"error": "No se pudo obtener la conexión a la base de datos."}), 500
+
+    try:
+        with connection.cursor(DictCursor) as cursor:
+            query = "SELECT * FROM rangos"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            
+            if result:
+                return jsonify({"Rangos": result})
+            else:
+                return jsonify({"message": "No se encontraron rangos", "Rangos": []}), 200
+
+    except Exception as ex:
+        Logger.add_to_log("error", f"Error al obtener los rangos: {str(ex)}")
+        return jsonify({"error": f"Error al obtener los rangos: {str(ex)}"}), 500
+
+    finally:
+        connection.close()
+
+# ---------------------------------------------------------------------------------------------------------------------------
