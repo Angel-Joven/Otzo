@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from . import fidelizacion_bp  # Importa el Blueprint de ventas
+from . import fidelizacion_bp  # Importar el Blueprint de ventas
 
 from src.db import get_connection
 from src.utils.Logger import Logger
