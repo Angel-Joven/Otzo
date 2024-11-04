@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from . import ventas_bp  # Importa el Blueprint de ventas
+from src.services.ventas.VentaService import VentaService
 
 
 @ventas_bp.route("/", methods=["GET"])
@@ -21,3 +22,18 @@ def handle_return():
     data = request.json
     # Procesa la devolución usando `data` y devuelve una respuesta
     return jsonify({"message": "Devolución procesada con éxito"})
+
+
+@ventas_bp.route("/test", methods=["POST"])
+def test():
+    data = request.json
+    venta = VentaService(
+        data["metodo_pago"],
+        data["monto_recibido"],
+        data["productos"],
+        data["id_cliente"],
+        data["id_trabajador"],
+    )
+    total_venta = venta.calcularTotal()
+    print(total_venta)
+    return jsonify({"total": total_venta})
