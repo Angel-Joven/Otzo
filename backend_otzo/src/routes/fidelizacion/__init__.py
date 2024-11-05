@@ -1,7 +1,7 @@
 from flask import Blueprint
 
-# Define el Blueprint para ventas
+#Definimos el Blueprint para fidelizacion
 fidelizacion_bp = Blueprint("fidelizacion", __name__)
 
-# Importa las rutas de ventas
+#Importamos las rutas de fidelizacion
 from . import routes

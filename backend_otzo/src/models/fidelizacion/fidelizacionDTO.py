@@ -2,25 +2,30 @@
 
 import json
 
+# ---------------------------------------------------------------------------------------------------------------------------
+
 class Serializable:
     def to_dict(self):
-        """Convierte el objeto en un diccionario."""
+        """Convertimos el objeto en un diccionario"""
         return self.__dict__
 
 
     def to_json(self):
-        """Convierte el objeto a formato JSON.""" 
+        """Convertimos el objeto a formato JSON""" 
         return json.dumps(self.to_dict())
 
     @classmethod
     def from_dict(cls, data):
-        """Crea un objeto desde un diccionario."""
-        return cls(**data)
+        """Creamos un objeto desde un diccionario, asimismo, eliminamos los guiones bajos de las claves"""
+        cleaned_data = {k.lstrip('_'): v for k, v in data.items()}
+        return cls(**cleaned_data)
 
     @classmethod
     def from_json(cls, json_data):
-        """Crea un objeto desde una cadena JSON."""
+        """Creamos un objeto desde una cadena JSON"""
         return cls.from_dict(json.loads(json_data))
+
+# ---------------------------------------------------------------------------------------------------------------------------
 
 class PuntosDTO(Serializable):
     def __init__(self, idclientes_puntos=None, idrango=None, total_puntos=0):
@@ -53,6 +58,8 @@ class PuntosDTO(Serializable):
     @total_puntos.setter
     def total_puntos(self, value):
         self._total_puntos = value
+
+# ---------------------------------------------------------------------------------------------------------------------------
 
 class RangosDTO(Serializable):
     def __init__(self, idrango=None, nombre_rango="", porcentaje_puntos=0, porcentaje_devolucionPuntos=0):
@@ -94,3 +101,53 @@ class RangosDTO(Serializable):
     @porcentaje_devolucionPuntos.setter
     def porcentaje_devolucionPuntos(self, value):
         self._porcentaje_devolucionPuntos = value
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+print("---------------------------------------------------------------------------------------------------------------------------")
+print("PUNTOS DTO")
+
+#PuntosDTO - EJEMPLO TEST
+puntos_dto = PuntosDTO(idclientes_puntos=1, idrango=5, total_puntos=100)
+
+#Convertimos a JSON - EJEMPLO TEST
+json_data = puntos_dto.to_json()
+print("JSON:", json_data)
+#JSON: {"_idclientes_puntos": 1, "_idrango": 5, "_total_puntos": 100}
+
+#Reconstruimos desde un JSON - EJEMPLO TEST
+nuevo_puntos_dto = PuntosDTO.from_json(json_data)
+print("Nuevo DTO:", nuevo_puntos_dto.to_dict())
+#Nuevo DTO: {'_idclientes_puntos': 1, '_idrango': 5, '_total_puntos': 100}
+
+print("ID del cliente:", puntos_dto.idclientes_puntos)
+print("Rango del cliente:", puntos_dto.idrango)
+print("Total de puntos del cliente:", puntos_dto.total_puntos)
+
+print("---------------------------------------------------------------------------------------------------------------------------")
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+print("RANGOS DTO")
+
+#PuntosDTO - EJEMPLO TEST
+rangos_dto = RangosDTO(idrango=1, nombre_rango='INVITADO', porcentaje_puntos=0, porcentaje_devolucionPuntos=0)
+
+#Convertimos a JSON - EJEMPLO TEST
+json_data = rangos_dto.to_json()
+print("JSON:", json_data)
+#JSON: {"_idrango": 1, "_nombre_rango": "INVITADO", "_porcentaje_puntos": 0, "_porcentaje_devolucionPuntos": 0}
+
+#Reconstruimos desde un JSON - EJEMPLO TEST
+nuevo_rangos_dto = RangosDTO.from_json(json_data)
+print("Nuevo DTO:", nuevo_rangos_dto.to_dict())
+#Nuevo DTO: {'_idrango': 1, '_nombre_rango': 'INVITADO', '_porcentaje_puntos': 0, '_porcentaje_devolucionPuntos': 0}
+
+print("ID del rango:", rangos_dto.idrango)
+print("Nombre del rango:", rangos_dto.nombre_rango)
+print("Porcentaje de puntos de compras para ese rango:", rangos_dto.porcentaje_puntos)
+print("Porcentaje de puntos de devoluciones para ese rango:", rangos_dto.porcentaje_devolucionPuntos)
+
+print("---------------------------------------------------------------------------------------------------------------------------")
+
+# ---------------------------------------------------------------------------------------------------------------------------
