@@ -30,7 +30,7 @@ def calcularPuntosCompra():
 
     puntos_service = PuntosService()
     puntos_obtenidos = puntos_service.calcular_puntos_compra(id_cliente, id_rango, precio_compra_total, porcentaje_compra_puntos)
-    return jsonify({"message": "Puntos de una compra calculados con exito"},{'Puntos obtenidos': puntos_obtenidos})
+    return jsonify({"message": "Puntos de una compra calculados con exito", 'Puntos obtenidos': puntos_obtenidos})
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ def calcularPuntosDevolucion():
 
     puntos_service = PuntosService()
     puntos_devolucion = puntos_service.calcular_puntos_devolucion(id_cliente, id_rango, precio_producto, porcentaje_devolucion_puntos)
-    return jsonify({"message": "Puntos de una devolucion calculados con exito"},{'Puntos devolucion': puntos_devolucion})
+    return jsonify({"message": "Puntos de una devolucion calculados con exito", 'Puntos devolucion': puntos_devolucion})
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
