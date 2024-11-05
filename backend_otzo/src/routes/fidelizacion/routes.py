@@ -175,4 +175,30 @@ def obtrng():
     finally:
         connection.close()
 
+# TEST para ver si hay registros en la tabla 'ventas' - BORRAR O COMENTAR EN PRODUCCION
+@fidelizacion_bp.route("/obtvts", methods=["GET"])
+def obtvts():
+    connection = get_connection()
+    if not connection:
+        Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
+        return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
+
+    try:
+        with connection.cursor(DictCursor) as cursor:
+            query = "SELECT * FROM ventas"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            
+            if result:
+                return jsonify({"Ventas": result})
+            else:
+                return jsonify({"message": "No se encontraron ventas", "ventas": []}), 200
+
+    except Exception as ex:
+        Logger.add_to_log("error", f"Error al obtener las ventas: {str(ex)}")
+        return jsonify({"error": f"Error al obtener las ventas: {str(ex)}"}), 500
+
+    finally:
+        connection.close()
+
 # ---------------------------------------------------------------------------------------------------------------------------
