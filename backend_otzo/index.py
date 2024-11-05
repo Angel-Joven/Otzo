@@ -8,7 +8,7 @@ app = init_app(configuration)
 CORS(app, resources={r"*": {"origins": "*"}})
 
 test_connection()
-test_query()
+# test_query()
 
 if __name__ == "__main__":
     app.run()
