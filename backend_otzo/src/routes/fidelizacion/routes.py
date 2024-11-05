@@ -1,122 +1,109 @@
-from flask import request, jsonify
-from . import fidelizacion_bp  # Importar el Blueprint de ventas
-
+from flask import request, jsonify, Response
+from . import fidelizacion_bp # Importar el Blueprint de fidelizacion
+from src.services.fidelizacion.fidelizacionService import PuntosService, RangosService
 from src.db import get_connection
-from src.utils.Logger import Logger
 
+from src.utils.Logger import Logger
 from pymysql.cursors import DictCursor
+
+# ---------------------------------------------------------------------------------------------------------------------------
 
 @fidelizacion_bp.route("/", methods=["GET"])
 def index():
     return jsonify({"mensaje": "Hola - Fidelizacion"})
 
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para calcular los puntos obtenidos de una compra
 @fidelizacion_bp.route("/calcularptscompra", methods=["POST"])
 def calcularPuntosCompra():
-    # Lógica para calcular los puntos de una compra
     data = request.json
-
-    id_cliente = data['id_cliente']
-    idrango = data['idrango']
-    precio_compra_total = data['precioCompraTotal']
-    porcentaje_compra_puntos = data['porcentajeCompraPuntos']
-    puntos_obtenidos = int(precio_compra_total * (porcentaje_compra_puntos / 100))
-
-    # Procesa los puntos usando `data` y devuelve una respuesta
-    return jsonify({"message": "Puntos de una compra calculados con éxito"},{'Puntos obtenidos': puntos_obtenidos})
-
-@fidelizacion_bp.route("/calcularptsdevolucion", methods=["POST"])
-def calcularPuntosDevolucion():
-    # Lógica para calcular los puntos de una devolucion
-    data = request.json
-
-    id_cliente = data['id_cliente']
-    idrango = data['idrango']
-    precio_producto = data['precioProducto']
-    porcentaje_devolucion_puntos = data['porcentajeDevolucionPuntos']
-    puntos_obtenidos = int(precio_producto * (porcentaje_devolucion_puntos / 100))
-
-    # Procesa los puntos usando `data` y devuelve una respuesta
-    return jsonify({"message": "Puntos de una devolucion calculados con éxito"},{'puntos_obtenidos': puntos_obtenidos})
-
-@fidelizacion_bp.route("/addptscompra", methods=["POST"])
-def añadirPuntosCompra():
-    # Lógica para añadir los puntos de una compra al cliente
-    data = request.json
-
-    id_cliente = data['id_cliente']
-    puntos_compra = data['puntosCompra']
+    id_cliente = data["id_cliente"]
+    id_rango = data["id_rango"]
+    precio_compra_total = data["precioCompraTotal"]
     
-    # Lógica para insertar o actualizar en la tabla 'puntos'
-    # Actualiza total_puntos en la tabla 'puntos' del cliente
-
-    # Procesa los puntos usando `data` y devuelve una respuesta
-    return jsonify({"message": "Puntos de una compra añadidos con éxito"})
-
-@fidelizacion_bp.route("/addptsdevolucion", methods=["POST"])
-def añadirPuntosDevolucion():
-    # Lógica para añadir los puntos de una devolucion al cliente
-    data = request.json
-
-    id_cliente = data['id_cliente']
-    puntos_devolucion = data['puntosDevolucion']
-
-    # Lógica de actualización en la tabla 'puntos' para la devolución
-    # Actualiza total_puntos en la tabla 'puntos' del cliente
-
-    # Procesa los puntos usando `data` y devuelve una respuesta
-    return jsonify({"message": "Puntos de una devolucion añadidos con éxito"})
-
-@fidelizacion_bp.route("/descontarpuntos", methods=["POST"])
-def descontarPuntos():
-    # Lógica para calcular los puntos que se descontaran de una compra
-    data = request.json
-
-    id_cliente = data['id_cliente']
-    precio_compra_total = data['precioCompraTotal']
+    rangos_service = RangosService()
+    porcentaje_compra_puntos = rangos_service.obtener_porcentaje_compra(id_rango)
     
-    # Consulta para obtener los puntos del cliente
-    puntos_totales = obtenerPuntos(id_cliente)
-    
-    if puntos_totales >= precio_compra_total:
-        # Resta puntos y procede con la transacción
-        return jsonify({'status': 'success', 'mensaje': 'Transacción completada con puntos'})
-    else:
-        # Notifica al usuario sobre puntos insuficientes
-        return jsonify({'status': 'failed', 'mensaje': f'Puntos Insuficientes. Actualmente tienes {puntos_totales} puntos.'})
+    if porcentaje_compra_puntos is None:
+        return jsonify({"error": "Rango no encontrado"}), 404
 
-    # Procesa los puntos usando `data` y devuelve una respuesta
-    #return jsonify({"message": "Puntos descontados de una compra con éxito"})
-
-id_cliente = 1 # test id
-
-@fidelizacion_bp.route("/obtenerpuntos", methods=["GET"])
-def obtenerPuntos(id_cliente=1):
-    connection = get_connection()
-    if not connection:
-        Logger.add_to_log("error", "No se pudo obtener la conexión a la base de datos.")
-        return 0
-
-    try:
-        with connection.cursor(DictCursor) as cursor:
-            query = "SELECT total_puntos FROM puntos WHERE idclientes_puntos = %s"
-            cursor.execute(query, (id_cliente,))
-            result = cursor.fetchone()
-            return result['total_puntos'] if result else jsonify({"message": "Puntos obtenidos correctamente del usuario"},{'Puntos del usuario': result})
-    except Exception as ex:
-        Logger.add_to_log("error", f"Error al obtener puntos para cliente {id_cliente}: {str(ex)}")
-        return 0
-    finally:
-        connection.close()
+    puntos_service = PuntosService()
+    puntos_obtenidos = puntos_service.calcular_puntos_compra(id_cliente, id_rango, precio_compra_total, porcentaje_compra_puntos)
+    return jsonify({"message": "Puntos de una compra calculados con exito"},{'Puntos obtenidos': puntos_obtenidos})
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
-# Test para ver si hay registros en la tabla 'clientes' - BORRAR O COMENTAR EN PRODUCCION
+#Ruta para calcular los puntos obtenidos de una devolucion
+@fidelizacion_bp.route("/calcularptsdevolucion", methods=["POST"])
+def calcularPuntosDevolucion():
+    data = request.json
+    id_cliente = data["id_cliente"]
+    id_rango = data["id_rango"]
+    precio_producto = data["precioProducto"]
+
+    rangos_service = RangosService()
+    porcentaje_devolucion_puntos = rangos_service.obtener_porcentaje_devolucion(id_rango)
+    
+    if porcentaje_devolucion_puntos is None:
+        return jsonify({"error": "Rango no encontrado"}), 404
+
+    puntos_service = PuntosService()
+    puntos_devolucion = puntos_service.calcular_puntos_devolucion(id_cliente, id_rango, precio_producto, porcentaje_devolucion_puntos)
+    return jsonify({"message": "Puntos de una devolucion calculados con exito"},{'Puntos devolucion': puntos_devolucion})
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para añadir los puntos obtenidos de una compra
+@fidelizacion_bp.route("/addptscompra", methods=["POST"])
+def añadirPuntosCompra():
+    data = request.json
+    id_cliente = data["id_cliente"]
+    puntos_compra = data["puntosCompra"]
+
+    puntos_service = PuntosService()
+    puntos_service.añadir_puntos_compra(id_cliente, puntos_compra)
+    return jsonify({"message": "Puntos de una compra añadidos con exito"})
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para añadir los puntos obtenidos de una devolucion
+@fidelizacion_bp.route("/añadirPuntosDevolucion", methods=["POST"])
+def añadirPuntosDevolucion():
+    data = request.json
+    id_cliente = data["id_cliente"]
+    puntos_devolucion = data["puntosDevolucion"]
+
+    puntos_service = PuntosService()
+    puntos_service.añadir_puntos_devolucion(id_cliente, puntos_devolucion)
+    return jsonify({"message": "Puntos de una devolucion añadidos con exito"})
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para descontar puntos de una compra
+@fidelizacion_bp.route("/descontarpuntos", methods=["POST"])
+def descontarPuntos():
+    data = request.json
+    id_cliente = data["id_cliente"]
+    precio_compra_total = data["precioCompraTotal"]
+
+    puntos_service = PuntosService()
+    resultado = puntos_service.descontar_puntos(id_cliente, precio_compra_total)
+    
+    if resultado["exito"]:
+        return jsonify({"message": "Puntos descontados con exito", "Puntos restantes": resultado["puntos_restantes"]})
+    else:
+        return jsonify({"message": resultado["mensaje"]}), 400
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+# TEST para ver si hay registros en la tabla 'clientes' - BORRAR O COMENTAR EN PRODUCCION
 @fidelizacion_bp.route("/obtcli", methods=["GET"])
 def obtcli():
     connection = get_connection()
     if not connection:
-        Logger.add_to_log("error", "No se pudo obtener la conexión a la base de datos.")
-        return jsonify({"error": "No se pudo obtener la conexión a la base de datos."}), 500
+        Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
+        return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
 
     try:
         with connection.cursor(DictCursor) as cursor:
@@ -136,13 +123,13 @@ def obtcli():
     finally:
         connection.close()
 
-# Test para ver si hay registros en la tabla 'puntos' - BORRAR O COMENTAR EN PRODUCCION
+# TEST para ver si hay registros en la tabla 'puntos' - BORRAR O COMENTAR EN PRODUCCION
 @fidelizacion_bp.route("/obtpts", methods=["GET"])
 def obtpts():
     connection = get_connection()
     if not connection:
-        Logger.add_to_log("error", "No se pudo obtener la conexión a la base de datos.")
-        return jsonify({"error": "No se pudo obtener la conexión a la base de datos."}), 500
+        Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
+        return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
 
     try:
         with connection.cursor(DictCursor) as cursor:
@@ -162,13 +149,13 @@ def obtpts():
     finally:
         connection.close()
 
-# Test para ver si hay registros en la tabla 'rangos' - BORRAR O COMENTAR EN PRODUCCION
+# TEST para ver si hay registros en la tabla 'rangos' - BORRAR O COMENTAR EN PRODUCCION
 @fidelizacion_bp.route("/obtrng", methods=["GET"])
 def obtrng():
     connection = get_connection()
     if not connection:
-        Logger.add_to_log("error", "No se pudo obtener la conexión a la base de datos.")
-        return jsonify({"error": "No se pudo obtener la conexión a la base de datos."}), 500
+        Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
+        return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
 
     try:
         with connection.cursor(DictCursor) as cursor:
