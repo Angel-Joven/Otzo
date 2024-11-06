@@ -27,3 +27,6 @@ dist-ssr
 venv
 __pycache__
 .env
+
+# Ignorar archivo package-lock.json
+package-lock.json

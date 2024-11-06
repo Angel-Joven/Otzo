@@ -11,6 +11,8 @@ def init_app(config):
 
     # Blueprints
     app.register_blueprint(ventas.ventas_bp, url_prefix="/api/ventas/")
-    app.register_blueprint(fidelizacion.fidelizacion_bp, url_prefix="/api/fidelizacion/")
+    app.register_blueprint(
+        fidelizacion.fidelizacion_bp, url_prefix="/api/fidelizacion/"
+    )
 
     return app

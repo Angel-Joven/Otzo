@@ -23,7 +23,7 @@ def index():
 
     with connection.cursor(DictCursor) as cursor:
         cursor.execute(
-            "SELECT * FROM venta",
+            "SELECT * FROM ventas",
         )
         resultado = cursor.fetchall()
         print(resultado)
