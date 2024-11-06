@@ -130,7 +130,14 @@ class VentaService(VentaModelo):
             print("Monto recibido insuficiente.")
             return {"exito": False, "mensaje": "Monto insuficiente para completar la compra"}
         
-        #OBTENCION Y ACTUALIZACION DE LOS PUNTOS DEVOLUCION - FIDELIZACION
+        #ACTUALIZACION DEL RANGO DEL USUARIO - FIDELIZACION
+        try:
+            resultado_rango = rangos_service.actualizarRangoPorHistorialCompras(self.id_cliente)
+            print(resultado_rango["mensaje"])
+        except Exception as e:
+            print("Error al actualizar el rango del cliente:", e)
+
+        #OBTENCION Y ACTUALIZACION DE LOS PUNTOS DE UNA COMPRA - FIDELIZACION
         try:
             id_rango = rangos_service.obtener_rango_cliente(self.id_cliente)
             porcentaje_compra_puntos = rangos_service.obtener_porcentaje_compra(id_rango)
@@ -166,7 +173,7 @@ class DetalleVentaService(DetalleVentaModelo):
 
     def devolverProducto(self, id_cliente, id_venta, precio_unitario):
 
-        #OBTENCION Y ACTUALIZACION DE LOS PUNTOS DEVOLUCION - FIDELIZACION
+        #OBTENCION Y ACTUALIZACION DE LOS PUNTOS DE UNA DEVOLUCION - FIDELIZACION
         puntos_service = PuntosService()
         rangos_service = RangosService()
         try:
