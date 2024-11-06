@@ -17,6 +17,8 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos de una compra calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de compra calculados para el rango 1: ", data)
 
     def test_calcularPuntosCompraRango2(self):
         response = self.app.post('/api/fidelizacion/calcularptscompra', json={
@@ -27,6 +29,8 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos de una compra calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de compra calculados para el rango 2: ", data)
 
     def test_calcularPuntosCompraRango3(self):
         response = self.app.post('/api/fidelizacion/calcularptscompra', json={
@@ -37,6 +41,8 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos de una compra calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de compra calculados para el rango 3: ", data)
 
     def test_calcularPuntosCompraRango4(self):
         response = self.app.post('/api/fidelizacion/calcularptscompra', json={
@@ -47,6 +53,32 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos de una compra calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de compra calculados para el rango 4: ", data)
+
+    def test_calcularPuntosCompraRango5(self):
+        response = self.app.post('/api/fidelizacion/calcularptscompra', json={
+            "id_cliente": 1,
+            "id_rango": 5,
+            "precioCompraTotal": 1000
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Puntos de una compra calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de compra calculados para el rango 5: ", data)
+    
+    def test_calcularPuntosCompraRango6(self):
+        response = self.app.post('/api/fidelizacion/calcularptscompra', json={
+            "id_cliente": 1,
+            "id_rango": 6,
+            "precioCompraTotal": 1000
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Puntos de una compra calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de compra calculados para el rango 6: ", data)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -59,6 +91,8 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos de una devolucion calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de devolucion calculados para el rango 1: ", data)
 
     def test_calcularPuntosDevolucionRango2(self):
         response = self.app.post('/api/fidelizacion/calcularptsdevolucion', json={
@@ -69,6 +103,8 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos de una devolucion calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de devolucion calculados para el rango 2: ", data)
 
     def test_calcularPuntosDevolucionRango3(self):
         response = self.app.post('/api/fidelizacion/calcularptsdevolucion', json={
@@ -79,6 +115,8 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos de una devolucion calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de devolucion calculados para el rango 3: ", data)
 
     def test_calcularPuntosDevolucionRango4(self):
         response = self.app.post('/api/fidelizacion/calcularptsdevolucion', json={
@@ -89,6 +127,32 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos de una devolucion calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de devolucion calculados para el rango 4: ", data)
+
+    def test_calcularPuntosDevolucionRango5(self):
+        response = self.app.post('/api/fidelizacion/calcularptsdevolucion', json={
+            "id_cliente": 1,
+            "id_rango": 5,
+            "precioProducto": 100
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Puntos de una devolucion calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de devolucion calculados para el rango 5: ", data)
+    
+    def test_calcularPuntosDevolucionRango6(self):
+        response = self.app.post('/api/fidelizacion/calcularptsdevolucion', json={
+            "id_cliente": 1,
+            "id_rango": 6,
+            "precioProducto": 100
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Puntos de una devolucion calculados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de devolucion calculados para el rango 6: ", data)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -101,6 +165,8 @@ class TestFidelizacion(unittest.TestCase):
             data = response.get_json()
             self.assertEqual(response.status_code, 200)
             self.assertIn("Puntos de una compra añadidos con exito", data["message"])
+            print("---------------------------------------------------------------------------------------------------------------------------")
+            print("Puntos de una compra añadidos con exito: ", data)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 

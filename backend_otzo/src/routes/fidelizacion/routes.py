@@ -109,7 +109,8 @@ def obtcli():
         with connection.cursor(DictCursor) as cursor:
             query = "SELECT * FROM clientes"
             cursor.execute(query)
-            result = cursor.fetchone()
+            #result = cursor.fetchone()
+            result = cursor.fetchall()
             
             if result:
                 return jsonify({"Clientes": result})
@@ -135,7 +136,8 @@ def obtpts():
         with connection.cursor(DictCursor) as cursor:
             query = "SELECT * FROM puntos"
             cursor.execute(query)
-            result = cursor.fetchone()
+            #result = cursor.fetchone()
+            result = cursor.fetchall()
             
             if result:
                 return jsonify({"Puntos": result})
@@ -161,7 +163,8 @@ def obtrng():
         with connection.cursor(DictCursor) as cursor:
             query = "SELECT * FROM rangos"
             cursor.execute(query)
-            result = cursor.fetchone()
+            #result = cursor.fetchone()
+            result = cursor.fetchall()
             
             if result:
                 return jsonify({"Rangos": result})
@@ -187,7 +190,8 @@ def obtvts():
         with connection.cursor(DictCursor) as cursor:
             query = "SELECT * FROM ventas"
             cursor.execute(query)
-            result = cursor.fetchone()
+            #result = cursor.fetchone()
+            result = cursor.fetchall()
             
             if result:
                 return jsonify({"Ventas": result})
