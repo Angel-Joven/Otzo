@@ -108,13 +108,14 @@ class VentaService(VentaModelo):
 
                 for producto in self.productos:
                     cursor.execute(
-                        "INSERT INTO detalle_ventas (id_venta, nombre_producto, codigo_producto, precio_unitario, categoria_producto, cantidad) VALUES (%s, %s, %s, %s, %s, %s)",
+                        "INSERT INTO detalle_ventas (id_venta, nombre_producto, codigo_producto, precio_unitario, categoria_producto, cantidad) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                         (
                             id_venta,
                             producto["nombre_producto"],
                             producto["codigo_producto"],
                             producto["precio_unitario"],
                             producto["categoria_producto"],
+                            producto["devuelto"],
                             producto["cantidad"],
                         ),
                     )
