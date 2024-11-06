@@ -49,14 +49,20 @@ class PuntosDTO(Serializable):
     # Setters
     @idclientes_puntos.setter
     def idclientes_puntos(self, value):
+        if value is not None and value < 0:
+            raise ValueError("El ID del cliente no puede ser negativo")
         self._idclientes_puntos = value
 
     @idrango.setter
     def idrango(self, value):
+        if value is not None and value < 0:
+            raise ValueError("El ID del rango no puede ser negativo")
         self._idrango = value
 
     @total_puntos.setter
     def total_puntos(self, value):
+        if value < 0:
+            raise ValueError("Los puntos no pueden ser negativos")
         self._total_puntos = value
 
 # ---------------------------------------------------------------------------------------------------------------------------
@@ -88,18 +94,26 @@ class RangosDTO(Serializable):
     # Setters
     @idrango.setter
     def idrango(self, value):
+        if value is not None and value < 0:
+            raise ValueError("El ID del rango no puede ser negativo")
         self._idrango = value
 
     @nombre_rango.setter
     def nombre_rango(self, value):
+        if not value:
+            raise ValueError("El nombre del rango no puede estar vacio")
         self._nombre_rango = value
 
     @porcentaje_puntos.setter
     def porcentaje_puntos(self, value):
+        if not (0 <= value <= 100):
+            raise ValueError("El porcentaje de puntos de una compra debe estar entre 0 y 100")
         self._porcentaje_puntos = value
 
     @porcentaje_devolucionPuntos.setter
     def porcentaje_devolucionPuntos(self, value):
+        if not (0 <= value <= 100):
+            raise ValueError("El porcentaje de devolucion de puntos debe estar entre 0 y 100")
         self._porcentaje_devolucionPuntos = value
 
 # ---------------------------------------------------------------------------------------------------------------------------

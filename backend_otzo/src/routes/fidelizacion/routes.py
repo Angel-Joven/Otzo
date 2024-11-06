@@ -14,43 +14,87 @@ def index():
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
+@fidelizacion_bp.route("/asigrnginiauto", methods=["GET"])
+def asignarRangoInicialAutomatico():
+    try:
+        rangos_service = RangosService()
+        resultado = rangos_service.asignarRangoInicialAuto()
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+@fidelizacion_bp.route("/actualizarrango", methods=["POST"])
+def actualizarRango():
+    try:
+        data = request.json
+        id_cliente = data["id_cliente"]
+
+        rangos_service = RangosService()
+        resultado = rangos_service.actualizarRangoPorHistorialCompras(id_cliente)
+
+        return jsonify(resultado), 200 if "nuevo_rango" in resultado else 400
+    except Exception as e:
+        return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
 #Ruta para calcular los puntos obtenidos de una compra
 @fidelizacion_bp.route("/calcularptscompra", methods=["POST"])
 def calcularPuntosCompra():
-    data = request.json
-    id_cliente = data["id_cliente"]
-    id_rango = data["id_rango"]
-    precio_compra_total = data["precioCompraTotal"]
-    
-    rangos_service = RangosService()
-    porcentaje_compra_puntos = rangos_service.obtener_porcentaje_compra(id_rango)
-    
-    if porcentaje_compra_puntos is None:
-        return jsonify({"error": "Rango no encontrado"}), 404
+    try:
+        data = request.json
+        id_cliente = data["id_cliente"]
+        id_rango = data["id_rango"]
+        precio_compra_total = data["precioCompraTotal"]
 
-    puntos_service = PuntosService()
-    puntos_obtenidos = puntos_service.calcular_puntos_compra(id_cliente, id_rango, precio_compra_total, porcentaje_compra_puntos)
-    return jsonify({"message": "Puntos de una compra calculados con exito", 'Puntos obtenidos': puntos_obtenidos})
+        if precio_compra_total < 0:
+            return jsonify({"error": "El precio de la compra no puede ser negativo"}), 404
+        
+        rangos_service = RangosService()
+        porcentaje_compra_puntos = rangos_service.obtener_porcentaje_compra(id_rango)
+        
+        if porcentaje_compra_puntos is None:
+            return jsonify({"error": "Rango no encontrado"}), 404
+
+        puntos_service = PuntosService()
+        puntos_obtenidos = puntos_service.calcular_puntos_compra(id_cliente, id_rango, precio_compra_total, porcentaje_compra_puntos)
+        return jsonify({"message": "Puntos de una compra calculados con exito", 'Puntos obtenidos': puntos_obtenidos})
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
 #Ruta para calcular los puntos obtenidos de una devolucion
 @fidelizacion_bp.route("/calcularptsdevolucion", methods=["POST"])
 def calcularPuntosDevolucion():
-    data = request.json
-    id_cliente = data["id_cliente"]
-    id_rango = data["id_rango"]
-    precio_producto = data["precioProducto"]
+    try:
+        data = request.json
+        id_cliente = data["id_cliente"]
+        id_rango = data["id_rango"]
+        precio_producto = data["precioProducto"]
 
-    rangos_service = RangosService()
-    porcentaje_devolucion_puntos = rangos_service.obtener_porcentaje_devolucion(id_rango)
-    
-    if porcentaje_devolucion_puntos is None:
-        return jsonify({"error": "Rango no encontrado"}), 404
+        if precio_producto < 0:
+            return jsonify({"error": "El precio del producto no puede ser negativo"}), 404
 
-    puntos_service = PuntosService()
-    puntos_devolucion = puntos_service.calcular_puntos_devolucion(id_cliente, id_rango, precio_producto, porcentaje_devolucion_puntos)
-    return jsonify({"message": "Puntos de una devolucion calculados con exito", 'Puntos devolucion': puntos_devolucion})
+        rangos_service = RangosService()
+        porcentaje_devolucion_puntos = rangos_service.obtener_porcentaje_devolucion(id_rango)
+        
+        if porcentaje_devolucion_puntos is None:
+            return jsonify({"error": "Rango no encontrado"}), 404
+
+        puntos_service = PuntosService()
+        puntos_devolucion = puntos_service.calcular_puntos_devolucion(id_cliente, id_rango, precio_producto, porcentaje_devolucion_puntos)
+        return jsonify({"message": "Puntos de una devolucion calculados con exito", 'Puntos devolucion': puntos_devolucion})
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -63,7 +107,7 @@ def añadirPuntosCompra():
 
     puntos_service = PuntosService()
     puntos_service.añadir_puntos_compra(id_cliente, puntos_compra)
-    return jsonify({"message": "Puntos de una compra añadidos con exito"})
+    return jsonify({"message": "Puntos de una compra añadidos con exito", "Puntos Compra": puntos_compra})
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -86,6 +130,9 @@ def descontarPuntos():
     data = request.json
     id_cliente = data["id_cliente"]
     precio_compra_total = data["precioCompraTotal"]
+
+    if precio_compra_total < 0:
+        return jsonify({"error": "El precio de la compra no puede ser negativo"}), 404
 
     puntos_service = PuntosService()
     resultado = puntos_service.descontar_puntos(id_cliente, precio_compra_total)

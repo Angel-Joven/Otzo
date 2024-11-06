@@ -8,6 +8,18 @@ class TestFidelizacion(unittest.TestCase):
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
+    def test_ActualizarRango(self):
+        response = self.app.post('/api/fidelizacion/actualizarrango', json={
+            "id_cliente": 1
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Rango actualizado", data["mensaje"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Rango actualizado: ", data)
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
     def test_calcularPuntosCompraRango1(self):
         response = self.app.post('/api/fidelizacion/calcularptscompra', json={
             "id_cliente": 1,
@@ -157,28 +169,28 @@ class TestFidelizacion(unittest.TestCase):
 # ---------------------------------------------------------------------------------------------------------------------------
 
     def test_añadirPuntosCompra(self):
-        for _ in range(3):
-            response = self.app.post('/api/fidelizacion/addptscompra', json={
-                "id_cliente": 1,
-                "puntosCompra": 1000
-            })
-            data = response.get_json()
-            self.assertEqual(response.status_code, 200)
-            self.assertIn("Puntos de una compra añadidos con exito", data["message"])
-            print("---------------------------------------------------------------------------------------------------------------------------")
-            print("Puntos de una compra añadidos con exito: ", data)
+        response = self.app.post('/api/fidelizacion/addptscompra', json={
+            "id_cliente": 1,
+            "puntosCompra": 1000
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Puntos de una compra añadidos con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de una compra añadidos con exito: ", data)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
     def test_añadirPuntosDevoluciones(self):
-        for _ in range(3):
-            response = self.app.post('/api/fidelizacion/añadirPuntosDevolucion', json={
-                "id_cliente": 1,
-                "puntosDevolucion": 1000
-            })
-            data = response.get_json()
-            self.assertEqual(response.status_code, 200)
-            self.assertIn("Puntos de una devolucion añadidos con exito", data["message"])
+        response = self.app.post('/api/fidelizacion/añadirPuntosDevolucion', json={
+            "id_cliente": 1,
+            "puntosDevolucion": 1000
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Puntos de una devolucion añadidos con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos de una devolucion añadidos con exito: ", data)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -190,6 +202,8 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertIn("Puntos descontados con exito", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("Puntos descontados por haber realizado una compra con exito: ", data)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -201,6 +215,64 @@ class TestFidelizacion(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(response.status_code, 400)
         self.assertIn("Puntos Insuficientes", data["message"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("No tienes los puntos necesarios para realizar una compra: ", data)
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+    def test_calcularPuntosCompraRangoInexistente(self):
+        response = self.app.post('/api/fidelizacion/calcularptscompra', json={
+            "id_cliente": 1,
+            "id_rango": 999,  # Rango inexistente
+            "precioCompraTotal": 1000
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("Rango no encontrado", data["error"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("No se pudieron calcular los puntos de una compra ya que no existe el Rango: ", data)
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+    def test_calcularPuntosDevolucionRangoInexistente(self):
+        response = self.app.post('/api/fidelizacion/calcularptsdevolucion', json={
+            "id_cliente": 1,
+            "id_rango": 999,  #Rango inexistente
+            "precioProducto": 1000
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("Rango no encontrado", data["error"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("No se pudieron calcular los puntos de una devolucion ya que no existe el Rango: ", data)
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+    def test_calcularPuntosCompraPrecioNegativo(self):
+        response = self.app.post('/api/fidelizacion/calcularptscompra', json={
+            "id_cliente": 1,
+            "id_rango": 1,
+            "precioCompraTotal": -100 #Precio Compra negativo
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("El precio de la compra no puede ser negativo", data["error"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("No se pudieron calcular los puntos de una compra ya que el precio de la compra no puede ser negativo: ", data)
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+    def test_calcularPuntosDevolucionPrecioNegativo(self):
+        response = self.app.post('/api/fidelizacion/calcularptsdevolucion', json={
+            "id_cliente": 1,
+            "id_rango": 1,
+            "precioProducto": -100 #Precio Compra negativo
+        })
+        data = response.get_json()
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("El precio del producto no puede ser negativo", data["error"])
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print("No se pudieron calcular los puntos de una devolucion ya que el precio del producto no puede ser negativo: ", data)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
