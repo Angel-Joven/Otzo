@@ -1,5 +1,8 @@
-from src.models.ventas.VentasModels import VentaModelo, DetalleVentaModelo
-from src.services.fidelizacion.fidelizacionService import PuntosService, RangosService #Para calcular los puntos - FIDELIZACION
+from backend_otzo.src.models.ventas.VentasModelos import VentaModelo, DetalleVentaModelo
+from src.services.fidelizacion.fidelizacionService import (
+    PuntosService,
+    RangosService,
+)  # Para calcular los puntos - FIDELIZACION
 
 from src.db import get_connection
 
@@ -75,26 +78,25 @@ class VentaService(VentaModelo):
     def agregarVenta(self):
         self.calcularTotal()
 
-        #if self.totalVenta <= self.monto_recibido and self.posible:
-            #connection = get_connection()
+        # ---------------------------------------------------------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------------------------------------------------------
-
-        #FIDELIZACION
+        # FIDELIZACION
         puntos_service = PuntosService()
         rangos_service = RangosService()
 
-        #Pago con puntos - FIDELIZACION
+        # Pago con puntos - FIDELIZACION
         if self.metodo_pago.lower() == "puntos":
-            resultado = puntos_service.descontar_puntos(self.id_cliente, self.totalVenta)
+            resultado = puntos_service.descontar_puntos(
+                self.id_cliente, self.totalVenta
+            )
             if not resultado["exito"]:
                 print(resultado["mensaje"])
                 return {"exito": False, "mensaje": resultado["mensaje"]}
             print("Compra realizada con puntos.")
-        
-# ---------------------------------------------------------------------------------------------------------------------------
 
-        #Pago con dinero
+        # ---------------------------------------------------------------------------------------------------------------------------
+
+        # Pago con dinero
         elif self.totalVenta <= self.monto_recibido and self.posible:
             connection = get_connection()
             with connection.cursor() as cursor:
@@ -132,35 +134,42 @@ class VentaService(VentaModelo):
             connection.close()
         else:
             print("Monto recibido insuficiente.")
-            return {"exito": False, "mensaje": "Monto insuficiente para completar la compra"}
-        
-# ---------------------------------------------------------------------------------------------------------------------------
+            return {
+                "exito": False,
+                "mensaje": "Monto insuficiente para completar la compra",
+            }
 
-        #ACTUALIZACION DEL RANGO DEL USUARIO - FIDELIZACION
+        # ---------------------------------------------------------------------------------------------------------------------------
+
+        # ACTUALIZACION DEL RANGO DEL USUARIO - FIDELIZACION
         try:
-            resultado_rango = rangos_service.actualizarRangoPorHistorialCompras(self.id_cliente)
+            resultado_rango = rangos_service.actualizarRangoPorHistorialCompras(
+                self.id_cliente
+            )
             print(resultado_rango["mensaje"])
         except Exception as e:
             print("Error al actualizar el rango del cliente:", e)
 
-        #OBTENCION Y ACTUALIZACION DE LOS PUNTOS DE UNA COMPRA - FIDELIZACION
+        # OBTENCION Y ACTUALIZACION DE LOS PUNTOS DE UNA COMPRA - FIDELIZACION
         try:
             id_rango = rangos_service.obtener_rango_cliente(self.id_cliente)
-            porcentaje_compra_puntos = rangos_service.obtener_porcentaje_compra(id_rango)
+            porcentaje_compra_puntos = rangos_service.obtener_porcentaje_compra(
+                id_rango
+            )
             puntos_obtenidos = puntos_service.calcular_puntos_compra(
                 id_cliente=self.id_cliente,
                 idrango=id_rango,
                 precio_compra_total=self.totalVenta,
-                porcentaje_compra_puntos=porcentaje_compra_puntos
+                porcentaje_compra_puntos=porcentaje_compra_puntos,
             )
-            #Añadimos/actualizamos los puntos de una compra en la BD
+            # Añadimos/actualizamos los puntos de una compra en la BD
             puntos_service.añadir_puntos_compra(self.id_cliente, puntos_obtenidos)
             print("Puntos añadidos con éxito:", puntos_obtenidos)
         except Exception as e:
             print("Error al procesar los puntos de la compra:", e)
 
-# ---------------------------------------------------------------------------------------------------------------------------
-        
+        # ---------------------------------------------------------------------------------------------------------------------------
+
         print("Venta hecha correctamente")
         return {"exito": True, "mensaje": "Venta completada"}
 
@@ -182,24 +191,25 @@ class DetalleVentaService(DetalleVentaModelo):
 
     def devolverProducto(self, id_cliente, id_venta, precio_unitario):
 
+        # ---------------------------------------------------------------------------------------------------------------------------
 
-
-# ---------------------------------------------------------------------------------------------------------------------------
-
-        #OBTENCION Y ACTUALIZACION DE LOS PUNTOS DE UNA DEVOLUCION - FIDELIZACION
+        # OBTENCION Y ACTUALIZACION DE LOS PUNTOS DE UNA DEVOLUCION - FIDELIZACION
         puntos_service = PuntosService()
         rangos_service = RangosService()
         try:
-            #Calculamos los puntos de una devolucion basados en el rango del cliente y el precio del producto
+            # Calculamos los puntos de una devolucion basados en el rango del cliente y el precio del producto
             puntos_devolucion = puntos_service.calcular_puntos_devolucion(
                 id_cliente=id_cliente,
                 idrango=rangos_service.obtener_rango_cliente(id_cliente),
                 precio_producto=self.precio_unitario,
-                porcentaje_devolucion_puntos=rangos_service.obtener_porcentaje_devolucion(rangos_service.obtener_rango_cliente(id_cliente))
+                porcentaje_devolucion_puntos=rangos_service.obtener_porcentaje_devolucion(
+                    rangos_service.obtener_rango_cliente(id_cliente)
+                ),
             )
-            #Añadimos/actualizamos los puntos de una devolucion en la BD
+            # Añadimos/actualizamos los puntos de una devolucion en la BD
             puntos_service.añadir_puntos_devolucion(id_cliente, puntos_devolucion)
         except Exception as e:
             print("Error al procesar los puntos de la devolucion:", e)
+
 
 # ---------------------------------------------------------------------------------------------------------------------------

@@ -1,17 +1,17 @@
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass
 from datetime import datetime
 
 
 @dataclass
 class DetalleVentasDTO:
-    _id_detalle_venta: int
-    _id_venta: int
-    _nombre_producto: str
+    _id_producto: int
     _codigo_producto: str
-    _precio_unitario: float
+    _nombre_producto: str
     _categoria_producto: str
-    _devuelto: bool
+    _precio_unitario: float = 0
+    _id_detalle_venta: int = None
+    _id_venta: int = None
+    _devuelto: bool = False
 
     @property
     def id_detalle_venta(self) -> int:
@@ -35,8 +35,8 @@ class DetalleVentasDTO:
 
     @nombre_producto.setter
     def nombre_producto(self, value: str):
-        if len(value) < 3:
-            raise ValueError("El nombre del producto debe tener al menos 3 caracteres")
+        if len(value) == 0:
+            raise ValueError("El nombre del producto debe tener al menos 1 caracter")
         self._nombre_producto = value
 
     @property
@@ -45,8 +45,9 @@ class DetalleVentasDTO:
 
     @codigo_producto.setter
     def codigo_producto(self, value: str):
-        if len(value) < 5:
-            raise ValueError("El código del producto debe tener al menos 5 caracteres")
+        # TODO: Cambiar por el numero de caracteres de inventario
+        if len(value) == 0:
+            raise ValueError("El código del producto debe tener al menos 1 caracter")
         self._codigo_producto = value
 
     @property
@@ -65,10 +66,8 @@ class DetalleVentasDTO:
 
     @categoria_producto.setter
     def categoria_producto(self, value: str):
-        if len(value) < 3:
-            raise ValueError(
-                "La categoría del producto debe tener al menos 3 caracteres"
-            )
+        if len(value) == 0:
+            raise ValueError("La categoría del producto debe tener al menos 1 caracter")
         self._categoria_producto = value
 
     @property
@@ -79,31 +78,43 @@ class DetalleVentasDTO:
     def devuelto(self, value: bool):
         self._devuelto = value
 
+    def mapear_datos(self):
+        pass
+
 
 @dataclass
 class VentaDTO:
-    _id_venta: int
-    _total_venta: float
+    _monto_recibido: float
     _fecha_venta: datetime
     _metodo_pago: str
     _id_cliente: int
-    _id_trabajador: int
-    detalles_ventas: List[DetalleVentasDTO] = field(default_factory=list)
+    _id_empleado: int
+    _detalles_venta: list
+    _total_venta: float = 0
+    _id_venta: int = None
 
     @property
     def id_venta(self) -> int:
         return self._id_venta
 
     @id_venta.setter
-    def id_venta(self, value: int):
+    def id_venta(self, value: int) -> None:
         self._id_venta = value
+
+    @property
+    def monto_recibido(self) -> float:
+        return self._monto_recibido
+
+    @monto_recibido.setter
+    def monto_recibido(self, value: float) -> None:
+        self._monto_recibido = value
 
     @property
     def total_venta(self) -> float:
         return self._total_venta
 
     @total_venta.setter
-    def total_venta(self, value: float):
+    def total_venta(self, value: float) -> None:
         if value < 0:
             raise ValueError("El total de la venta no puede ser negativo")
         self._total_venta = value
@@ -113,7 +124,7 @@ class VentaDTO:
         return self._fecha_venta
 
     @fecha_venta.setter
-    def fecha_venta(self, value: datetime):
+    def fecha_venta(self, value: datetime) -> None:
         if value < datetime.now():
             raise ValueError("La fecha de venta no puede ser anterior a la actual")
         self._fecha_venta = value
@@ -124,7 +135,7 @@ class VentaDTO:
 
     @metodo_pago.setter
     def metodo_pago(self, value: str):
-        if value not in ["efectivo", "t_debito", "t_credito"]:
+        if value not in ["efectivo", "t_debito", "t_credito", "puntos"]:
             raise ValueError("Método de pago no válido")
         self._metodo_pago = value
 
@@ -137,55 +148,17 @@ class VentaDTO:
         self._id_cliente = value
 
     @property
-    def id_trabajador(self) -> int:
-        return self._id_trabajador
+    def id_empleado(self) -> int:
+        return self._id_empleado
 
-    @id_trabajador.setter
-    def id_trabajador(self, value: int):
-        self._id_trabajador = value
+    @id_empleado.setter
+    def id_empleado(self, value: int):
+        self._id_empleado = value
 
-    def agregar_detalle_venta(self, detalle_venta: DetalleVentasDTO):
-        self.detalles_ventas.append(detalle_venta)
+    @property
+    def detalles_venta(self) -> list:
+        return self._detalles_venta
 
-
-# Crear un detalle de venta
-detalle_venta1 = DetalleVentasDTO(
-    _id_detalle_venta=1,
-    _id_venta=101,
-    _nombre_producto="Laptop",
-    _codigo_producto="ABC123",
-    _precio_unitario=999.99,
-    _categoria_producto="Electrónica",
-    _devuelto=False,
-)
-
-# Crear una venta y añadir el detalle de venta
-venta = VentaDTO(
-    _id_venta=101,
-    _total_venta=999.99,
-    _fecha_venta=datetime.now(),
-    _metodo_pago="t_debito",
-    _id_cliente=1001,
-    _id_trabajador=501,
-)
-
-# Añadir el detalle de venta a la venta
-venta.agregar_detalle_venta(detalle_venta1)
-
-# Imprimir detalles de la venta y sus detalles de venta
-print(f"ID de Venta: {venta.id_venta}")
-print(f"Total de Venta: {venta.total_venta}")
-print(f"Fecha de Venta: {venta.fecha_venta}")
-print(f"Método de Pago: {venta.metodo_pago}")
-print(f"ID de Cliente: {venta.id_cliente}")
-print(f"ID de Trabajador: {venta.id_trabajador}")
-
-# Imprimir detalles de cada detalle de venta
-for detalle in venta.detalles_ventas:
-    print(f"\nID de Detalle de Venta: {detalle.id_detalle_venta}")
-    print(f"ID de Venta: {detalle.id_venta}")
-    print(f"Nombre del Producto: {detalle.nombre_producto}")
-    print(f"Código del Producto: {detalle.codigo_producto}")
-    print(f"Precio Unitario: {detalle.precio_unitario}")
-    print(f"Categoría del Producto: {detalle.categoria_producto}")
-    print(f"Devuelto: {detalle.devuelto}")
+    @detalles_venta.setter
+    def detalles_venta(self, value: DetalleVentasDTO):
+        self._detalles_venta.append(value)

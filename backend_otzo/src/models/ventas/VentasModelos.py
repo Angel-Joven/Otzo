@@ -7,7 +7,7 @@ class VentaModelo(ABC):
         pass
 
     @abstractmethod
-    def calcularTotal(self):
+    def calcularTotalVenta(self):
         pass
 
 

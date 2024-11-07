@@ -1,11 +1,14 @@
 from flask import request, jsonify, Response
-from . import ventas_bp  # Importa el Blueprint de ventas
-from src.services.ventas.VentaService import VentaService
-from src.db import get_connection
 from pymysql.cursors import DictCursor
-import json
-from decimal import Decimal
+from src.db import get_connection
 from datetime import datetime
+from decimal import Decimal
+from . import ventas_bp  # Importa el Blueprint de ventas
+import json
+
+from src.models.ventas.VentasDTOs import VentaDTO, DetalleVentasDTO
+
+from src.services.ventas.VentaServicio import VentaServicio
 
 
 # Conversor para serializar Decimals y datetimes
@@ -36,71 +39,67 @@ def index():
     return Response(json_data, content_type="application/json; charset=utf-8")
 
 
-@ventas_bp.route("/<int:id>", methods=["GET"])
-def obtenerVenta(id):
-    connection = get_connection()
-
-    with connection.cursor(DictCursor) as cursor:
-        cursor.execute("SELECT * FROM ventas where id_venta = (%s)", id)
-        resultado = cursor.fetchone()
-        print(resultado)
-        connection.close()
-
-    # Convierte el resultado a JSON usando el conversor personalizado
-    json_data = json.dumps(
-        {"venta": resultado}, ensure_ascii=False, default=custom_json_serializer
-    )
-    return Response(json_data, content_type="application/json; charset=utf-8")
-
-
 @ventas_bp.route("/agregar", methods=["POST"])
-def agregar_venta():
+def agregar():
     data = request.json
 
-    venta = VentaService(
-        data["metodo_pago"],
+    # Crear los objetos DetalleVentasDTO
+    detalles_venta = []
+
+    conexion = get_connection()
+    cursor = conexion.cursor(DictCursor)
+
+    for producto in data["detalles_venta"]:
+        cursor.execute(
+            "select * from inventario where codigo_producto = (%s)",
+            producto["codigo_producto"],
+        )
+
+        producto_db = cursor.fetchone()
+
+        if not producto_db:
+            return (
+                jsonify(
+                    {
+                        "error": f"Producto con código {producto["codigo_producto"]} no encontrado"
+                    }
+                ),
+                404,
+            )
+
+        detalle = DetalleVentasDTO(
+            producto_db["id_inventario"],
+            producto["codigo_producto"],
+            producto_db["nombre_producto"],
+            producto_db["categoria"],
+            float(producto_db["precio_unitario"]),
+        )
+
+        detalles_venta.append(detalle)
+
+    conexion.close()
+
+    # Crear el objeto VentaDTO
+    venta = VentaDTO(
         data["monto_recibido"],
-        data["productos"],
+        datetime.now(),
+        data["metodo_pago"],
         data["id_cliente"],
-        data["id_trabajador"],
+        data["id_empleado"],
+        detalles_venta,
     )
 
-    venta.agregarVenta()
+    venta_servicio = VentaServicio()
+    venta.total_venta = venta_servicio.calcularTotalVenta(venta)
 
-    return jsonify({"message": "xd"})
+    if venta.monto_recibido >= venta.total_venta:
+        pass
+        # venta_servicio.agregarVenta(venta)
 
+    # Calcular el total de la venta
+    # venta.total_venta = VentaService().calcularTotalVenta(venta)
 
-@ventas_bp.route("/returns", methods=["POST"])
-def handle_return():
-    # Lógica para manejar devoluciones
-    data = request.json
-    # Procesa la devolución usando `data` y devuelve una respuesta
-    return jsonify({"message": "Devolución procesada con éxito"})
+    # Agregar la venta a la base de datos
+    # VentaService().agregarVenta(venta)
 
-
-@ventas_bp.route("/test", methods=["POST"])
-def test():
-    data = request.json
-
-    venta = VentaService(
-        data["metodo_pago"],
-        data["monto_recibido"],
-        data["productos"],
-        data["id_cliente"],
-        data["id_trabajador"],
-    )
-
-    venta.agregarVenta()
-
-    return jsonify({"message": "xd"})
-
-    """ venta = VentaService(
-        data["metodo_pago"],
-        data["monto_recibido"],
-        data["productos"],
-        data["id_cliente"],
-        data["id_trabajador"],
-    )
-    total_venta = venta.calcularTotal()
-    print(total_venta)
-    return jsonify({"total": total_venta}) """
+    return jsonify({"Mensaje": "Venta agregada correctamente"}), 201
