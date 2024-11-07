@@ -38,7 +38,7 @@ class VentaService(VentaModelo):
 
                 if resultado is None:
                     print(
-                        f"El producto '{producto["nombre_producto"]}' no existe en el inventario."
+                        f"El producto '{producto['nombre_producto']}' no existe en el inventario."
                     )
                     self.posible = False
                     connection.close()
@@ -78,6 +78,8 @@ class VentaService(VentaModelo):
         #if self.totalVenta <= self.monto_recibido and self.posible:
             #connection = get_connection()
 
+# ---------------------------------------------------------------------------------------------------------------------------
+
         #FIDELIZACION
         puntos_service = PuntosService()
         rangos_service = RangosService()
@@ -90,6 +92,8 @@ class VentaService(VentaModelo):
                 return {"exito": False, "mensaje": resultado["mensaje"]}
             print("Compra realizada con puntos.")
         
+# ---------------------------------------------------------------------------------------------------------------------------
+
         #Pago con dinero
         elif self.totalVenta <= self.monto_recibido and self.posible:
             connection = get_connection()
@@ -130,6 +134,8 @@ class VentaService(VentaModelo):
             print("Monto recibido insuficiente.")
             return {"exito": False, "mensaje": "Monto insuficiente para completar la compra"}
         
+# ---------------------------------------------------------------------------------------------------------------------------
+
         #ACTUALIZACION DEL RANGO DEL USUARIO - FIDELIZACION
         try:
             resultado_rango = rangos_service.actualizarRangoPorHistorialCompras(self.id_cliente)
@@ -147,10 +153,13 @@ class VentaService(VentaModelo):
                 precio_compra_total=self.totalVenta,
                 porcentaje_compra_puntos=porcentaje_compra_puntos
             )
+            #Añadimos/actualizamos los puntos de una compra en la BD
             puntos_service.añadir_puntos_compra(self.id_cliente, puntos_obtenidos)
             print("Puntos añadidos con éxito:", puntos_obtenidos)
         except Exception as e:
             print("Error al procesar los puntos de la compra:", e)
+
+# ---------------------------------------------------------------------------------------------------------------------------
         
         print("Venta hecha correctamente")
         return {"exito": True, "mensaje": "Venta completada"}
@@ -173,6 +182,10 @@ class DetalleVentaService(DetalleVentaModelo):
 
     def devolverProducto(self, id_cliente, id_venta, precio_unitario):
 
+
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
         #OBTENCION Y ACTUALIZACION DE LOS PUNTOS DE UNA DEVOLUCION - FIDELIZACION
         puntos_service = PuntosService()
         rangos_service = RangosService()
@@ -184,6 +197,9 @@ class DetalleVentaService(DetalleVentaModelo):
                 precio_producto=self.precio_unitario,
                 porcentaje_devolucion_puntos=rangos_service.obtener_porcentaje_devolucion(rangos_service.obtener_rango_cliente(id_cliente))
             )
+            #Añadimos/actualizamos los puntos de una devolucion en la BD
             puntos_service.añadir_puntos_devolucion(id_cliente, puntos_devolucion)
         except Exception as e:
             print("Error al procesar los puntos de la devolucion:", e)
+
+# ---------------------------------------------------------------------------------------------------------------------------
