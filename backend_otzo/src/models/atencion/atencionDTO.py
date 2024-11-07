@@ -86,7 +86,7 @@ class QuejasDTO:
         self._comentarioSeguimiento = value
     
 @dataclass
-class Sugerencias:
+class SugerenciasDTO:
     _idSugerencia: int
     _idCliente: int
     _fechaHora: datetime
@@ -150,47 +150,3 @@ class Sugerencias:
     @comentarioSeguimiento.setter
     def comentarioSeguimiento(self, value: str):
         self._comentarioSeguimiento = value
-
-#Crear una queja
-queja = QuejasDTO(
-    _idQueja = 1,
-    _idCliente = 1,
-    _rangoUsuario = 1,
-    _fechaHora = datetime.now(),
-    _descripcion = "Mala atención del personal",
-    _categoria = "Atención al cliente",
-    _estado = "En espera",
-    _prioridad = 1,
-    _comentarioSeguimiento = ""
-)
-
-#Crear una sugerencia
-sugerencia = Sugerencias(
-    _idSugerencia = 1,
-    _idCliente = 1,
-    _fechaHora = datetime.now(),
-    _descripcion = "Deberían tener más variedad de productos",
-    _categoria = "Productos",
-    _estado = "En espera",
-    _comentarioSeguimiento = ""
-)
-
-#Imprimir los datos de la queja
-print("ID de la queja:", queja.idQueja)
-print("ID del cliente:", queja.idCliente)
-print("Rango del usuario:", queja.rangoUsuario)
-print("Fecha y hora:", queja.fechaHora)
-print("Descripción:", queja.descripcion)
-print("Categoría:", queja.categoria)
-print("Estado:", queja.estado)
-print("Prioridad:", queja.prioridad)
-print("Comentario de seguimiento:", queja.comentarioSeguimiento)
-
-#Imprimir los datos de la sugerencia
-print("ID de la sugerencia:", sugerencia.idSugerencia)
-print("ID del cliente:", sugerencia.idCliente)
-print("Fecha y hora:", sugerencia.fechaHora)
-print("Descripción:", sugerencia.descripcion)
-print("Categoría:", sugerencia.categoria)
-print("Estado:", sugerencia.estado)
-print("Comentario de seguimiento:", sugerencia.comentarioSeguimiento)

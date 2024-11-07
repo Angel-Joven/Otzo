@@ -1,7 +1,10 @@
 from src.models.atencion.atencionModels import QuejasModelo, SugerenciasModelo
-
+from src.models.atencion.atencionDTO import QuejasDTO, SugerenciasDTO
+from dataclasses import dataclass
+from pymysql.cursors import DictCursor
 from src.db import get_connection
 
+@dataclass
 class QuejasService(QuejasModelo):
     def __init__(
         self, 
@@ -33,6 +36,7 @@ class QuejasService(QuejasModelo):
             connection.commit()
         connection.close()
 
+@dataclass
 class SugerenciasService(SugerenciasModelo):
     def __init__(
         self, 

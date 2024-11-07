@@ -1,6 +1,8 @@
 from flask import request, jsonify, Response
+from pymysql.cursors import DictCursor
 from . import atencion_bp  # Importa el Blueprint de atencion
 from src.services.atencion.AtencionService import QuejasService, SugerenciasService
+from src.models.atencion.atencionDTO import QuejasDTO, SugerenciasDTO
 from src.db import get_connection
 import json
 from datetime import datetime
@@ -15,7 +17,7 @@ def custom_json_serializer(obj):
 def get_complaints():
     connection = get_connection()
 
-    with connection.cursor() as cursor:
+    with connection.cursor(DictCursor) as cursor:
         cursor.execute(
             "SELECT * FROM quejas",
         )
@@ -29,19 +31,22 @@ def get_complaints():
     )
     return Response(json_data, content_type="application/json; charset=utf-8")
 
-@atencion_bp.route("/quejas", methods=["POST"])
+@atencion_bp.route("/qagregar", methods=["POST"])
 def add_complaint():
     # Lógica para agregar una nueva queja
     data = request.json
+    
     queja = QuejasService(
         data["id_cliente"],
-        data["id_trabajador"],
+        datetime.now(),
         data["descripcion"],
+        data["categoria"],
+        data["estado"],
     )
     queja.crearQueja()
     return jsonify({"message": "Queja registrada con éxito"})
 
-@atencion_bp.route("/quejas/<int:id_queja>", methods=["PUT"])
+@atencion_bp.route("/qagregar/<int:id_queja>", methods=["PUT"])
 def resolve_complaint(id_queja):
     # Lógica para actualizar una queja
     queja = QuejasService(None, None, None)
@@ -66,19 +71,20 @@ def get_suggestions():
     )
     return Response(json_data, content_type="application/json; charset=utf-8")
 
-@atencion_bp.route("/sugerencias", methods=["POST"])
+@atencion_bp.route("/sagregar", methods=["POST"])
 def add_suggestion():
     # Lógica para agregar una nueva sugerencia
     data = request.json
     sugerencia = SugerenciasService(
         data["id_cliente"],
-        data["id_trabajador"],
+        datetime.now(),
         data["descripcion"],
+        data["categoria"],
     )
     sugerencia.crearSugerencia()
     return jsonify({"message": "Sugerencia registrada con éxito"})
 
-@atencion_bp.route("/sugerencias/<int:id_sugerencia>", methods=["PUT"])
+@atencion_bp.route("/sagregar/<int:id_sugerencia>", methods=["PUT"])
 def resolve_suggestion(id_sugerencia):
     # Lógica para actualizar una sugerencia
     sugerencia = SugerenciasService(None, None, None)
