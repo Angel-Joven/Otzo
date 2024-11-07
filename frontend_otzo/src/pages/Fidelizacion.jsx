@@ -87,6 +87,8 @@ export function Fidelizacion() {
                       <th className="py-2 px-4 border-b text-center">Rango</th>
                       <th className="py-2 px-4 border-b text-center">Total de Puntos</th>
                       <th className="py-2 px-4 border-b text-center">Estado de la Cuenta</th>
+                      <th className="py-2 px-4 border-b text-center">Fecha de Ultima Actualizacion de Puntos</th>
+                      <th className="py-2 px-4 border-b text-center">Fecha de Ultima Actualizacion de Rango</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -105,6 +107,16 @@ export function Fidelizacion() {
                             : 'Este Cliente NO puede obtener puntos debido al estado de su cuenta.'}
                         </td>
                         <td className="py-2 px-4 border-b text-center">{clientes[0].Estado}</td>
+                        <td className="py-2 px-4 border-b text-center">
+                          {puntos.find(p => p.idclientes_puntos === clientes[0].idCliente)
+                            ? puntos.find(p => p.idclientes_puntos === clientes[0].idCliente).ultima_actualizacionPuntos
+                            : 'Este Cliente NO puede consultar su ultimo movimiento de puntos debido al estado de su cuenta.'}
+                        </td>
+                        <td className="py-2 px-4 border-b text-center">
+                          {puntos.find(p => p.idclientes_puntos === clientes[0].idCliente)
+                            ? puntos.find(p => p.idclientes_puntos === clientes[0].idCliente).ultima_actualizacionRangos
+                            : 'Este Cliente NO puede consultar su ultimo movimiento de rangos debido al estado de su cuenta.'}
+                        </td>
                       </tr>
                     )}
                   </tbody>
@@ -137,6 +149,8 @@ export function Fidelizacion() {
                       <th className="py-2 px-4 border-b text-center">Rango</th>
                       <th className="py-2 px-4 border-b text-center">Total de Puntos</th>
                       <th className="py-2 px-4 border-b text-center">Estado de la Cuenta</th>
+                      <th className="py-2 px-4 border-b text-center">Fecha de Ultima Actualizacion de Puntos</th>
+                      <th className="py-2 px-4 border-b text-center">Fecha de Ultima Actualizacion de Rango</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -156,6 +170,12 @@ export function Fidelizacion() {
                             {puntosCliente ? puntosCliente.total_puntos : 'Este Cliente NO puede obtener puntos debido al estado de su cuenta.'}
                           </td>
                           <td className="py-2 px-4 border-b text-center">{cliente.Estado}</td>
+                          <td className="py-2 px-4 border-b text-center">
+                            {puntosCliente ? puntosCliente.ultima_actualizacionPuntos : 'Este Cliente NO puede consultar su ultimo movimiento de puntos debido al estado de su cuenta.'}
+                          </td>
+                          <td className="py-2 px-4 border-b text-center">
+                            {puntosCliente ? puntosCliente.ultima_actualizacionRangos : 'Este Cliente NO puede consultar su ultimo movimiento de rangos debido al estado de su cuenta.'}
+                          </td>
                         </tr>
                       );
                     })}

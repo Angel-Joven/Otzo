@@ -1,5 +1,6 @@
 from src.models.fidelizacion.fidelizacionModels import PuntosModelo, RangosModelo
 from src.db import get_connection
+from pymysql import DatabaseError
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -14,68 +15,110 @@ class PuntosService(PuntosModelo):
 
     def añadir_puntos_compra(self, id_cliente, puntos_compra):
         connection = get_connection()
-        with connection.cursor() as cursor:
-            #Validamos si el cliente existe en la tabla de puntos
-            cursor.execute("SELECT COUNT(*) FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
-            cliente_existe = cursor.fetchone()[0] > 0
+        try:
+            with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
 
-            if not cliente_existe:
-                connection.close()
-                raise ValueError("Cliente no encontrado para añadir puntos de compra.")
+                #Validamos si el cliente existe en la tabla de puntos
+                cursor.execute("SELECT COUNT(*) FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
+                cliente_existe = cursor.fetchone()[0] > 0
 
-            cursor.execute(
-                "UPDATE puntos SET total_puntos = total_puntos + %s WHERE idclientes_puntos = %s",
-                (puntos_compra, id_cliente),
-            )
-            connection.commit()
-        connection.close()
-    
+                if not cliente_existe:
+                    raise ValueError("La cuenta del cliente no fue encontrada para añadir sus puntos de compra.")
+
+                cursor.execute(
+                    "UPDATE puntos SET total_puntos = total_puntos + %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s",
+                    (puntos_compra, id_cliente),
+                )
+                #Confirmamos la transaccion
+                connection.commit()
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
+        finally:
+            connection.close()
+
     def añadir_puntos_devolucion(self, id_cliente, puntos_devolucion):
         connection = get_connection()
-        with connection.cursor() as cursor:
-            # Validamos si el cliente existe en la tabla de puntos
-            cursor.execute("SELECT COUNT(*) FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
-            cliente_existe = cursor.fetchone()[0] > 0
+        try:
+            with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
 
-            if not cliente_existe:
-                connection.close()
-                raise ValueError("Cliente no encontrado para añadir puntos de devolución.")
+                #Validamos si el cliente existe en la tabla de puntos
+                cursor.execute("SELECT COUNT(*) FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
+                cliente_existe = cursor.fetchone()[0] > 0
 
-            cursor.execute(
-                "UPDATE puntos SET total_puntos = total_puntos + %s WHERE idclientes_puntos = %s",
-                (puntos_devolucion, id_cliente),
-            )
-            connection.commit()
-        connection.close()
+                if not cliente_existe:
+                    raise ValueError("La cuenta del cliente no fue encontrada para añadir sus puntos de devolucion.")
+
+                cursor.execute(
+                    "UPDATE puntos SET total_puntos = total_puntos + %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s",
+                    (puntos_devolucion, id_cliente),
+                )
+                #Confirmamos la transaccion
+                connection.commit()
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
+        finally:
+            connection.close()
 
     def descontar_puntos(self, id_cliente, precio_compra_total):
         connection = get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT total_puntos FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
-            )
-            resultado = cursor.fetchone()
+        try:
+            with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
 
-            if not resultado:
-                connection.close()
-                return {"exito": False, "mensaje": "Cliente no encontrado."}
-
-            puntos_totales = resultado[0]
-            if puntos_totales >= precio_compra_total:
-                puntos_restantes = puntos_totales - precio_compra_total
+                #Validamos si el cliente existe
                 cursor.execute(
-                    "UPDATE puntos SET total_puntos = %s WHERE idclientes_puntos = %s",
-                    (puntos_restantes, id_cliente),
+                    "SELECT Estado FROM clientes WHERE idCliente = %s", (id_cliente,)
                 )
-                connection.commit()
-                connection.close()
-                return {"exito": True, "puntos_restantes": puntos_restantes}
-            else:
-                connection.close()
-                return {
-                    "exito": False,
-                    "mensaje": f"Puntos Insuficientes (Puntos actuales: {puntos_totales}).",
-                }
+                estado_cliente = cursor.fetchone()
+                if not estado_cliente:
+                    raise ValueError("La cuenta del cliente no fue encontrada para realizar el descuento de puntos.")
+                elif estado_cliente[0] == 'Suspendido':
+                    raise ValueError("La cuenta del cliente esta suspendida y no puede realizar operaciones de puntos.")
+                elif estado_cliente[0] == 'Inactivo':
+                    raise ValueError("La cuenta del cliente esta inactiva y no puede realizar operaciones de puntos.")
+
+                #Obtenemos los puntos totales del cliente
+                cursor.execute(
+                    "SELECT total_puntos FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
+                )
+                resultado = cursor.fetchone()
+
+                if not resultado:
+                    raise ValueError("La cuenta del cliente no fue encontrada para realizar el descuento de puntos.")
+
+                puntos_totales = resultado[0]
+                if puntos_totales >= precio_compra_total:
+                    puntos_restantes = puntos_totales - precio_compra_total
+                    cursor.execute(
+                        "UPDATE puntos SET total_puntos = %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s",
+                        (puntos_restantes, id_cliente),
+                    )
+                    #Confirmamos la transaccion
+                    connection.commit()
+                    return {
+                        "exito": True,
+                        "mensaje": f"Compra realizada con exito. Puntos Restantes: {puntos_restantes}.",
+                        }
+                else:
+                    return {
+                        "exito": False,
+                        "mensaje": f"La compra no fue realizada con exito. Puntos Insuficientes. (Puntos actuales: {puntos_totales}).",
+                    }
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
+        finally:
+            connection.close()
             
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -85,6 +128,9 @@ class RangosService(RangosModelo):
         connection = get_connection()
         try:
             with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
+
                 #Obtenemos todos los usuarios de la tabla clientes que no tienen un registro en la tabla puntos
                 cursor.execute(
                     """
@@ -94,10 +140,13 @@ class RangosService(RangosModelo):
                     WHERE idCliente NOT IN (SELECT idclientes_puntos FROM puntos) AND Estado = 'Activo'
                     """
                 )
+                #Confirmamos la transaccion
                 connection.commit()
-                return {"mensaje": "Rango 1 asignado a todos los usuarios sin rango y que sus cuentas esten activos"}
-        except Exception as e:
-            raise Exception(f"Error al asignar el rango 1 a usuarios sin rango: {str(e)}")
+                return {"mensaje": "Rango 1 asignado a todos los usuarios sin rango y que sus cuentas esten activas"}
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
         finally:
             connection.close()
 
@@ -105,13 +154,27 @@ class RangosService(RangosModelo):
         connection = get_connection()
         try:
             with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
+
+                #Verificar si el cliente existe antes de proceder
+                cursor.execute("SELECT Estado FROM clientes WHERE idCliente = %s", (id_cliente,))
+                estado_cliente = cursor.fetchone()
+
+                if estado_cliente is None:
+                    raise ValueError("La cuenta del cliente no se encontro para actualizar su rango.")
+                elif estado_cliente[0] == 'Suspendido':
+                    return {"mensaje": "La cuenta del cliente no puede recibir un rango debido a que su cuenta esta suspendida."}
+                elif estado_cliente[0] == 'Inactivo':
+                    return {"mensaje": "La cuenta del cliente no puede recibir un rango debido a que su cuenta esta inactiva."}
+
                 #Obtenemos la cantidad total de compras del cliente
                 cursor.execute(
                     "SELECT COUNT(*) FROM ventas WHERE id_cliente = %s", (id_cliente,)
                 )
                 compras_totales = cursor.fetchone()[0]
 
-                #Determinamos el nuevo rango en funcion con su numero total de compras
+                #Determinamos el nuevo rango en función del número total de compras
                 if compras_totales >= 25:
                     nuevo_rango = 6
                 elif compras_totales >= 20:
@@ -125,29 +188,28 @@ class RangosService(RangosModelo):
                 else:
                     nuevo_rango = 1
 
-                #Obtenemos el rango actual del cliente
-                cursor.execute(
-                    "SELECT idrango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
-                )
+                #Validamos el rango actual y actualizamos si es necesario
+                cursor.execute("SELECT idrango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
                 rango_actual = cursor.fetchone()[0]
 
-                #Actualizamos el rango si el nuevo rango es mayor que el actual
                 if nuevo_rango > rango_actual:
                     cursor.execute(
-                        "UPDATE puntos SET idrango = %s WHERE idclientes_puntos = %s",
+                        "UPDATE puntos SET idrango = %s, ultima_actualizacionRangos = NOW() WHERE idclientes_puntos = %s",
                         (nuevo_rango, id_cliente)
                     )
+                    #Confirmamos la transaccion
                     connection.commit()
                     return {
-                        "mensaje": f"Rango actualizado a {nuevo_rango} después de {compras_totales} compras.",
+                        "mensaje": f"Rango actualizado a {nuevo_rango} despues de {compras_totales} compras.",
                         "nuevo_rango": nuevo_rango,
                     }
                 else:
-                    return {"mensaje": "El cliente ya tiene el rango adecuado para su numero de compras."}
+                    return {"mensaje": "La cuenta del cliente ya tiene el rango adecuado para su numero total de compras."}
 
-        except Exception as e:
-            print("Error al actualizar el rango:", e)
-            return {"mensaje": "Error al actualizar el rango", "error": str(e)}
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
         finally:
             connection.close()
 
@@ -155,44 +217,81 @@ class RangosService(RangosModelo):
         connection = get_connection()
         try:
             with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
+
                 cursor.execute(
                     "SELECT idrango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
                 )
+                #Confirmamos la transaccion
+                connection.commit()
+
                 resultado = cursor.fetchone()
 
                 if resultado:
                     return {"rango": resultado[0]}
                 else:
                     return {"mensaje": "Cliente no encontrado"}
+
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
         finally:
             connection.close()
 
     def obtener_porcentaje_compra(self, idrango):
         connection = get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT porcentaje_puntos FROM rangos WHERE idrango = %s", (idrango,)
-            )
-            resultado = cursor.fetchone()
-        connection.close()
-        
-        if resultado:
-            return resultado[0]
-        else:
-            raise ValueError("Rango no encontrado.")
+        try:
+            with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
+
+                cursor.execute(
+                    "SELECT porcentaje_puntos FROM rangos WHERE idrango = %s", (idrango,)
+                )
+                # Confirmamos la transaccion
+                connection.commit()
+
+                resultado = cursor.fetchone()
+            
+                if resultado:
+                    return resultado[0]
+                else:
+                    raise ValueError("Porcentaje Puntos Compra no fue encontrado.")
+
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
+        finally:
+            connection.close()
 
     def obtener_porcentaje_devolucion(self, idrango):
         connection = get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT porcentaje_devolucionPuntos FROM rangos WHERE idrango = %s", (idrango,)
-            )
-            resultado = cursor.fetchone()
-        connection.close()
-        
-        if resultado:
-            return resultado[0]
-        else:
-            raise ValueError("Rango no encontrado.")
+        try:
+            with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
+                
+                cursor.execute(
+                    "SELECT porcentaje_devolucionPuntos FROM rangos WHERE idrango = %s", (idrango,)
+                )
+                # Confirmamos la transaccion
+                connection.commit()
+
+                resultado = cursor.fetchone()
+            
+                if resultado:
+                    return resultado[0]
+                else:
+                    raise ValueError("Porcentaje Puntos Devolucion no fue encontrado.")
+
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
+        finally:
+            connection.close()
 
 # ---------------------------------------------------------------------------------------------------------------------------
