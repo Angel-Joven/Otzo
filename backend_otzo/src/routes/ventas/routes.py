@@ -93,8 +93,7 @@ def agregar():
     venta.total_venta = venta_servicio.calcularTotalVenta(venta)
 
     if venta.monto_recibido >= venta.total_venta:
-        pass
-        # venta_servicio.agregarVenta(venta)
+        venta_servicio.agregarVenta(venta)
 
     # Calcular el total de la venta
     # venta.total_venta = VentaService().calcularTotalVenta(venta)
