@@ -221,7 +221,7 @@ class RangosService(RangosModelo):
                 connection.begin()
 
                 cursor.execute(
-                    "SELECT idrango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
+                    "SELECT idrango, nombre_rango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
                 )
                 #Confirmamos la transaccion
                 connection.commit()
