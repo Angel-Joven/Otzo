@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
 
 # Editor directories and files
 .vscode/*
@@ -26,7 +27,6 @@ dist-ssr
 
 venv
 __pycache__
-.env
 
 # Ignorar archivo package-lock.json
 package-lock.json
