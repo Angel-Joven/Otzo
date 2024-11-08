@@ -1,3 +1,12 @@
+/*
+
+Pagina Principal para el Modulo de Fidelizacion y Marketing
+Creado por: JOVEN JIMENEZ ANGEL CRISTIAN
+
+Temas Especiales de Programacion 2 | 1061
+
+*/
+
 import { React, useEffect, useState } from "react";
 import { motion } from 'framer-motion';
 import DataTable from "react-data-table-component";

@@ -1,3 +1,8 @@
+# Modelos para el Modulo de Fidelizacion y Marketing
+# Creado por: JOVEN JIMENEZ ANGEL CRISTIAN
+
+# Temas Especiales de Programacion 2 | 1061
+
 from abc import ABC, abstractmethod
 
 # ---------------------------------------------------------------------------------------------------------------------------

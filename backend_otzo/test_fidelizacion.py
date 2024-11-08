@@ -1,3 +1,8 @@
+# Pruebas Unitarias para el Modulo de Fidelizacion y Marketing
+# Creado por: JOVEN JIMENEZ ANGEL CRISTIAN
+
+# Temas Especiales de Programacion 2 | 1061
+
 import unittest
 from index import app
 
@@ -20,7 +25,7 @@ class TestFidelizacion(unittest.TestCase):
 
     def test_ActualizarRangoClienteActivo(self):
         response = self.app.post('/api/fidelizacion/actualizarrango', json={
-            "id_cliente": 1  #Colocar ID de un cliente que no tenga el rango aun, pero que si cumpla con sus total de compras.
+            "id_cliente": 1  #Colocar el ID de un cliente que no tenga el rango aun, pero que si cumpla con sus total de compras.
         })
         data = response.get_json()
         self.assertEqual(response.status_code, 200)
@@ -30,7 +35,7 @@ class TestFidelizacion(unittest.TestCase):
 
     def test_ActualizarRangoClienteInactivo(self):
         response = self.app.post('/api/fidelizacion/actualizarrango', json={
-            "id_cliente": 5 # Cliente inactivo
+            "id_cliente": 5 #Cliente inactivo
         })
         data = response.get_json()
         self.assertEqual(response.status_code, 400)
@@ -40,7 +45,7 @@ class TestFidelizacion(unittest.TestCase):
 
     def test_ActualizarRangoClienteSuspendido(self):
         response = self.app.post('/api/fidelizacion/actualizarrango', json={
-            "id_cliente": 9 # Cliente suspendido
+            "id_cliente": 9 #Cliente suspendido
         })
         data = response.get_json()
         self.assertEqual(response.status_code, 400)
@@ -50,7 +55,7 @@ class TestFidelizacion(unittest.TestCase):
 
     def test_ActualizarRangoClienteInexistente(self):
         response = self.app.post('/api/fidelizacion/actualizarrango', json={
-            "id_cliente": 9999 # Cliente inexistente
+            "id_cliente": 9999 #Cliente inexistente
         })
         data = response.get_json()
         self.assertEqual(response.status_code, 400)
@@ -350,7 +355,7 @@ class TestFidelizacion(unittest.TestCase):
 
     def test_descontarPuntosClienteActivo(self):
         response = self.app.post('/api/fidelizacion/descontarpuntos', json={
-            "id_cliente": 1,  # Cliente Activo
+            "id_cliente": 1,  #Cliente Activo
             "precioCompraTotal": 100
         })
         data = response.get_json()
@@ -361,7 +366,7 @@ class TestFidelizacion(unittest.TestCase):
 
     def test_descontarPuntosClienteInactivo(self):
         response = self.app.post('/api/fidelizacion/descontarpuntos', json={
-            "id_cliente": 5,  # Cliente inactivo
+            "id_cliente": 5,  #Cliente inactivo
             "precioCompraTotal": 0
         })
         data = response.get_json()
@@ -372,7 +377,7 @@ class TestFidelizacion(unittest.TestCase):
 
     def test_descontarPuntosClienteSuspendido(self):
         response = self.app.post('/api/fidelizacion/descontarpuntos', json={
-            "id_cliente": 9,  # Cliente suspendido
+            "id_cliente": 9,  #Cliente suspendido
             "precioCompraTotal": 0
         })
         data = response.get_json()
@@ -383,7 +388,7 @@ class TestFidelizacion(unittest.TestCase):
 
     def test_descontarPuntosClienteInexistente(self):
         response = self.app.post('/api/fidelizacion/descontarpuntos', json={
-            "id_cliente": 9999,  # Cliente inexistente
+            "id_cliente": 9999,  #Cliente inexistente
             "precioCompraTotal": 0
         })
         data = response.get_json()

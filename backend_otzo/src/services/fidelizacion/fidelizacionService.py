@@ -1,3 +1,8 @@
+# Servicios para el Modulo de Fidelizacion y Marketing
+# Creado por: JOVEN JIMENEZ ANGEL CRISTIAN
+
+# Temas Especiales de Programacion 2 | 1061
+
 from src.models.fidelizacion.fidelizacionModels import PuntosModelo, RangosModelo
 from src.db import get_connection
 from pymysql import DatabaseError
@@ -14,11 +19,11 @@ class PuntosService(PuntosModelo):
         return round(puntos_devolucion)
 
     def añadir_puntos_compra(self, id_cliente, puntos_compra):
-        connection = get_connection()
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
 
                 #Validamos si el cliente existe en la tabla de puntos
                 cursor.execute("SELECT COUNT(*) FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
@@ -27,25 +32,24 @@ class PuntosService(PuntosModelo):
                 if not cliente_existe:
                     raise ValueError("La cuenta del cliente no fue encontrada para añadir sus puntos de compra.")
 
-                cursor.execute(
-                    "UPDATE puntos SET total_puntos = total_puntos + %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s",
-                    (puntos_compra, id_cliente),
-                )
+                cursor.execute("UPDATE puntos SET total_puntos = total_puntos + %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s", (puntos_compra, id_cliente))
+
                 #Confirmamos la transaccion
-                connection.commit()
+                conexion.commit()
+
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
 
     def añadir_puntos_devolucion(self, id_cliente, puntos_devolucion):
-        connection = get_connection()
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
 
                 #Validamos si el cliente existe en la tabla de puntos
                 cursor.execute("SELECT COUNT(*) FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
@@ -54,30 +58,26 @@ class PuntosService(PuntosModelo):
                 if not cliente_existe:
                     raise ValueError("La cuenta del cliente no fue encontrada para añadir sus puntos de devolucion.")
 
-                cursor.execute(
-                    "UPDATE puntos SET total_puntos = total_puntos + %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s",
-                    (puntos_devolucion, id_cliente),
-                )
+                cursor.execute("UPDATE puntos SET total_puntos = total_puntos + %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s", (puntos_devolucion, id_cliente))
                 #Confirmamos la transaccion
-                connection.commit()
+                conexion.commit()
+
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
 
     def descontar_puntos(self, id_cliente, precio_compra_total):
-        connection = get_connection()
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
 
                 #Validamos si el cliente existe
-                cursor.execute(
-                    "SELECT Estado FROM clientes WHERE idCliente = %s", (id_cliente,)
-                )
+                cursor.execute("SELECT Estado FROM clientes WHERE idCliente = %s", (id_cliente,))
                 estado_cliente = cursor.fetchone()
                 if not estado_cliente:
                     raise ValueError("La cuenta del cliente no fue encontrada para realizar el descuento de puntos.")
@@ -87,9 +87,7 @@ class PuntosService(PuntosModelo):
                     raise ValueError("La cuenta del cliente esta inactiva y no puede realizar operaciones de puntos.")
 
                 #Obtenemos los puntos totales del cliente
-                cursor.execute(
-                    "SELECT total_puntos FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
-                )
+                cursor.execute("SELECT total_puntos FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
                 resultado = cursor.fetchone()
 
                 if not resultado:
@@ -98,64 +96,55 @@ class PuntosService(PuntosModelo):
                 puntos_totales = resultado[0]
                 if puntos_totales >= precio_compra_total:
                     puntos_restantes = puntos_totales - precio_compra_total
-                    cursor.execute(
-                        "UPDATE puntos SET total_puntos = %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s",
-                        (puntos_restantes, id_cliente),
-                    )
+                    cursor.execute("UPDATE puntos SET total_puntos = %s, ultima_actualizacionPuntos = NOW() WHERE idclientes_puntos = %s", (puntos_restantes, id_cliente))
                     #Confirmamos la transaccion
-                    connection.commit()
-                    return {
-                        "exito": True,
-                        "mensaje": f"Compra realizada con exito. Puntos Restantes: {puntos_restantes}.",
-                        }
+                    conexion.commit()
+                    return {"exito": True, "mensaje": f"Compra realizada con exito. Puntos Restantes: {puntos_restantes}."}
                 else:
-                    return {
-                        "exito": False,
-                        "mensaje": f"La compra no fue realizada con exito. Puntos Insuficientes. (Puntos actuales: {puntos_totales}).",
-                    }
+                    return {"exito": False, "mensaje": f"La compra no fue realizada con exito. Puntos Insuficientes. (Puntos actuales: {puntos_totales})."}
+
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
             
 # ---------------------------------------------------------------------------------------------------------------------------
 
 class RangosService(RangosModelo):
 
     def asignarRangoInicialAuto(self):
-        connection = get_connection()
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
 
                 #Obtenemos todos los usuarios de la tabla clientes que no tienen un registro en la tabla puntos
                 cursor.execute(
                     """
                     INSERT INTO puntos (idclientes_puntos, idrango, total_puntos)
-                    SELECT idCliente, 1, 0
-                    FROM clientes
+                    SELECT idCliente, 1, 0 FROM clientes
                     WHERE idCliente NOT IN (SELECT idclientes_puntos FROM puntos) AND Estado = 'Activo'
                     """
                 )
                 #Confirmamos la transaccion
-                connection.commit()
+                conexion.commit()
                 return {"mensaje": "Rango 1 asignado a todos los usuarios sin rango y que sus cuentas esten activas"}
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
 
     def actualizarRangoPorHistorialCompras(self, id_cliente):
-        connection = get_connection()
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
 
                 #Verificar si el cliente existe antes de proceder
                 cursor.execute("SELECT Estado FROM clientes WHERE idCliente = %s", (id_cliente,))
@@ -169,9 +158,7 @@ class RangosService(RangosModelo):
                     return {"mensaje": "La cuenta del cliente no puede recibir un rango debido a que su cuenta esta inactiva."}
 
                 #Obtenemos la cantidad total de compras del cliente
-                cursor.execute(
-                    "SELECT COUNT(*) FROM ventas WHERE id_cliente = %s", (id_cliente,)
-                )
+                cursor.execute("SELECT COUNT(*) FROM ventas WHERE id_cliente = %s", (id_cliente,))
                 compras_totales = cursor.fetchone()[0]
 
                 #Determinamos el nuevo rango en función del número total de compras
@@ -193,38 +180,30 @@ class RangosService(RangosModelo):
                 rango_actual = cursor.fetchone()[0]
 
                 if nuevo_rango > rango_actual:
-                    cursor.execute(
-                        "UPDATE puntos SET idrango = %s, ultima_actualizacionRangos = NOW() WHERE idclientes_puntos = %s",
-                        (nuevo_rango, id_cliente)
-                    )
+                    cursor.execute("UPDATE puntos SET idrango = %s, ultima_actualizacionRangos = NOW() WHERE idclientes_puntos = %s", (nuevo_rango, id_cliente))
                     #Confirmamos la transaccion
-                    connection.commit()
-                    return {
-                        "mensaje": f"Rango actualizado a {nuevo_rango} despues de {compras_totales} compras.",
-                        "nuevo_rango": nuevo_rango,
-                    }
+                    conexion.commit()
+                    return {"mensaje": f"Rango actualizado a {nuevo_rango} despues de {compras_totales} compras.", "nuevo_rango": nuevo_rango}
                 else:
                     return {"mensaje": "La cuenta del cliente ya tiene el rango adecuado para su numero total de compras."}
 
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
 
     def obtener_rango_cliente(self, id_cliente):
-        connection = get_connection()
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
 
-                cursor.execute(
-                    "SELECT idrango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
-                )
+                cursor.execute("SELECT idrango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
                 #Confirmamos la transaccion
-                connection.commit()
+                conexion.commit()
 
                 resultado = cursor.fetchone()
 
@@ -234,10 +213,10 @@ class RangosService(RangosModelo):
                     return {"mensaje": "Cliente no encontrado"}
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
 
 # ---------------------------------------------------------------------------------------------------------------------------
     
@@ -245,23 +224,21 @@ class RangosService(RangosModelo):
     # EN BASE AL IDCLIENTE PROPORCIONADO
 
     def obtener_rango_cliente_atencion(self, id_cliente):
-        connection = get_connection()
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
 
                 cursor.execute(
                     """
-                    SELECT p.idclientes_puntos, p.idrango, r.nombre_rango 
-                    FROM puntos p
+                    SELECT p.idclientes_puntos, p.idrango, r.nombre_rango FROM puntos p
                     JOIN rangos r ON p.idrango = r.idrango
                     WHERE p.idclientes_puntos = %s
-                    """,
-                    (id_cliente,)
+                    """, (id_cliente,)
                 )
                 #Confirmamos la transaccion
-                connection.commit()
+                conexion.commit()
 
                 resultado = cursor.fetchone()
 
@@ -272,25 +249,29 @@ class RangosService(RangosModelo):
 
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
-    def obtener_porcentaje_compra(self, idrango):
-        connection = get_connection()
+    def obtener_porcentaje_compra(self, idCliente, idrango):
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
 
-                cursor.execute(
-                    "SELECT porcentaje_puntos FROM rangos WHERE idrango = %s", (idrango,)
-                )
+                cursor.execute("SELECT idCliente FROM clientes WHERE idCliente = %s", (idCliente,))
+                cliente_existente = cursor.fetchone()
+
+                if not cliente_existente:
+                    raise ValueError("La cuenta del cliente no fue encontrado.")
+
+                cursor.execute("SELECT porcentaje_puntos FROM rangos WHERE idrango = %s", (idrango,))
                 # Confirmamos la transaccion
-                connection.commit()
+                conexion.commit()
 
                 resultado = cursor.fetchone()
             
@@ -301,23 +282,27 @@ class RangosService(RangosModelo):
 
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
 
-    def obtener_porcentaje_devolucion(self, idrango):
-        connection = get_connection()
+    def obtener_porcentaje_devolucion(self,  idCliente, idrango):
+        conexion = get_connection()
         try:
-            with connection.cursor() as cursor:
+            with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
-                connection.begin()
+                conexion.begin()
                 
-                cursor.execute(
-                    "SELECT porcentaje_devolucionPuntos FROM rangos WHERE idrango = %s", (idrango,)
-                )
-                # Confirmamos la transaccion
-                connection.commit()
+                cursor.execute("SELECT idCliente FROM clientes WHERE idCliente = %s", (idCliente,))
+                cliente_existente = cursor.fetchone()
+
+                if not cliente_existente:
+                    raise ValueError("La cuenta del cliente no fue encontrado.")
+
+                cursor.execute("SELECT porcentaje_devolucionPuntos FROM rangos WHERE idrango = %s", (idrango,))
+                #Confirmamos la transaccion
+                conexion.commit()
 
                 resultado = cursor.fetchone()
             
@@ -328,9 +313,9 @@ class RangosService(RangosModelo):
 
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
-            connection.rollback()
+            conexion.rollback()
             raise e
         finally:
-            connection.close()
+            conexion.close()
 
 # ---------------------------------------------------------------------------------------------------------------------------
