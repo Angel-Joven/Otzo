@@ -30,7 +30,7 @@ export function Fidelizacion() {
         setLoadingClientes(false);
       });
 
-    axios.get('http://localhost:5000/api/fidelizacion/obtpts')
+    axios.get('http://localhost:5000/api/fidelizacion/obtenerpuntos')
       .then(response => {
         console.log('Datos de puntos:', response.data.Puntos);
         setPuntos(response.data.Puntos);
@@ -41,7 +41,7 @@ export function Fidelizacion() {
         setLoadingPuntos(false);
       });
 
-    axios.get('http://localhost:5000/api/fidelizacion/obtrng')
+    axios.get('http://localhost:5000/api/fidelizacion/obtenerrango')
       .then(response => {
         setRangos(response.data.Rangos);
         setLoadingRangos(false);

@@ -51,6 +51,51 @@ def actualizarRango():
     except Exception as e:
         return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
 
+#Ruta para ver los rangos de todos los clientes
+@fidelizacion_bp.route("/obtenerrango", methods=["GET"])
+def obtrng():
+    connection = get_connection()
+    if not connection:
+        Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
+        return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
+    try:
+        with connection.cursor(DictCursor) as cursor:
+            query = "SELECT * FROM rangos"
+            cursor.execute(query)
+            #result = cursor.fetchone()
+            result = cursor.fetchall()
+            
+            if result:
+                return jsonify({"Rangos": result}), 200
+            else:
+                return jsonify({"message": "No se encontraron rangos", "Rangos": []}), 400
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as ex:
+        Logger.add_to_log("error", f"Error al obtener los rangos: {str(ex)}")
+        return jsonify({"error": f"Error al obtener los rangos: {str(ex)}"}), 500
+    finally:
+        connection.close()
+
+#Ruta para ver el rango de un cliente en especifico
+@fidelizacion_bp.route("/obtenerrango/<int:id_cliente>", methods=["GET"])
+def obtrng_cliente(id_cliente):
+    try:
+        rangos_service = RangosService()
+        resultado = rangos_service.obtener_rango_cliente_atencion(id_cliente)
+
+        if "idrango" in resultado:
+            return jsonify({"Rangos": resultado}), 200
+        else:
+            return jsonify(resultado), 404
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        Logger.add_to_log("error", f"Error inesperado: {str(e)}")
+        return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
+
 # ---------------------------------------------------------------------------------------------------------------------------
 
 #Ruta para calcular los puntos obtenidos de una compra
@@ -171,13 +216,40 @@ def descontarPuntos():
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
-@fidelizacion_bp.route("/historialpuntos/<int:id_cliente>", methods=["GET"])
-def obtener_historial_puntos(id_cliente):
+#Ruta para ver los puntos totales de todos los clientes
+@fidelizacion_bp.route("/obtenerpuntos", methods=["GET"])
+def obtpts():
     connection = get_connection()
     if not connection:
         Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
         return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
+    try:
+        with connection.cursor(DictCursor) as cursor:
+            query = "SELECT * FROM puntos"
+            cursor.execute(query)
+            #result = cursor.fetchone()
+            result = cursor.fetchall()
+            
+            if result:
+                return jsonify({"Puntos": result}), 200
+            else:
+                return jsonify({"message": "No se encontraron clientes con puntos", "Puntos": []}), 400
+    
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as ex:
+        Logger.add_to_log("error", f"Error al obtener los puntos: {str(ex)}")
+        return jsonify({"error": f"Error al obtener los puntos: {str(ex)}"}), 500
+    finally:
+        connection.close()
 
+#Ruta para ver los puntos totales de un cliente en especifico
+@fidelizacion_bp.route("/obtenerpuntos/<int:id_cliente>", methods=["GET"])
+def obtenerpuntos_cliente(id_cliente):
+    connection = get_connection()
+    if not connection:
+        Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
+        return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
     try:
         with connection.cursor(DictCursor) as cursor:
             query = """
@@ -190,15 +262,15 @@ def obtener_historial_puntos(id_cliente):
             resultado = cursor.fetchone()
 
             if resultado:
-                return jsonify(resultado), 200
+                return jsonify({"Puntos": resultado}), 200
             else:
                 return jsonify({"mensaje": "Cliente no encontrado"}), 404
-
+    
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as ex:
-        Logger.add_to_log("error", f"Error al obtener el historial de puntos del cliente: {str(ex)}")
-        return jsonify({"error": f"Error al obtener el historial de puntos del cliente: {str(ex)}"}), 500
+        Logger.add_to_log("error", f"Error al obtener los puntos del cliente: {str(ex)}")
+        return jsonify({"error": f"Error al obtener los puntos del cliente: {str(ex)}"}), 500
     finally:
         connection.close()
 
@@ -229,62 +301,6 @@ def obtcli():
     except Exception as ex:
         Logger.add_to_log("error", f"Error al obtener los clientes: {str(ex)}")
         return jsonify({"error": f"Error al obtener los clientes: {str(ex)}"}), 500
-    finally:
-        connection.close()
-
-# TEST para ver si hay registros en la tabla 'puntos' - BORRAR O COMENTAR EN PRODUCCION
-@fidelizacion_bp.route("/obtpts", methods=["GET"])
-def obtpts():
-    connection = get_connection()
-    if not connection:
-        Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
-        return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
-
-    try:
-        with connection.cursor(DictCursor) as cursor:
-            query = "SELECT * FROM puntos"
-            cursor.execute(query)
-            #result = cursor.fetchone()
-            result = cursor.fetchall()
-            
-            if result:
-                return jsonify({"Puntos": result}), 200
-            else:
-                return jsonify({"message": "No se encontraron puntos", "Puntos": []}), 400
-
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    except Exception as ex:
-        Logger.add_to_log("error", f"Error al obtener los puntos: {str(ex)}")
-        return jsonify({"error": f"Error al obtener los puntos: {str(ex)}"}), 500
-    finally:
-        connection.close()
-
-# TEST para ver si hay registros en la tabla 'rangos' - BORRAR O COMENTAR EN PRODUCCION
-@fidelizacion_bp.route("/obtrng", methods=["GET"])
-def obtrng():
-    connection = get_connection()
-    if not connection:
-        Logger.add_to_log("error", "No se pudo obtener la conexion a la base de datos")
-        return jsonify({"error": "No se pudo obtener la conexion a la base de datos"}), 500
-
-    try:
-        with connection.cursor(DictCursor) as cursor:
-            query = "SELECT * FROM rangos"
-            cursor.execute(query)
-            #result = cursor.fetchone()
-            result = cursor.fetchall()
-            
-            if result:
-                return jsonify({"Rangos": result}), 200
-            else:
-                return jsonify({"message": "No se encontraron rangos", "Rangos": []}), 400
-
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    except Exception as ex:
-        Logger.add_to_log("error", f"Error al obtener los rangos: {str(ex)}")
-        return jsonify({"error": f"Error al obtener los rangos: {str(ex)}"}), 500
     finally:
         connection.close()
 

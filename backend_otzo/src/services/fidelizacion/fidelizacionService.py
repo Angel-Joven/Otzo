@@ -221,7 +221,7 @@ class RangosService(RangosModelo):
                 connection.begin()
 
                 cursor.execute(
-                    "SELECT idrango, nombre_rango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
+                    "SELECT idrango FROM puntos WHERE idclientes_puntos = %s", (id_cliente,)
                 )
                 #Confirmamos la transaccion
                 connection.commit()
@@ -232,6 +232,43 @@ class RangosService(RangosModelo):
                     return {"rango": resultado[0]}
                 else:
                     return {"mensaje": "Cliente no encontrado"}
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            connection.rollback()
+            raise e
+        finally:
+            connection.close()
+
+# ---------------------------------------------------------------------------------------------------------------------------
+    
+    # FUNCIONALIDAD QUE DEVUELVE EL IDRANGO Y EL NOMBRE_RANGO
+    # EN BASE AL IDCLIENTE PROPORCIONADO
+
+    def obtener_rango_cliente_atencion(self, id_cliente):
+        connection = get_connection()
+        try:
+            with connection.cursor() as cursor:
+                #Comenzamos la transaccion
+                connection.begin()
+
+                cursor.execute(
+                    """
+                    SELECT p.idclientes_puntos, p.idrango, r.nombre_rango 
+                    FROM puntos p
+                    JOIN rangos r ON p.idrango = r.idrango
+                    WHERE p.idclientes_puntos = %s
+                    """,
+                    (id_cliente,)
+                )
+                #Confirmamos la transaccion
+                connection.commit()
+
+                resultado = cursor.fetchone()
+
+                if resultado:
+                    return {"idcliente_puntos": resultado[0], "idrango": resultado[1], "nombre_rango": resultado[2]}
+                else:
+                    return {"mensaje": "Cliente no encontrado en la tabla 'puntos'. Esto se debe a que su cuenta esta Inactiva/Suspendida y por ende no se le asigno un rango."}
 
         except DatabaseError as e:
             #Deshacemos la transaccion en caso de error
@@ -239,6 +276,8 @@ class RangosService(RangosModelo):
             raise e
         finally:
             connection.close()
+
+# ---------------------------------------------------------------------------------------------------------------------------
 
     def obtener_porcentaje_compra(self, idrango):
         connection = get_connection()
