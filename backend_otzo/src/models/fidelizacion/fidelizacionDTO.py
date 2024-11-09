@@ -31,7 +31,7 @@ class Serializable:
 # ---------------------------------------------------------------------------------------------------------------------------
 
 class PuntosDTO(Serializable):
-    def __init__(self, idclientes_puntos=None, idrango=None, total_puntos=0):
+    def __init__(self, idclientes_puntos=None, idrango=None, total_puntos=0, ultima_actualizacionPuntos=None, ultima_actualizacionRangos = None, habilitado = 0):
         self._idclientes_puntos = idclientes_puntos
         self._idrango = idrango
         self._total_puntos = total_puntos
@@ -48,6 +48,18 @@ class PuntosDTO(Serializable):
     @property
     def total_puntos(self):
         return self._total_puntos
+    
+    @property
+    def ultima_actualizacionPuntos(self):
+        return self._ultima_actualizacionPuntos
+    
+    @property
+    def ultima_actualizacionRangos(self):
+        return self._ultima_actualizacionRangos
+    
+    @property
+    def habilitado(self):
+        return self._habilitado
 
     # Setters
     @idclientes_puntos.setter
@@ -67,15 +79,34 @@ class PuntosDTO(Serializable):
         if value < 0:
             raise ValueError("Los puntos no pueden ser negativos")
         self._total_puntos = value
+    
+    @ultima_actualizacionPuntos.setter
+    def ultima_actualizacionPuntos(self, value):
+        if not value:
+            raise ValueError("Esta fecha puntos no puede ser vacia")
+        self._ultima_actualizacionPuntos = value
+    
+    @ultima_actualizacionRangos.setter
+    def ultima_actualizacionRangos(self, value):
+        if not value:
+            raise ValueError("Esta fecha rangos no puede ser vacia")
+        self._ultima_actualizacionRangos = value
+    
+    @habilitado.setter
+    def habilitado(self, value):
+        if not value:
+            raise ValueError("Esta valor no puede ser vacio")
+        self._habilitado = value
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
 class RangosDTO(Serializable):
-    def __init__(self, idrango=None, nombre_rango="", porcentaje_puntos=0, porcentaje_devolucionPuntos=0):
+    def __init__(self, idrango=None, nombre_rango="", porcentaje_puntos=0, porcentaje_devolucionPuntos=0, num_ComprasRequisito=0):
         self._idrango = idrango
         self._nombre_rango = nombre_rango
         self._porcentaje_puntos = porcentaje_puntos
         self._porcentaje_devolucionPuntos = porcentaje_devolucionPuntos
+        self._num_ComprasRequisito = num_ComprasRequisito
 
     # Getters
     @property
@@ -93,6 +124,10 @@ class RangosDTO(Serializable):
     @property
     def porcentaje_devolucionPuntos(self):
         return self._porcentaje_devolucionPuntos
+    
+    @property
+    def num_ComprasRequisitos(self):
+        return self._num_ComprasRequisito
 
     # Setters
     @idrango.setter
@@ -118,6 +153,12 @@ class RangosDTO(Serializable):
         if not (0 <= value <= 100):
             raise ValueError("El porcentaje de devolucion de puntos debe estar entre 0 y 100")
         self._porcentaje_devolucionPuntos = value
+    
+    @num_ComprasRequisitos.setter
+    def num_ComprasRequisitos(self, value):
+        if not value:
+            raise ValueError("El numero de compras minimas para alcancar el rango no puede estar vacio")
+        self._num_ComprasRequisitos = value
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -148,22 +189,23 @@ print("-------------------------------------------------------------------------
 print("RANGOS DTO")
 
 #PuntosDTO - EJEMPLO TEST
-rangos_dto = RangosDTO(idrango=1, nombre_rango='INVITADO', porcentaje_puntos=0, porcentaje_devolucionPuntos=0)
+rangos_dto = RangosDTO(idrango=1, nombre_rango='INVITADO', porcentaje_puntos=0, porcentaje_devolucionPuntos=0, num_ComprasRequisito=0)
 
 #Convertimos a JSON - EJEMPLO TEST
 json_data = rangos_dto.to_json()
 print("JSON:", json_data)
-#JSON: {"_idrango": 1, "_nombre_rango": "INVITADO", "_porcentaje_puntos": 0, "_porcentaje_devolucionPuntos": 0}
+#JSON: {"_idrango": 1, "_nombre_rango": "INVITADO", "_porcentaje_puntos": 0, "_porcentaje_devolucionPuntos": 0, "_num_ComprasRequisito": 0}
 
 #Reconstruimos desde un JSON - EJEMPLO TEST
 nuevo_rangos_dto = RangosDTO.from_json(json_data)
 print("Nuevo DTO:", nuevo_rangos_dto.to_dict())
-#Nuevo DTO: {'_idrango': 1, '_nombre_rango': 'INVITADO', '_porcentaje_puntos': 0, '_porcentaje_devolucionPuntos': 0}
+#Nuevo DTO: {'_idrango': 1, '_nombre_rango': 'INVITADO', '_porcentaje_puntos': 0, '_porcentaje_devolucionPuntos': 0, "_num_ComprasRequisito": 0}
 
 print("ID del rango:", rangos_dto.idrango)
 print("Nombre del rango:", rangos_dto.nombre_rango)
 print("Porcentaje de puntos de compras para ese rango:", rangos_dto.porcentaje_puntos)
 print("Porcentaje de puntos de devoluciones para ese rango:", rangos_dto.porcentaje_devolucionPuntos)
+print("Numero de compras minimas para alcanzar este rango:", rangos_dto.num_ComprasRequisito)
 
 print("---------------------------------------------------------------------------------------------------------------------------")
 

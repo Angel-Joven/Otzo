@@ -5,7 +5,7 @@
 
 from flask import request, jsonify, Response
 from . import fidelizacion_bp # Importar el Blueprint de fidelizacion
-from src.services.fidelizacion.fidelizacionService import PuntosService, RangosService
+from src.services.fidelizacion.fidelizacionService import *
 from src.db import get_connection
 
 from src.utils.Logger import Logger
