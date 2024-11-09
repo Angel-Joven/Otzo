@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass
-class DetalleVentasDTO:
+class DetalleVentaDTO:
     _id_producto: int
     _codigo_producto: str
     _nombre_producto: str
@@ -160,5 +160,5 @@ class VentaDTO:
         return self._detalles_venta
 
     @detalles_venta.setter
-    def detalles_venta(self, value: DetalleVentasDTO):
+    def detalles_venta(self, value: DetalleVentaDTO):
         self._detalles_venta.append(value)

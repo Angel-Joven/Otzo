@@ -4,15 +4,25 @@ import DataTable from "react-data-table-component";
 import "@flaticon/flaticon-uicons/css/all/all.css";
 import Spinner from "../components/Spinner";
 
-export function Sales() {
+export function Ventas() {
   const columns = [
+    {
+      name: "Acciones",
+      cell: (row) => (
+        <button
+          onClick={() => manejarboton(row)}
+          className="bg-green-500 p-2 rounded-xl text-white font-bold"
+        >
+          <i className="fi fi-sr-shopping-cart-add"></i> Agregar
+        </button>
+      ),
+    },
     {
       name: "Producto",
       selector: (row) => row.producto,
-      sortable: true,
     },
     {
-      name: "Disponibles",
+      name: "Cantidad",
       selector: (row) => row.disponibles,
     },
     {
@@ -20,15 +30,8 @@ export function Sales() {
       selector: (row) => row.precio,
     },
     {
-      name: "Acción",
-      selector: (row) => (
-        <button
-          onClick={console.log(row.disponibles)}
-          className="p-2 bg-green-500 rounded-xl"
-        >
-          +
-        </button>
-      ),
+      name: "Categoria",
+      selector: (row) => row.precio,
     },
   ];
 
@@ -37,48 +40,61 @@ export function Sales() {
       producto: "Coca cola",
       disponibles: 10,
       precio: 12.5,
+      categoria: "Bebida",
     },
     {
       producto: "Sabritas",
       disponibles: 15,
       precio: 18.5,
+      categoria: "Snack",
     },
     {
       producto: "Donitas",
       disponibles: 15,
       precio: 18.5,
+      categoria: "Snack",
     },
     {
       producto: "Pepsi",
       disponibles: 15,
       precio: 18.5,
+      categoria: "Snack",
     },
     {
       producto: "Maruchan",
       disponibles: 15,
       precio: 18.5,
+      categoria: "Snack",
     },
     {
       producto: "Sabritas",
       disponibles: 15,
       precio: 18.5,
-    },
-    {
-      producto: "Sabritas",
-      disponibles: 15,
-      precio: 18.5,
-    },
-    {
-      producto: "Sabritas",
-      disponibles: 15,
-      precio: 18.5,
-    },
-    {
-      producto: "Sabritas",
-      disponibles: 15,
-      precio: 22,
+      categoria: "Snack",
     },
   ];
+
+  const manejarboton = (row) => {
+    console.log(row);
+  };
+
+  const customStyles = {
+    cells: {
+      style: {
+        padding: "2px", // Reduce el espacio interior de las celdas
+      },
+    },
+    rows: {
+      style: {
+        minHeight: "20px", // Reduce la altura mínima de las filas
+      },
+    },
+    headCells: {
+      style: {
+        padding: "2px", // Reduce el espacio interior de las celdas de encabezado
+      },
+    },
+  };
 
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -122,7 +138,7 @@ export function Sales() {
               animate={{ x: 0, opacity: 1, transition: { delay: 0.8 } }}
               className="w-full h-full bg-white/100 rounded-lg p-4 shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)]"
             >
-              <div className="shadow-lg rounded-lg p-4 bg-gray-900">
+              <div className="shadow-lg rounded-lg p-4 bg-gray-900 z-10">
                 <h2 className="font-bold text-white">
                   <i className="align-middle fi fi-sr-boxes"></i> Productos
                 </h2>
@@ -141,9 +157,7 @@ export function Sales() {
                     columns={columns}
                     data={records}
                     fixedHeader
-                    pagination
-                    paginationPerPage={5}
-                    rowsPerPageOptions={[5, 10, 25]}
+                    customStyles={customStyles}
                     progressPending={loading}
                     progressComponent={<Spinner />}
                     onSelectedRowsChange={(data) => console.log(data)}

@@ -1,5 +1,5 @@
 from src.models.ventas.VentasModelos import VentaModelo, DetalleVentaModelo
-from src.models.ventas.VentasDTOs import VentaDTO, DetalleVentasDTO
+from src.models.ventas.VentasDTOs import VentaDTO, DetalleVentaDTO
 from pymysql.cursors import DictCursor
 from dataclasses import dataclass
 from src.db import get_connection
@@ -8,6 +8,14 @@ from decimal import Decimal
 
 @dataclass
 class VentaServicio(VentaModelo):
+
+    def obtenerDatosProductos(self, productos: dict):
+        conexion = get_connection()
+        cursor = conexion.cursor(DictCursor)
+
+        # TODO: LOGICA PARA OBTENER LOS DATOS
+
+        conexion.close()
 
     def calcularTotalVenta(self, venta: VentaDTO) -> float:
 
@@ -18,40 +26,52 @@ class VentaServicio(VentaModelo):
 
         return totalVenta
 
-    def agregarVenta(self, venta: VentaDTO):
-        conexion = get_connection()
-        cursor = conexion.cursor(DictCursor)
+    def calcularCantidadVenta(self, detallesVenta: list[DetalleVentaDTO]) -> dict:
+        cantidad_por_producto = {}
 
-        PRODUCTOS_DISPONIBLES = {}
-        CANTIDAD_PRODUCTOS = {}
-
-        for producto in venta.detalles_venta:
-            print(producto.nombre_producto)
-            cursor.execute(
-                "SELECT COUNT(nombre_producto) FROM inventario WHERE nombre_producto = (%s)",
-                producto.nombre_producto,
-            )
-
-            resultado = cursor.fetchone()
-
-            resultado = next(iter(resultado.items()))
-
-            cantidad = resultado[1]
-
-            # print(cantidad)
-
-            if producto.nombre_producto not in PRODUCTOS_DISPONIBLES:
-                PRODUCTOS_DISPONIBLES[producto.nombre_producto] = cantidad
-
-            if producto.nombre_producto not in CANTIDAD_PRODUCTOS:
-                CANTIDAD_PRODUCTOS[producto.nombre_producto] = 1
+        for producto in detallesVenta:
+            if producto.nombre_producto not in cantidad_por_producto:
+                cantidad_por_producto[producto.nombre_producto] = 1
             else:
-                CANTIDAD_PRODUCTOS[producto.nombre_producto] += 1
+                cantidad_por_producto[producto.nombre_producto] += 1
 
-            print(CANTIDAD_PRODUCTOS)
-            print(PRODUCTOS_DISPONIBLES)
+        return cantidad_por_producto
 
-        conexion.close()
+    def agregarVenta(self, venta: VentaDTO):
+        pass
+        # conexion = get_connection()
+        # cursor = conexion.cursor(DictCursor)
+
+        # PRODUCTOS_DISPONIBLES = {}
+        # CANTIDAD_PRODUCTOS = {}
+
+        # for producto in venta.detalles_venta:
+        #     print(producto.nombre_producto)
+        #     cursor.execute(
+        #         "SELECT COUNT(nombre_producto) FROM inventario WHERE nombre_producto = (%s)",
+        #         producto.nombre_producto,
+        #     )
+
+        #     resultado = cursor.fetchone()
+
+        #     resultado = next(iter(resultado.items()))
+
+        #     cantidad = resultado[1]
+
+        #     # print(cantidad)
+
+        #     if producto.nombre_producto not in PRODUCTOS_DISPONIBLES:
+        #         PRODUCTOS_DISPONIBLES[producto.nombre_producto] = cantidad
+
+        #     if producto.nombre_producto not in CANTIDAD_PRODUCTOS:
+        #         CANTIDAD_PRODUCTOS[producto.nombre_producto] = 1
+        #     else:
+        #         CANTIDAD_PRODUCTOS[producto.nombre_producto] += 1
+
+        #     print(CANTIDAD_PRODUCTOS)
+        #     print(PRODUCTOS_DISPONIBLES)
+
+        # conexion.close()
         # Insertar la venta
         # cursor.execute(
         #     "INSERT INTO ventas (total_venta, fecha_venta, metodo_pago, id_cliente, id_empleado) VALUES (%s, %s, %s, %s, %s)",

@@ -6,7 +6,7 @@ from decimal import Decimal
 from . import ventas_bp  # Importa el Blueprint de ventas
 import json
 
-from src.models.ventas.VentasDTOs import VentaDTO, DetalleVentasDTO
+from src.models.ventas.VentasDTOs import VentaDTO, DetalleVentaDTO
 
 from src.services.ventas.VentaServicio import VentaServicio
 
@@ -22,15 +22,15 @@ def custom_json_serializer(obj):
 
 @ventas_bp.route("/", methods=["GET"])
 def index():
-    connection = get_connection()
+    conexion = get_connection()
+    cursor = conexion.cursor(DictCursor)
 
-    with connection.cursor(DictCursor) as cursor:
-        cursor.execute(
-            "SELECT * FROM ventas",
-        )
-        resultado = cursor.fetchall()
-        print(resultado)
-        connection.close()
+    cursor.execute(
+        "SELECT * FROM ventas",
+    )
+
+    resultado = cursor.fetchall()
+    conexion.close()
 
     # Convierte el resultado a JSON usando el conversor personalizado
     json_data = json.dumps(
@@ -67,7 +67,7 @@ def agregar():
                 404,
             )
 
-        detalle = DetalleVentasDTO(
+        detalle = DetalleVentaDTO(
             producto_db["id_inventario"],
             producto["codigo_producto"],
             producto_db["nombre_producto"],
