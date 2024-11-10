@@ -5,6 +5,7 @@ from datetime import datetime
 from decimal import Decimal
 from . import ventas_bp  # Importa el Blueprint de ventas
 import json
+from flask_cors import cross_origin
 
 from src.models.ventas.VentasDTOs import VentaDTO, DetalleVentaDTO
 
@@ -102,3 +103,11 @@ def agregar():
     # VentaService().agregarVenta(venta)
 
     return jsonify({"Mensaje": "Venta agregada correctamente"}), 201
+
+
+@ventas_bp.route("/test", methods=["POST", "OPTIONS"])
+@cross_origin()
+def test():
+    data = request.json
+    print(data)
+    return jsonify({"Mensaje": "Venta agregada correctamente"}), 200
