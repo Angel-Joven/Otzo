@@ -12,16 +12,6 @@ class VentaModelo(ABC):
         """Funcion para calcular el precio total de una venta"""
         pass
 
-    @abstractmethod
-    def calcularCantidadVenta(self):
-        """Funcion para poder calcular la cantidad de producto unico en una venta"""
-        pass
-
-    @abstractmethod
-    def obtenerDatosProductos(self):
-        """Funcion para obtener los datos de los productos en una venta"""
-        pass
-
 
 class DetalleVentaModelo(ABC):
     @abstractmethod

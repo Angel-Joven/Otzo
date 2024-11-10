@@ -4,10 +4,10 @@ from datetime import datetime
 
 @dataclass
 class DetalleVentaDTO:
-    _id_producto: int
-    _codigo_producto: str
     _nombre_producto: str
-    _categoria_producto: str
+    _codigo_producto: str = None
+    _categoria_producto: str = None
+    _id_producto: int = None
     _precio_unitario: float = 0
     _id_detalle_venta: int = None
     _id_venta: int = None
@@ -77,9 +77,6 @@ class DetalleVentaDTO:
     @devuelto.setter
     def devuelto(self, value: bool):
         self._devuelto = value
-
-    def mapear_datos(self):
-        pass
 
 
 @dataclass

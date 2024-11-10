@@ -8,15 +8,6 @@ from decimal import Decimal
 
 @dataclass
 class VentaServicio(VentaModelo):
-
-    def obtenerDatosProductos(self, productos: dict):
-        conexion = get_connection()
-        cursor = conexion.cursor(DictCursor)
-
-        # TODO: LOGICA PARA OBTENER LOS DATOS
-
-        conexion.close()
-
     def calcularTotalVenta(self, venta: VentaDTO) -> float:
 
         totalVenta = 0
@@ -25,8 +16,6 @@ class VentaServicio(VentaModelo):
             totalVenta += producto.precio_unitario
 
         return totalVenta
-
-    def calcularCantidadVenta(self, detallesVenta: list[DetalleVentaDTO]) -> dict:
         cantidad_por_producto = {}
 
         for producto in detallesVenta:

@@ -109,5 +109,22 @@ def agregar():
 @cross_origin()
 def test():
     data = request.json
-    print(data)
+
+    detalles_venta = []
+
+    for producto in data["detalles_venta"]:
+
+        # TODO: FUNCION QUE AL PASAR UN NOMBRE DE PRODUCTO Y LA CANTIDAD, RETORNE
+        # UNA LISTA DE DICCIONARIOS CON TODOS LOS CAMPOS POR CADA PRODUCTO Y SI NO HAY SUFICIENTE CANTIDAD
+        # QUE RETORNE NONE -----FUNCIONALIDAD DE INVENTARIO-----
+
+        print(producto)
+        # detalle = DetalleVentaDTO()
+
+    # INSTANCIAR VENTA
+
+    # AGREGAR VENTA A BASE DE DATOS
+
+    # ACTUALIZAR PUNTOS
+
     return jsonify({"Mensaje": "Venta agregada correctamente"}), 200

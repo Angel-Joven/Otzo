@@ -182,15 +182,17 @@ export function Ventas() {
   // Función para manejar la compra, ahora incluye el cálculo del cambio si se paga en efectivo
   const manejarCompra = async () => {
     const datosCompra = {
-      productos: carrito.map((item) => ({
+      detalles_venta: carrito.map((item) => ({
         producto: item.producto,
         cantidad: item.cantidad,
         precio: item.precio,
       })),
-      metodoPago: metodoPago,
+      metodo_pago: metodoPago,
       total: calcularTotal(),
-      efectivoDado: metodoPago === "Efectivo" ? efectivoDado : null, // Enviar efectivo dado solo si es en efectivo
+      monto_recibido: metodoPago === "Efectivo" ? efectivoDado : null, // Enviar efectivo dado solo si es en efectivo
       cambio: metodoPago === "Efectivo" ? cambio : null, // Enviar el cambio solo si es en efectivo
+      id_cliente: 1,
+      id_empleado: 1,
     };
 
     try {
@@ -218,12 +220,13 @@ export function Ventas() {
             Ventas
           </motion.h1>
         </div>
+
         <div className="grid grid-cols-1 grid-rows-1 gap-x-2.5 xl:grid-cols-2">
           <div className="w-full h-full p-4">
             <motion.div
               initial={{ x: -200, opacity: 0 }}
               animate={{ x: 0, opacity: 1, transition: { delay: 0.8 } }}
-              className="w-full h-full bg-white/100 rounded-lg p-4 shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)]"
+              className="bg-white/100 rounded-lg p-4 shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)]"
             >
               <div className="rounded-lg p-4 bg-gray-900 z-10">
                 <h2 className="font-bold text-white">
@@ -259,7 +262,7 @@ export function Ventas() {
             <motion.div
               initial={{ x: 200, opacity: 0 }}
               animate={{ x: 0, opacity: 1, transition: { delay: 0.8 } }}
-              className="w-full h-full bg-white/100 rounded-lg p-4 shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)]"
+              className="bg-white/100 rounded-lg p-4 shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)]"
             >
               <div className="rounded-lg p-4 bg-gray-900">
                 <h2 className="font-bold text-white">
@@ -272,7 +275,7 @@ export function Ventas() {
                   carrito.map((item, index) => (
                     <div
                       key={index}
-                      className="flex justify-between items-center mb-2"
+                      className="flex justify-between items-center mb-2 px-4 py-2"
                     >
                       <span className="font-bold">{item.producto}</span>
                       <div className="flex items-center gap-2">
@@ -356,16 +359,6 @@ export function Ventas() {
                 </button>
               </div>
             </motion.div>
-          </div>
-        </div>
-        <div className="hidden p-4 flex justify-center md:justify-end">
-          <div className="bg-white p-3 w-full md:w-auto md:p-4 rounded-lg">
-            <h3 className="font-bold text-3xl mb-4">
-              <span className="text-red-400">Total: </span>$250 MXN
-            </h3>
-            <button className="bg-green-500 p-3 rounded-xl w-full text-white font-bold">
-              Pagar ahora
-            </button>
           </div>
         </div>
       </div>
