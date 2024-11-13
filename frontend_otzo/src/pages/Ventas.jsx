@@ -156,6 +156,16 @@ export function Ventas() {
     );
   };
 
+  // Función para eliminar un producto del carrito
+  const eliminarDelCarrito = (producto) => {
+    setCarrito((prevCarrito) => {
+      const nuevoCarrito = prevCarrito.filter(
+        (item) => item.producto !== producto.producto
+      );
+      return nuevoCarrito;
+    });
+  };
+
   // Función para calcular el total de la compra
   const calcularTotal = () => {
     return carrito
@@ -176,6 +186,12 @@ export function Ventas() {
     setEfectivoDado(montoEfectivo);
     setCambio((montoEfectivo - calcularTotal()).toFixed(2));
   };
+
+  useEffect(() => {
+    if (metodoPago === "Efectivo") {
+      setCambio((efectivoDado - calcularTotal()).toFixed(2));
+    }
+  }, [carrito, efectivoDado]);
 
   // ... (función para calcular el total)
 
@@ -291,6 +307,12 @@ export function Ventas() {
                           }
                         />
                         <span>x ${item.precio.toFixed(2)} MXN</span>
+                        <button
+                          onClick={() => eliminarDelCarrito(item)}
+                          className="bg-red-500 p-1 rounded-full text-white"
+                        >
+                          <i className="fi fi-sr-trash"></i>
+                        </button>
                       </div>
                     </div>
                   ))
