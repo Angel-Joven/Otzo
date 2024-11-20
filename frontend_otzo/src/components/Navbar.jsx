@@ -1,3 +1,12 @@
+/*
+
+Navbar Principal para la pagina web
+Creado por: JOVEN JIMENEZ ANGEL CRISTIAN
+
+Temas Especiales de Programacion 2 | 1061
+
+*/
+
 import React from "react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -15,9 +24,12 @@ export function Navbar() {
   const location = useLocation();
 
   useEffect(() => {
-    console.log("La ruta actual es:", location.pathname);
-    setIsNavbarVisible(false);
+    // Muestra la navbar solo si la ruta es /indexClientes
+    if (location.pathname === "/") {
+      setIsNavbarVisible(false);
+    }
   }, [location.pathname]);
+console.log("La ruta actual es:", location.pathname);
 
   return (
     <>
@@ -83,78 +95,26 @@ export function Navbar() {
                 <Link
                   to={"/ventas"}
                   className={`block py-2 px-3 mb-2 ${
-                    location.pathname == "/ventas"
+                    location.pathname == "/loginClientes"
                       ? "text-black font-bold md:text-blue-500 underline"
                       : "text-white"
                   } bg-green-600 rounded md:bg-transparent md:p-0`}
                   aria-current="page"
                 >
-                  Ventas
+                  Login Clientes
                 </Link>
               </li>
               <li>
                 <Link
                   to={"/clientes"}
                   className={`block py-2 px-3 mb-2 ${
-                    location.pathname == "/clientes"
+                    location.pathname == "/loginAdministradores"
                       ? "text-black font-bold md:text-blue-500 underline"
                       : "text-white"
                   } bg-purple-600 rounded md:bg-transparent md:p-0`}
                   aria-current="page"
                 >
-                  Clientes
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"/administracion"}
-                  className={`block py-2 px-3 mb-2 ${
-                    location.pathname == "/administracion"
-                      ? "text-black font-bold md:text-blue-500 underline"
-                      : "text-white"
-                  } bg-purple-600 rounded md:bg-transparent md:p-0`}
-                  aria-current="page"
-                >
-                  Administracion
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"/fidelizacion"}
-                  className={`block py-2 px-3 mb-2 ${
-                    location.pathname == "/fidelizacion"
-                      ? "text-black font-bold md:text-blue-500 underline"
-                      : "text-white"
-                  } bg-purple-600 rounded md:bg-transparent md:p-0`}
-                  aria-current="page"
-                >
-                  Fidelización
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"/atencion"}
-                  className={`block py-2 px-3 ${
-                    location.pathname == "/atencion"
-                      ? "text-black font-bold md:text-blue-500 underline"
-                      : "text-white"
-                  } bg-blue-600 rounded md:bg-transparent md:p-0`}
-                  aria-current="page"
-                >
-                  Atención al Cliente
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"/reportes"}
-                  className={`block py-2 px-3 mb-2 ${
-                    location.pathname == "/reportes"
-                      ? "text-black font-bold md:text-blue-500 underline"
-                      : "text-white"
-                  } bg-purple-600 rounded md:bg-transparent md:p-0`}
-                  aria-current="page"
-                >
-                  Reportes
+                  Login Administradores
                 </Link>
               </li>
             </ul>
