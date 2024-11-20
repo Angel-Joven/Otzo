@@ -46,7 +46,11 @@ export function Index() {
             route={"/atencion"}
             animation_delay={1}
           />
-          <Card title={"Módulo de reportes y análisis"} animation_delay={1.1} />
+          <Card 
+            title={"Módulo de reportes y análisis"} animation_delay={1.1}
+            image={"reportes.png"}
+            route={"/reportes"} 
+          />
           <Card
             title={"Módulo de lógistica y reabastecimiento"}
             animation_delay={1.3}
