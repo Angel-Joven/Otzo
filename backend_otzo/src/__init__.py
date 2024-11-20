@@ -3,6 +3,7 @@ from .routes import ventas
 from .routes import fidelizacion
 from .routes import clientes
 from .routes import administracion
+from .routes import reportes
 
 app = Flask(__name__)
 
@@ -16,5 +17,6 @@ def init_app(config):
     app.register_blueprint(fidelizacion.fidelizacion_bp, url_prefix="/api/fidelizacion/")
     app.register_blueprint(clientes.clientes_bp, url_prefix="/api/clientes/")
     app.register_blueprint(administracion.administracion_bp, url_prefix="/api/administracion/")
+    app.register_blueprint(reportes.reportes_bp, url_prefix="/api/reportes/")
 
     return app

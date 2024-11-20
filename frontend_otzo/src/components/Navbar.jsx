@@ -144,6 +144,19 @@ export function Navbar() {
                   Atención al Cliente
                 </Link>
               </li>
+              <li>
+                <Link
+                  to={"/reportes"}
+                  className={`block py-2 px-3 mb-2 ${
+                    location.pathname == "/reportes"
+                      ? "text-black font-bold md:text-blue-500 underline"
+                      : "text-white"
+                  } bg-purple-600 rounded md:bg-transparent md:p-0`}
+                  aria-current="page"
+                >
+                  Reportes
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
