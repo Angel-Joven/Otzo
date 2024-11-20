@@ -131,7 +131,7 @@ class RangosService(RangosModelo):
                 conexion.commit()
 
                 #Validamos si el estado de la cuenta de algun cliente ya ingresado a la tabla puntos paso de 'Activo' a 'Suspendido' o 'Inactivo'
-                cursor.execute("UPDATE puntos SET habilitado = 0 WHERE idclientes_puntos IN (SELECT idCliente FROM clientes WHERE Estado IN ('Suspendido', 'Inactivo'))")
+                cursor.execute("UPDATE puntos SET habilitado = 0 WHERE idclientes_puntos IN (SELECT idCliente FROM clientes WHERE estado_cuenta IN ('Suspendido', 'Inactivo'))")
                 #Confirmamos la transaccion
                 conexion.commit()
                 return {"mensaje": "Rango 1 asignado a todos los usuarios sin rango y que sus cuentas esten activas"}

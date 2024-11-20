@@ -14,8 +14,6 @@ import { easeInOut, motion } from "framer-motion";
 
 export function Navbar() {
   const [isNavbarVisible, setIsNavbarVisible] = useState(false);
-
-  // Función para alternar la visibilidad de la navbar
   const toggleNavbar = () => {
     console.log(isNavbarVisible);
     setIsNavbarVisible(!isNavbarVisible);
@@ -24,7 +22,6 @@ export function Navbar() {
   const location = useLocation();
 
   useEffect(() => {
-    // Muestra la navbar solo si la ruta es /indexClientes
     if (location.pathname === "/") {
       setIsNavbarVisible(false);
     }
@@ -93,7 +90,7 @@ console.log("La ruta actual es:", location.pathname);
               </li>
               <li>
                 <Link
-                  to={"/ventas"}
+                  to={"/loginClientes"}
                   className={`block py-2 px-3 mb-2 ${
                     location.pathname == "/loginClientes"
                       ? "text-black font-bold md:text-blue-500 underline"
@@ -106,7 +103,7 @@ console.log("La ruta actual es:", location.pathname);
               </li>
               <li>
                 <Link
-                  to={"/clientes"}
+                  to={"/loginAdministradores"}
                   className={`block py-2 px-3 mb-2 ${
                     location.pathname == "/loginAdministradores"
                       ? "text-black font-bold md:text-blue-500 underline"

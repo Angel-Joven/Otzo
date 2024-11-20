@@ -141,7 +141,7 @@ export function Fidelizacion() {
                           <td className="py-2 px-4 border-b text-center">
                             {cliente.idCliente}
                           </td>
-                          <td className="py-2 px-4 border-b text-center">{`${cliente.Nombre} ${cliente.Apellido_Paterno} ${cliente.Apellido_Materno}`}</td>
+                          <td className="py-2 px-4 border-b text-center">{`${cliente.nombre} ${cliente.apellido_paterno} ${cliente.apellido_materno}`}</td>
                           <td className="py-2 px-4 border-b text-center">
                             {rangoCliente
                               ? rangoCliente.nombre_rango
@@ -153,7 +153,7 @@ export function Fidelizacion() {
                               : "Este Cliente NO puede obtener puntos debido al estado de su cuenta."}
                           </td>
                           <td className="py-2 px-4 border-b text-center">
-                            {cliente.Estado}
+                            {cliente.estado_cuenta}
                           </td>
                           <td className="py-2 px-4 border-b text-center">
                             {puntosCliente
@@ -244,7 +244,7 @@ export function Fidelizacion() {
                           <td className="py-2 px-4 border-b text-center">
                             {cliente.idCliente}
                           </td>
-                          <td className="py-2 px-4 border-b text-center">{`${cliente.Nombre} ${cliente.Apellido_Paterno} ${cliente.Apellido_Materno}`}</td>
+                          <td className="py-2 px-4 border-b text-center">{`${cliente.nombre} ${cliente.apellido_paterno} ${cliente.apellido_materno}`}</td>
                           <td className="py-2 px-4 border-b text-center">
                             {rangoCliente
                               ? rangoCliente.nombre_rango
@@ -256,7 +256,7 @@ export function Fidelizacion() {
                               : "Este Cliente NO puede obtener puntos debido al estado de su cuenta."}
                           </td>
                           <td className="py-2 px-4 border-b text-center">
-                            {cliente.Estado}
+                            {cliente.estado_cuenta}
                           </td>
                           <td className="py-2 px-4 border-b text-center">
                             {puntosCliente
