@@ -47,14 +47,20 @@ export function Index() {
             animation_delay={1}
           />
           <Card title={"Módulo de reportes y análisis"} animation_delay={1.1} />
-          <Card title={"Módulo de administración"} animation_delay={1.2} />
           <Card
             title={"Módulo de lógistica y reabastecimiento"}
             animation_delay={1.3}
           />
           <Card
-            title={"Módulo de control de calidad y auditoria"}
+            title={"Módulo de clientes"}
+            image={"clientes.png"}
+            route={"/clientes"}
             animation_delay={1.4}
+          />
+          <Card title={"Módulo de administración"}
+            image={"administracion.png"}
+            route={"/administracion"}
+            animation_delay={1.2}
           />
           <Card
             title={"Módulo de fidelización y marketing"}

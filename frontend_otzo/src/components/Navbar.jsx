@@ -94,6 +94,32 @@ export function Navbar() {
               </li>
               <li>
                 <Link
+                  to={"/clientes"}
+                  className={`block py-2 px-3 mb-2 ${
+                    location.pathname == "/clientes"
+                      ? "text-black font-bold md:text-blue-500 underline"
+                      : "text-white"
+                  } bg-purple-600 rounded md:bg-transparent md:p-0`}
+                  aria-current="page"
+                >
+                  Clientes
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={"/administracion"}
+                  className={`block py-2 px-3 mb-2 ${
+                    location.pathname == "/administracion"
+                      ? "text-black font-bold md:text-blue-500 underline"
+                      : "text-white"
+                  } bg-purple-600 rounded md:bg-transparent md:p-0`}
+                  aria-current="page"
+                >
+                  Administracion
+                </Link>
+              </li>
+              <li>
+                <Link
                   to={"/fidelizacion"}
                   className={`block py-2 px-3 mb-2 ${
                     location.pathname == "/fidelizacion"
