@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Index } from "./pages/Index";
 import { Ventas } from "./pages/Ventas";
 import { Fidelizacion } from "./pages/Fidelizacion";
+import { Reportes } from "./pages/Reportes";
 import { Atencion } from "./pages/Atencion";
 import "./App.css";
 import { Navbar } from "./components/Navbar";
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/ventas" element={<Ventas />} />
         <Route path="/fidelizacion" element={<Fidelizacion />} />
+        <Route path="/reportes" element={<Reportes />} />
         <Route path="/atencion" element={<Atencion />} />
       </Routes>
     </BrowserRouter>
