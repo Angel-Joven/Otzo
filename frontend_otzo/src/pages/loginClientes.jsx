@@ -7,7 +7,7 @@ Temas Especiales de Programacion 2 | 1061
 
 */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UsarAutenticadorNombre } from '../context/Autenticacion';
@@ -18,7 +18,15 @@ export function LoginClientes() {
   const [contraseña, setContraseña] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { setUserType } = UsarAutenticadorNombre();
+  const { userType, setUserType } = UsarAutenticadorNombre();
+
+  useEffect(() => {
+    if (userType === 'cliente') {
+      navigate('/indexClientes');
+    } else {
+      setUserType(null);
+    }
+  }, [userType, navigate, setUserType]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

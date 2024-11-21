@@ -7,18 +7,19 @@ Temas Especiales de Programacion 2 | 1061
 
 */
 
-import React from 'react';
-import { Navigate } from 'react-router-dom'; // Usa Navigate para redirigir
+import { Navigate } from 'react-router-dom';
 import { UsarAutenticadorNombre } from '../context/Autenticacion';
 
-export function RutaProtegida({ children }) {
-  const { userType } = UsarAutenticadorNombre(); // Verifica si hay un tipo de usuario autenticado
+export function RutaProtegida({ children, allowedUserTypes }) {
+  const { userType } = UsarAutenticadorNombre();
 
   if (!userType) {
-    // Si no hay usuario autenticado, redirige a la página principal usando Navigate
     return <Navigate to="/" />;
   }
 
-  // Si hay un usuario autenticado, renderiza el contenido de la ruta
+  if (allowedUserTypes && !allowedUserTypes.includes(userType)) {
+    return <Navigate to="/" />;
+  }
+
   return children;
 }

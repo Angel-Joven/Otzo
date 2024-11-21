@@ -12,17 +12,23 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const AutenticadorNombre = createContext();
 
 export function ObtenerAutenticadorNombre({ children }) {
-  const [userType, setUserType] = useState(null);
+  const [userType, setUserType] = useState(() => localStorage.getItem('userType') || null);
 
   useEffect(() => {
-    //Guardamos el tipo de usuario en localStorage despues de logearse
     if (userType) {
       localStorage.setItem('userType', userType);
+    } else {
+      localStorage.removeItem('userType');
     }
   }, [userType]);
 
+  const logout = () => {
+    setUserType(null);
+    localStorage.removeItem('userType');
+  };
+
   return (
-    <AutenticadorNombre.Provider value={{ userType, setUserType }}>
+    <AutenticadorNombre.Provider value={{ userType, setUserType, logout }}>
       {children}
     </AutenticadorNombre.Provider>
   );

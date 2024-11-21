@@ -34,11 +34,11 @@ def login():
     contraseña = data.get('contraseña')
 
     if not nombre or not contraseña:
-        return jsonify({"error": "Faltan datos de inicio de sesion"}), 400
+        return jsonify({"error": "El nombre y la contraseña son obligatorios"}), 400
 
     try:
-        connection = get_connection()
-        with connection.cursor(DictCursor) as cursor:
+        conexion = get_connection()
+        with conexion.cursor(DictCursor) as cursor:
             cursor.execute(
                 "SELECT id_empleado, nombre, contraseña FROM administracion WHERE nombre = %s",
                 (nombre,)
@@ -47,67 +47,20 @@ def login():
 
         if not cliente:
             return jsonify({"error": "La cuenta no existe"}), 404
-
         if cliente['contraseña'] != contraseña:
             return jsonify({"error": "La contraseña es incorrecta"}), 401
-
         return jsonify({
             "mensaje": "Inicio de sesion exitoso",
-            "cliente": {
-                "id_empleado": cliente['id_empleado'],
-                "nombre": cliente['nombre']
-            }
+            "id_empleado": cliente['id_empleado']
         }), 200
-
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        connection.close()
-    
+        conexion.close()
+
 # ---------------------------------------------------------------------------------------------------------------------------
 
-@administracion_bp.route('/crearadmin', methods=['POST'])
-def crear_administrador():
-    try:
-        data = request.get_json()
-        resultado = AdministracionService.altaAdministrador(data)
-        return jsonify(resultado), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@administracion_bp.route('/darbajaadmin/<int:id_empleado>', methods=['DELETE'])
-def baja_administrador(id_empleado):
-    try:
-        resultado = AdministracionService.bajaAdministrador(id_empleado)
-        return jsonify(resultado), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@administracion_bp.route('/suspenderadmin/<int:id_empleado>', methods=['POST'])
-def suspender_administrador(id_empleado):
-    try:
-        resultado = AdministracionService.suspenderAdministrador(id_empleado)
-        return jsonify(resultado), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@administracion_bp.route('/banearadmin/<int:id_empleado>', methods=['POST'])
-def banear_administrador(id_empleado):
-    try:
-        resultado = AdministracionService.banearAdministrador(id_empleado)
-        return jsonify(resultado), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@administracion_bp.route('/modificaradmin/<int:id_empleado>', methods=['PUT'])
-def modificar_administrador(id_empleado):
-    try:
-        data = request.get_json()
-        resultado = AdministracionService.modificarAdministrador(id_empleado, data)
-        return jsonify(resultado), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+#Ruta para obtener el id del empleado que ha iniciado sesion actualmente
 @administracion_bp.route('/sesionactualadmin/<int:id_empleado>', methods=['GET'])
 def administrador_sesionActual(id_empleado):
     try:
@@ -118,7 +71,80 @@ def administrador_sesionActual(id_empleado):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@administracion_bp.route('/<int:id_empleado>', methods=['GET'])
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para crear un administrador (dar de alta)
+@administracion_bp.route('/crearadmin', methods=['POST'])
+def crear_administrador():
+    try:
+        data = request.get_json()
+        resultado = AdministracionService.altaAdministrador(data)
+        return jsonify(resultado), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para inactivar un administrador (dar de baja)
+@administracion_bp.route('/darbajaadmin/<int:id_empleado>', methods=['DELETE'])
+def baja_administrador(id_empleado):
+    try:
+        resultado = AdministracionService.bajaAdministrador(id_empleado)
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para suspender un administrador
+@administracion_bp.route('/suspenderadmin/<int:id_empleado>', methods=['POST'])
+def suspender_administrador(id_empleado):
+    try:
+        resultado = AdministracionService.suspenderAdministrador(id_empleado)
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para banear un administrador
+@administracion_bp.route('/banearadmin/<int:id_empleado>', methods=['POST'])
+def banear_administrador(id_empleado):
+    try:
+        resultado = AdministracionService.banearAdministrador(id_empleado)
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta para modificar la informacion de un administrador (Modificacion)
+@administracion_bp.route('/modificaradmin/<int:id_empleado>', methods=['PUT'])
+def modificar_administrador(id_empleado):
+    try:
+        data = request.get_json()
+        resultado = AdministracionService.modificarAdministrador(id_empleado, data)
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta que devuelve todos los administradores que existen en la BD
+@administracion_bp.route('/administradores', methods=['GET'])
+def devolver_lista_administradores():
+    try:
+        administrador = AdministracionService.devolverListaAdministradores()
+        return jsonify(administrador), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Ruta que devuelve a 1 administrador en concreto en base al id_empleado
+@administracion_bp.route('/administradores/<int:id_empleado>', methods=['GET'])
 def devolver_administrador(id_empleado):
     try:
         administrador = AdministracionService.devolverAdministrador(id_empleado)
@@ -127,3 +153,5 @@ def devolver_administrador(id_empleado):
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------

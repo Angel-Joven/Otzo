@@ -16,7 +16,7 @@ import "./App.css";
 import { Navbar } from "./components/Navbar"; //Navbar general
 import { NavbarClientes } from "./components/NavbarClientes"; //Navbar para clientes
 import { NavbarAdministradores } from "./components/NavbarAdministradores"; //Navbar para los administradores
-import { RutaProtegida } from './components/RutasProtegidas';
+import { RutaProtegida } from './components/RutasProtegidas'; //Proteger rutas para que solo puedan acceder usuarios logeados
 
 function AppContent() {
   const location = useLocation();
@@ -44,14 +44,14 @@ function AppContent() {
         <Route path="/" element={<IndexPrincipal />} />
         <Route path="/loginClientes" element={<LoginClientes />} />
         <Route path="/loginAdministradores" element={<LoginAdministradores />} />
-        <Route path="/indexClientes" element={<RutaProtegida> <IndexClientes /> </RutaProtegida>} />
-        <Route path="/indexAdministradores" element={<RutaProtegida> <IndexAdministradores /> </RutaProtegida>} />
-        <Route path="/ventas" element={<RutaProtegida> <Ventas /> </RutaProtegida>} />
-        <Route path="/fidelizacion" element={<RutaProtegida> <Fidelizacion /> </RutaProtegida>} />
-        <Route path="/reportes" element={<RutaProtegida> <Reportes /> </RutaProtegida>} />
-        <Route path="/atencion" element={<RutaProtegida> <Atencion /> </RutaProtegida>} />
-        <Route path="/clientes" element={<RutaProtegida> <Clientes /> </RutaProtegida>} />
-        <Route path="/administracion" element={<RutaProtegida> <Administracion /> </RutaProtegida>} />
+        <Route path="/indexClientes" element={<RutaProtegida allowedUserTypes={['cliente']} > <IndexClientes /> </RutaProtegida>} />
+        <Route path="/indexAdministradores" element={<RutaProtegida allowedUserTypes={['administrador']}> <IndexAdministradores /> </RutaProtegida>} />
+        <Route path="/ventas" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Ventas /> </RutaProtegida>} />
+        <Route path="/fidelizacion" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Fidelizacion /> </RutaProtegida>} />
+        <Route path="/reportes" element={<RutaProtegida allowedUserTypes={['administrador']}> <Reportes /> </RutaProtegida>} />
+        <Route path="/atencion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Atencion /> </RutaProtegida>} />
+        <Route path="/clientes" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Clientes /> </RutaProtegida>} />
+        <Route path="/administracion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Administracion /> </RutaProtegida>} />
       </Routes>
     </>
   );

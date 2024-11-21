@@ -7,25 +7,22 @@ Temas Especiales de Programacion 2 | 1061
 
 */
 
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { easeInOut, motion } from "framer-motion";
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { UsarAutenticadorNombre } from '../context/Autenticacion';
 
 export function NavbarAdministradores() {
-  const [isNavbarVisible, setIsNavbarVisible] = useState(false);
+  const { logout } = UsarAutenticadorNombre();
+  const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    if (location.pathname === "/indexAdministradores") {
-      setIsNavbarVisible(true);
-    } else {
-      setIsNavbarVisible(false);
-    }
-  }, [location.pathname]);
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
-  if (!isNavbarVisible) {
-    return null;
-  }
+  const [isNavbarVisible, setIsNavbarVisible] = useState(false);
 
   return (
     <motion.nav className="bg-gray-900 h-20">
@@ -47,7 +44,7 @@ export function NavbarAdministradores() {
           type="button"
           className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm rounded-lg md:hidden focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
           aria-controls="navbar-default"
-          aria-expanded="false"
+          aria-expanded={isNavbarVisible}
         >
           <span className="sr-only">Open main menu</span>
           <svg
@@ -75,9 +72,9 @@ export function NavbarAdministradores() {
           <ul className="font-medium flex flex-col p-4 md:p-2 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 bg-gray-800 md:bg-gray-900 border-gray-700 w-full">
             <li>
               <Link
-                to={"/"}
+                to={"/indexAdministradores"}
                 className={`block py-2 px-3 mb-2 ${
-                  location.pathname === "/"
+                  location.pathname === "/indexAdministradores"
                     ? "text-black font-bold md:text-blue-500 underline"
                     : "text-white"
                 } bg-orange-600 rounded md:bg-transparent md:p-0`}
@@ -106,7 +103,7 @@ export function NavbarAdministradores() {
                   location.pathname === "/clientes"
                     ? "text-black font-bold md:text-blue-500 underline"
                     : "text-white"
-                } bg-purple-600 rounded md:bg-transparent md:p-0`}
+                } bg-yellow-500 rounded md:bg-transparent md:p-0`}
                 aria-current="page"
               >
                 Clientes
@@ -119,7 +116,7 @@ export function NavbarAdministradores() {
                   location.pathname === "/administracion"
                     ? "text-black font-bold md:text-blue-500 underline"
                     : "text-white"
-                } bg-purple-600 rounded md:bg-transparent md:p-0`}
+                } bg-red-600 rounded md:bg-transparent md:p-0`}
                 aria-current="page"
               >
                 Administracion
@@ -141,7 +138,7 @@ export function NavbarAdministradores() {
             <li>
               <Link
                 to={"/atencion"}
-                className={`block py-2 px-3 ${
+                className={`block py-2 px-3 mb-2 ${
                   location.pathname === "/atencion"
                     ? "text-black font-bold md:text-blue-500 underline"
                     : "text-white"
@@ -158,11 +155,16 @@ export function NavbarAdministradores() {
                   location.pathname === "/reportes"
                     ? "text-black font-bold md:text-blue-500 underline"
                     : "text-white"
-                } bg-purple-600 rounded md:bg-transparent md:p-0`}
+                } bg-gray-500 rounded md:bg-transparent md:p-0`}
                 aria-current="page"
               >
                 Reportes
               </Link>
+            </li>
+            <li>
+              <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">
+                Cerrar Sesión
+              </button>
             </li>
           </ul>
         </div>

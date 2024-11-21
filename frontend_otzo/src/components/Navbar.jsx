@@ -95,7 +95,7 @@ console.log("La ruta actual es:", location.pathname);
                     location.pathname == "/loginClientes"
                       ? "text-black font-bold md:text-blue-500 underline"
                       : "text-white"
-                  } bg-green-600 rounded md:bg-transparent md:p-0`}
+                  } bg-yellow-500 rounded md:bg-transparent md:p-0`}
                   aria-current="page"
                 >
                   Login Clientes
@@ -108,7 +108,7 @@ console.log("La ruta actual es:", location.pathname);
                     location.pathname == "/loginAdministradores"
                       ? "text-black font-bold md:text-blue-500 underline"
                       : "text-white"
-                  } bg-purple-600 rounded md:bg-transparent md:p-0`}
+                  } bg-red-600 rounded md:bg-transparent md:p-0`}
                   aria-current="page"
                 >
                   Login Administradores
