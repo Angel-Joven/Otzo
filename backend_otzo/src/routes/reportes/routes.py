@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
-from reportesModels import obtener_reporte_mas_reciente
-from reportesDTO import ReporteDTO
+from src.models.reportes.reportesModels import obtener_reporte_mas_reciente
+from src.models.reportes.reportesDTO import ReporteDTO
 
 # Crear un Blueprint para las rutas de reportes
 reportes_bp = Blueprint('reportes', __name__)

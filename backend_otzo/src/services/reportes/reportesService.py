@@ -1,6 +1,6 @@
 from datetime import datetime
-from reportesModels import obtener_datos_puntos, guardar_reporte_diario
-from reportesDTO import ReporteDTO
+from src.models.reportes.reportesModels import obtener_datos_puntos, guardar_reporte_diario
+from src.models.reportes.reportesDTO import ReporteDTO
 
 def generar_reporte_diario():
     """Genera el reporte diario de puntos."""
