@@ -39,22 +39,16 @@ export function IndexClientes() {
         </div>
         <div className="p-4 gap-4 flex flex-col items-center flex-wrap md:justify-center md:flex-row">
           <Card
-            title={"Módulo de ventas"}
-            image={"carro.png"}
-            route={"/ventas"}
-            animation_delay={0.8}
-          />
-          <Card
             title={"Módulo de clientes"}
             image={"clientes.png"}
             route={"/clientes"}
             animation_delay={0.9}
           />
           <Card
-            title={"Módulo de fidelización y marketing"}
-            image={"fidelizacion.png"}
-            route={"/fidelizacion"}
-            animation_delay={1}
+            title={"Módulo de ventas"}
+            image={"carro.png"}
+            route={"/ventas"}
+            animation_delay={0.8}
           />
         </div>
       </div>

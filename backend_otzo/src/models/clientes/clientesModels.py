@@ -15,6 +15,11 @@ class ClientesModelo(ABC):
         pass
 
     @abstractmethod
+    def altaClienteLogin(self, nombre, apellido_paterno, apellido_materno, contacto_correo, contraseña):
+        """Generamos el poder de crear una cuenta para algun cliente desde el login"""
+        pass
+
+    @abstractmethod
     def bajaCliente(self, id_cliente):
         """Generamos el poder de dar de baja a un cliente"""
         pass

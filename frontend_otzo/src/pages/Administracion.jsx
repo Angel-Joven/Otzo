@@ -16,6 +16,8 @@ export function Administracion() {
   const [listaAdministradores, setListaAdministradores] = useState([]);
   const [administradorParaEditar, setAdministradorParaEditar] = useState(null);
   const [administradorParaAñadir, setAdministradorParaAñadir] = useState(null);
+  const [mostrarMensajeModalAutorizacion, setmostrarMensajeModalAutorizacion] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
   const administradorAlmacenado = localStorage.getItem('administrador');
   let idEmpleado = null;
 
@@ -62,7 +64,34 @@ export function Administracion() {
       });
   }, [idEmpleado]);
 
+  const verificarPermisosAdministrador = () => {
+    const estadosRestringidos = ['Suspendido', 'Inactivo', 'Baneado'];
+    const areasPermitidas = ['Administracion', 'DBA'];
+  
+    if (administradorActual && estadosRestringidos.includes(administradorActual.estado_cuenta)) {
+      setModalMessage(
+        `No puede usar este boton porque su cuenta tiene el estado: "${administradorActual.estado_cuenta}"\n
+         Por favor, contacte al DBA o a algun otro Administrador para poder resolver este problema.`
+      );
+      setmostrarMensajeModalAutorizacion(true);
+      return false;
+    }
+  
+    if (!administradorActual || !areasPermitidas.includes(administradorActual.area_Trabajo)) {
+      setModalMessage(
+        `No puede usar este boton debido a que no tiene el area de trabajo necesario para poder usar estos botones.\n
+        Solo los usuarios con las areas de trabajo: ${areasPermitidas.join(', ')} tienen acceso.\n
+        Su area de trabajo actual es: ${administradorActual ? administradorActual.area_Trabajo : 'Desconocida'}.`
+      );
+      setmostrarMensajeModalAutorizacion(true);
+      return false;
+    }
+  
+    return true;
+  };
+
   const manejarClickModificar = (administrador) => {
+    if (!verificarPermisosAdministrador()) return;
     //Convertimos la fecha de nacimiento a formato "YYYY-MM-DD"
     if (administrador.fecha_nacimiento) {
       const fechaNacimiento = new Date(administrador.fecha_nacimiento);
@@ -71,9 +100,8 @@ export function Administracion() {
       const año = fechaNacimiento.getFullYear();
       administrador.fecha_nacimiento = `${año}-${mes}-${dia}`;
     }
-
     setAdministradorParaEditar(administrador);
-  };
+  }
 
   const manejarConfirmarCambios = () => {
     const {
@@ -137,34 +165,36 @@ export function Administracion() {
   };
 
   const manejarDarDeBaja = (id_empleado) => {
+    if (!verificarPermisosAdministrador()) return;
     axios.delete(`http://localhost:5000/api/administracion/darbajaadmin/${id_empleado}`)
       .then(respuesta => {
         alert(respuesta.data.mensaje);
         window.location.reload();
       })
-      .catch(error => {
-        console.error("Error al dar de baja al administrador:", error);
-      });
-  };
+    .catch(error => {
+      console.error("Error al dar de baja al administrador:", error);
+    });
+  }
 
   const manejarClickAñadirAdministrador = () => {
+    if (!verificarPermisosAdministrador()) return;
     setAdministradorParaAñadir({
-      nombre: "",
-      apellido_paterno: "",
-      apellido_materno: "",
-      fecha_nacimiento: "",
-      genero: "",
-      direccion_calle: "",
-      direccion_colonia: "",
-      direccion_codigopostal: "",
-      direccion_estado: "",
-      direccion_municipio: "",
-      contacto_correo: "",
-      contraseña: "",
-      contacto_telefono: "",
-      area_Trabajo: ""
+    nombre: "",
+    apellido_paterno: "",
+    apellido_materno: "",
+    fecha_nacimiento: "",
+    genero: "",
+    direccion_calle: "",
+    direccion_colonia: "",
+    direccion_codigopostal: "",
+    direccion_estado: "",
+    direccion_municipio: "",
+    contacto_correo: "",
+    contraseña: "",
+    contacto_telefono: "",
+    area_Trabajo: ""
     });
-  };
+  }
 
   const manejarConfirmarAñadir = () => {
     const {
@@ -498,6 +528,31 @@ export function Administracion() {
           </div>
         </div>
       )}
+        {/* Modal - autorizacion */}
+        {mostrarMensajeModalAutorizacion && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-4 text-center">Acceso Denegado</h2>
+              <p className="mb-4 text-center">
+                {modalMessage.split('\n').map((line, index) => (
+                  <span key={index}>
+                    {line.trim()}
+                    <br />
+                  </span>
+                ))}
+              </p>
+              <div className="flex justify-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => setmostrarMensajeModalAutorizacion(false)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 }

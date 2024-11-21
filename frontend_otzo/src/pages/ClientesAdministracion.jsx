@@ -13,10 +13,58 @@ import axios from "axios";
 
 export function ClientesAdministracion() {
   const [clienteActual, setClienteActual] = useState(null);
+  const [administradorActual, setAdministradorActual] = useState(null);
+  const administradorAlmacenado = localStorage.getItem('administrador');
+  let idEmpleado = null;
   const [listaClientes, setListaClientes] = useState([]);
   const [clienteParaEditar, setClienteParaEditar] = useState(null);
   const [clienteParaAñadir, setClienteParaAñadir] = useState(null);
-  
+  const [mostrarMensajeModalAutorizacion, setmostrarMensajeModalAutorizacion] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+
+  if (administradorAlmacenado && administradorAlmacenado !== 'undefined') {
+    try {
+      const administradorParseado = JSON.parse(administradorAlmacenado);
+      console.log("Datos del administrador almacenado:", administradorParseado);
+      if (administradorParseado && administradorParseado.id_empleado) {
+        idEmpleado = administradorParseado.id_empleado;
+      }
+    } catch (error) {
+      console.error('Error al parsear el administrador del localStorage:', error);
+    }
+  }
+  console.log("ID del empleado obtenido:", idEmpleado);
+
+  useEffect(() => {
+    //Para obtener el id del administrador actual (el que inicio sesion)
+    if (idEmpleado) {
+      axios.get(`http://localhost:5000/api/administracion/sesionactualadmin/${idEmpleado}`)
+        .then(respuesta => {
+          if (respuesta.data && !respuesta.data.error) {
+            setAdministradorActual(respuesta.data);
+          } else {
+            console.error("Error en la respuesta del servidor para el administrador actual:", respuesta.data);
+          }
+        })
+        .catch(error => {
+          console.error("Error al obtener el administrador actual:", error);
+        });
+    }
+
+    //Para obtener la lista de todos los administradores
+    axios.get('http://localhost:5000/api/administracion/administradores')
+      .then(respuesta => {
+        if (Array.isArray(respuesta.data)) {
+          setListaAdministradores(respuesta.data);
+        } else {
+          console.error("Error en la respuesta del servidor para la lista de administradores:", respuesta.data);
+        }
+      })
+      .catch(error => {
+        console.error("Error al obtener la lista de todos los administradores:", error);
+      });
+  }, [idEmpleado]);
+
   const clienteAlmacenado = localStorage.getItem('cliente');
   let idCliente = null;
 
@@ -84,7 +132,34 @@ export function ClientesAdministracion() {
 
   }, [idCliente]);
 
+  const verificarPermisosCliente = () => {
+    const estadosRestringidos = ['Suspendido', 'Inactivo', 'Baneado'];
+    const areasPermitidas = ['Clientes', 'Administracion', 'DBA'];
+  
+    if (administradorActual && estadosRestringidos.includes(administradorActual.estado_cuenta)) {
+      setModalMessage(
+        `No puede usar este boton porque su cuenta tiene el estado: "${administradorActual.estado_cuenta}".\n
+        Por favor, contacte al DBA o a algun otro Administrador para poder resolver este problema.`
+      );
+      setmostrarMensajeModalAutorizacion(true);
+      return false;
+    }
+  
+    if (!administradorActual || !areasPermitidas.includes(administradorActual.area_Trabajo)) {
+      setModalMessage(
+        `No puede usar este boton debido a que no tiene el area de trabajo necesario para poder usar estos botones.\n
+        Solo los usuarios con las areas de trabajo: ${areasPermitidas.join(', ')} tienen acceso.\n
+        Su area de trabajo actual es: ${administradorActual ? administradorActual.area_Trabajo : 'Desconocida'}.`
+      );
+      setmostrarMensajeModalAutorizacion(true);
+      return false;
+    }
+  
+    return true;
+  };
+
   const manejarClickModificar = (cliente) => {
+    if (!verificarPermisosCliente()) return;
     //Convertimos la fecha de nacimiento a formato "YYYY-MM-DD"
     if (cliente.fecha_nacimiento) {
       const fechaNacimiento = new Date(cliente.fecha_nacimiento);
@@ -163,6 +238,7 @@ export function ClientesAdministracion() {
   };
 
   const manejarDarDeBaja = (idCliente) => {
+    if (!verificarPermisosCliente()) return;
     axios.delete(`http://localhost:5000/api/clientes/darbajacliente/${idCliente}`)
       .then(respuesta => {
         alert(respuesta.data.mensaje);
@@ -174,6 +250,7 @@ export function ClientesAdministracion() {
   };
 
   const manejarClickAñadirCliente = () => {
+    if (!verificarPermisosCliente()) return;
     setClienteParaAñadir({
       nombre: "",
       apellido_paterno: "",
@@ -534,6 +611,31 @@ export function ClientesAdministracion() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+    {/* Modal - autorizacion */}
+    {mostrarMensajeModalAutorizacion && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-center">Acceso Denegado</h2>
+            <p className="mb-4 text-center">
+              {modalMessage.split("\n").map((line, index) => (
+                <span key={index}>
+                  {line.trim()}
+                  <br />
+                </span>
+              ))}
+            </p>
+            <div className="flex justify-center mt-4">
+              <button
+                type="button"
+                onClick={() => setmostrarMensajeModalAutorizacion(false)}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}

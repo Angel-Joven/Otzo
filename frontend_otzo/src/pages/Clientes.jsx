@@ -1,8 +1,10 @@
 /*
-Página Principal para el Módulo de Clientes
+
+Página Principal para el Modulo de Clientes
 Creado por: JOVEN JIMENEZ ANGEL CRISTIAN
 
 Temas Especiales de Programación 2 | 1061
+
 */
 
 import React, { useEffect, useState } from "react";
@@ -201,7 +203,7 @@ export function Clientes() {
                       <td className="py-2 px-4 border-b text-center">
                         {(() => {
                           const puntosCliente = puntos.find(p => p.idclientes_puntos === clienteActual.idCliente);
-                          return puntosCliente ? puntosCliente.total_puntos : "N/A";
+                          return puntosCliente ? puntosCliente.total_puntos : "N/A (Cierre e inicie sesion de nuevo para actualizar su cuenta. Si no funciona, contacte a Atencion al Cliente)";
                         })()}
                       </td>
                       <td className="py-2 px-4 border-b text-center">
@@ -209,14 +211,14 @@ export function Clientes() {
                           const puntosCliente = puntos.find(p => p.idclientes_puntos === clienteActual.idCliente);
                           if (puntosCliente) {
                             const rangoCliente = rangos.find(r => r.idrango === puntosCliente.idrango);
-                            return rangoCliente ? rangoCliente.nombre_rango : "N/A";
+                            return rangoCliente ? rangoCliente.nombre_rango : "N/A (Cierre e inicie sesion de nuevo para actualizar su cuenta. Si no funciona, contacte a Atencion al Cliente)";
                           }
-                          return "N/A";
+                          return "N/A (Cierre e inicie sesion de nuevo para actualizar su cuenta. Si no funciona, contacte a Atencion al Cliente)";
                         })()}
                       </td>
                       <td className="py-2 px-4 border-b text-center">{clienteActual.estado_cuenta}</td>
                       <td className="py-2 px-4 border-b text-center">
-                        <button onClick={() => manejarClickModificar(clienteActual)} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Modificar</button>
+                        <button onClick={() => manejarClickModificar(clienteActual)} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Modificar Informacion</button>
                       </td>
                     </tr>
                   ) : (
@@ -231,7 +233,7 @@ export function Clientes() {
         </div>
 
         {/* Recuadro - Lista de clientes */}
-        <div className="grid grid-cols-1 gap-4">
+        {/*<div className="grid grid-cols-1 gap-4">
           <motion.div
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { delay: 0.8 } }}
@@ -281,9 +283,53 @@ export function Clientes() {
               </table>
             </div>
           </motion.div>
-        </div>
+        </div>*/}
+        {/* Recuadro - Lista de todos los rangos */}
+        <motion.div
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1, transition: { delay: 0.8 } }}
+          className="w-full bg-white/100 rounded-lg p-4 shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)]"
+        >
+          <div className="shadow-lg rounded-lg p-4 bg-gray-900">
+            <center>
+              <h2 className="font-bold text-white">
+                <i className="align-middle fi fi-sr-document"></i> Rangos Que Usted Puede Obtener y sus Beneficios
+              </h2>
+            </center>
+          </div>
+          <div className="h-[calc(25vh)] md:h-[calc(50vh)] overflow-y-auto">
+            <table className="min-w-full bg-white">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 border-b text-center">Nombre del Rango</th>
+                  <th className="py-2 px-4 border-b text-center">
+                    Porcentaje de Puntos<br />a obtener de una Compra (%)
+                  </th>
+                  <th className="py-2 px-4 border-b text-center">
+                    Porcentaje de Puntos<br />a obtener de una Devolucion (%)
+                  </th>
+                  <th className="py-2 px-4 border-b text-center">
+                    Numero Total de<br />Compras Necesarias<br />para obtener este Rango
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rangos.map((rango, index) => (
+                  <tr
+                    key={rango.idrango}
+                    className={index % 2 === 0 ? "bg-gray-100" : "bg-gray-200"}
+                  >
+                    <td className="py-2 px-4 border-b text-center">{rango.nombre_rango}</td>
+                    <td className="py-2 px-4 border-b text-center">{rango.porcentaje_puntos}</td>
+                    <td className="py-2 px-4 border-b text-center">{rango.porcentaje_devolucionPuntos}</td>
+                    <td className="py-2 px-4 border-b text-center">{rango.num_ComprasRequisito}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
       </div>
-
       {/* Formulario para poder modificar el cliente */}
       {clienteParaEditar && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">

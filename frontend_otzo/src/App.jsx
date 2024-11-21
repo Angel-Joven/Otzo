@@ -48,7 +48,8 @@ function AppContent() {
         <Route path="/indexClientes" element={<RutaProtegida allowedUserTypes={['cliente']} > <IndexClientes /> </RutaProtegida>} />
         <Route path="/indexAdministradores" element={<RutaProtegida allowedUserTypes={['administrador']}> <IndexAdministradores /> </RutaProtegida>} />
         <Route path="/ventas" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Ventas /> </RutaProtegida>} />
-        <Route path="/fidelizacion" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Fidelizacion /> </RutaProtegida>} />
+        {/* <Route path="/fidelizacion" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Fidelizacion /> </RutaProtegida>} /> */}
+        <Route path="/fidelizacion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Fidelizacion /> </RutaProtegida>} />
         <Route path="/reportes" element={<RutaProtegida allowedUserTypes={['administrador']}> <Reportes /> </RutaProtegida>} />
         <Route path="/atencion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Atencion /> </RutaProtegida>} />
         <Route path="/clientes" element={<RutaProtegida allowedUserTypes={['cliente']}> <Clientes /> </RutaProtegida>} />

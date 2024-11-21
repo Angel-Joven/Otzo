@@ -85,19 +85,6 @@ export function NavbarClientes() {
             </li>
             <li>
               <Link
-                to={"/ventas"}
-                className={`block py-2 px-3 mb-2 ${
-                  location.pathname === "/ventas"
-                    ? "text-black font-bold md:text-blue-500 underline"
-                    : "text-white"
-                } bg-green-600 rounded md:bg-transparent md:p-0`}
-                aria-current="page"
-              >
-                Ventas
-              </Link>
-            </li>
-            <li>
-              <Link
                 to={"/clientes"}
                 className={`block py-2 px-3 mb-2 ${
                   location.pathname === "/clientes"
@@ -111,15 +98,15 @@ export function NavbarClientes() {
             </li>
             <li>
               <Link
-                to={"/fidelizacion"}
+                to={"/ventas"}
                 className={`block py-2 px-3 mb-2 ${
-                  location.pathname === "/fidelizacion"
+                  location.pathname === "/ventas"
                     ? "text-black font-bold md:text-blue-500 underline"
                     : "text-white"
-                } bg-purple-600 rounded md:bg-transparent md:p-0`}
+                } bg-green-600 rounded md:bg-transparent md:p-0`}
                 aria-current="page"
               >
-                Fidelización
+                Ventas
               </Link>
             </li>
             <li>

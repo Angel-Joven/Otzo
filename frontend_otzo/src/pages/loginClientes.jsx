@@ -17,6 +17,21 @@ export function LoginClientes() {
   const [nombre, setNombre] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [error, setError] = useState('');
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarReset, setMostrarReset] = useState(false);
+  const [resetData, setResetData] = useState({
+    nombre: '',
+    apellido_paterno: '',
+    apellido_materno: '',
+    nueva_contraseña: '',
+  });
+  const [nuevaCuenta, setNuevaCuenta] = useState({
+    nombre: '',
+    apellido_paterno: '',
+    apellido_materno: '',
+    contacto_correo: '',
+    contraseña: '',
+  });
   const navigate = useNavigate();
   const { userType, setUserType } = UsarAutenticadorNombre();
 
@@ -33,15 +48,60 @@ export function LoginClientes() {
     try {
       const response = await axios.post('http://localhost:5000/api/clientes/login', { nombre, contraseña });
       if (response.status === 200) {
-        //Guardamos la informacion del cliente en el estado o en el 'localStorage' y le asignamos el tipo de usuario
         setUserType('cliente');
         localStorage.setItem('administrador', JSON.stringify(response.data));
         localStorage.setItem('cliente', JSON.stringify(response.data));
-        //Lo mandamos a la ruta de clientes
         navigate('/indexClientes');
       }
     } catch (err) {
       setError(err.response?.data?.error || 'Error al iniciar sesion');
+    }
+  };
+
+  const manejarCambioEntrada = (e) => {
+    const { name, value } = e.target;
+    setNuevaCuenta({ ...nuevaCuenta, [name]: value });
+  };
+
+  const manejarCrearCuenta = async () => {
+    const { nombre, apellido_paterno, apellido_materno, contacto_correo, contraseña } = nuevaCuenta;
+
+    if (!nombre || !apellido_paterno || !contacto_correo || !contraseña) {
+      alert('Por favor, complete todos los campos obligatorios.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/clientes/verificarcliente', nuevaCuenta);
+      if (response.data.existe) {
+        alert('Esta cuenta ya existe. Por favor, inicie sesion con esta cuenta.');
+        return;
+      }
+
+      await axios.post('http://localhost:5000/api/clientes/crearclientelogin', nuevaCuenta);
+      alert('Cuenta creada con éxito. Por favor, inicie sesion.');
+      setMostrarModal(false);
+    } catch (error) {
+      console.error('Error al crear la cuenta:', error);
+      alert(error.response?.data?.error || 'Error al crear la cuenta.');
+    }
+  };
+
+  const manejarResetearContraseña = async () => {
+    const { nombre, apellido_paterno, apellido_materno, nueva_contraseña } = resetData;
+
+    if (!nombre || !apellido_paterno || !apellido_materno || !nueva_contraseña) {
+      alert('Por favor, complete todos los campos obligatorios.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/clientes/resetearcontraseña', resetData);
+      alert(response.data.mensaje || 'Contraseña actualizada con wxito. Por favor, inicie sesion.');
+      setMostrarReset(false);
+    } catch (error) {
+      console.error('Error al resetear la contraseña:', error);
+      alert(error.response?.data?.error || 'Error al resetear la contraseña.');
     }
   };
 
@@ -68,7 +128,16 @@ export function LoginClientes() {
             {error}
           </motion.p>
         )}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { delay: 0.2 } }}
+          className="text-center text-blue-500 font-semibold cursor-pointer mb-4"
+          onClick={() => setMostrarReset(true)}
+        >
+          ¿Olvido su contraseña?
+        </motion.p>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <label>Nombre</label>
           <motion.input
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { delay: 0.4 } }}
@@ -78,6 +147,7 @@ export function LoginClientes() {
             onChange={(e) => setNombre(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
+          <label>Contraseña</label>
           <motion.input
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
@@ -96,7 +166,146 @@ export function LoginClientes() {
             Ingresar
           </motion.button>
         </form>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { delay: 0.7 } }}
+          className="text-center mt-4"
+        >
+          ¿Es nuevo y no tiene cuenta?{' '}
+          <span
+            className="text-yellow-600 font-bold cursor-pointer hover:underline"
+            onClick={() => setMostrarModal(true)}
+          >
+            ¡De clic aqui para crear una nueva cuenta!
+          </span>
+        </motion.p>
       </div>
+
+      {mostrarModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-md md:max-w-lg">
+            <h2 className="text-2xl font-bold mb-4 text-center">Crear Cuenta</h2>
+            <div className="grid gap-4">
+              <label>Nombre(s)</label>
+              <input
+                type="text"
+                name="nombre"
+                value={nuevaCuenta.nombre}
+                onChange={manejarCambioEntrada}
+                placeholder="Nombre"
+                className="p-2 border rounded"
+              />
+              <label>Apellido Paterno</label>
+              <input
+                type="text"
+                name="apellido_paterno"
+                value={nuevaCuenta.apellido_paterno}
+                onChange={manejarCambioEntrada}
+                placeholder="Apellido Paterno"
+                className="p-2 border rounded"
+              />
+              <label>Apellido Materno</label>
+              <input
+                type="text"
+                name="apellido_materno"
+                value={nuevaCuenta.apellido_materno}
+                onChange={manejarCambioEntrada}
+                placeholder="Apellido Materno"
+                className="p-2 border rounded"
+              />
+              <label>Correo Electronico</label>
+              <input
+                type="email"
+                name="contacto_correo"
+                value={nuevaCuenta.contacto_correo}
+                onChange={manejarCambioEntrada}
+                placeholder="Correo Electronico"
+                className="p-2 border rounded"
+              />
+              <label>Contraseña</label>
+              <input
+                type="password"
+                name="contraseña"
+                value={nuevaCuenta.contraseña}
+                onChange={manejarCambioEntrada}
+                placeholder="Contraseña"
+                className="p-2 border rounded"
+              />
+              <button
+                onClick={manejarCrearCuenta}
+                className="bg-green-500 text-white py-2 rounded hover:bg-green-600"
+              >
+                Crear Cuenta
+              </button>
+              <button
+                onClick={() => setMostrarModal(false)}
+                className="bg-gray-500 text-white py-2 rounded hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mostrarReset && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-md md:max-w-lg">
+            <h2 className="text-2xl font-bold mb-4 text-center">Resetear Contraseña</h2>
+            <div className="grid gap-4">
+              <label>Nombre(s)</label>
+              <input
+                type="text"
+                name="nombre"
+                value={resetData.nombre}
+                onChange={(e) => setResetData({ ...resetData, [e.target.name]: e.target.value })}
+                placeholder="Nombre"
+                className="p-2 border rounded"
+              />
+              <label>Apellido Paterno</label>
+              <input
+                type="text"
+                name="apellido_paterno"
+                value={resetData.apellido_paterno}
+                onChange={(e) => setResetData({ ...resetData, [e.target.name]: e.target.value })}
+                placeholder="Apellido Paterno"
+                className="p-2 border rounded"
+              />
+              <label>Apellido Materno</label>
+              <input
+                type="text"
+                name="apellido_materno"
+                value={resetData.apellido_materno}
+                onChange={(e) => setResetData({ ...resetData, [e.target.name]: e.target.value })}
+                placeholder="Apellido Materno"
+                className="p-2 border rounded"
+              />
+              <label>Nueva Contraseña</label>
+              <input
+                type="password"
+                name="nueva_contraseña"
+                value={resetData.nueva_contraseña}
+                onChange={(e) => setResetData({ ...resetData, [e.target.name]: e.target.value })}
+                placeholder="Nueva Contraseña"
+                className="p-2 border rounded"
+              />
+              <button
+                onClick={manejarResetearContraseña}
+                className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+              >
+                Resetear Contraseña
+              </button>
+              <button
+                onClick={() => setMostrarReset(false)}
+                className="bg-gray-500 text-white py-2 rounded hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
+

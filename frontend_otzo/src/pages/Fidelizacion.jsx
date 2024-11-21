@@ -13,12 +13,99 @@ import { FidelizacionData } from "../api/fidelizacionData.api.js";
 import axios from "axios";
 
 export function Fidelizacion() {
+  const [administradorActual, setAdministradorActual] = useState(null);
+  const [listaAdministradores, setListaAdministradores] = useState([]);
+  const [mostrarMensajeModalAutorizacion, setmostrarMensajeModalAutorizacion] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const administradorAlmacenado = localStorage.getItem('administrador');
   const [clientes, setClientes] = useState([]);
   const [puntos, setPuntos] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [loadingClientes, setLoadingClientes] = useState(true);
   const [loadingPuntos, setLoadingPuntos] = useState(true);
   const [loadingRangos, setLoadingRangos] = useState(true);
+  let idEmpleado = null;
+
+  if (administradorAlmacenado && administradorAlmacenado !== 'undefined') {
+    try {
+      const administradorParseado = JSON.parse(administradorAlmacenado);
+      console.log("Datos del administrador almacenado:", administradorParseado);
+      if (administradorParseado && administradorParseado.id_empleado) {
+        idEmpleado = administradorParseado.id_empleado;
+      }
+    } catch (error) {
+      console.error('Error al parsear el administrador del localStorage:', error);
+    }
+  }
+  console.log("ID del empleado obtenido:", idEmpleado);
+
+  useEffect(() => {
+    //Para obtener el id del administrador actual (el que inicio sesion)
+    if (idEmpleado) {
+      axios.get(`http://localhost:5000/api/administracion/sesionactualadmin/${idEmpleado}`)
+        .then(respuesta => {
+          if (respuesta.data && !respuesta.data.error) {
+            setAdministradorActual(respuesta.data);
+          } else {
+            console.error("Error en la respuesta del servidor para el administrador actual:", respuesta.data);
+          }
+        })
+        .catch(error => {
+          console.error("Error al obtener el administrador actual:", error);
+        });
+    }
+
+    //Para obtener la lista de todos los administradores
+    axios.get('http://localhost:5000/api/administracion/administradores')
+      .then(respuesta => {
+        if (Array.isArray(respuesta.data)) {
+          setListaAdministradores(respuesta.data);
+        } else {
+          console.error("Error en la respuesta del servidor para la lista de administradores:", respuesta.data);
+        }
+      })
+      .catch(error => {
+        console.error("Error al obtener la lista de todos los administradores:", error);
+      });
+  }, [idEmpleado]);
+
+  const verificarPermisosAdministrador = () => {
+    const estadosRestringidos = ['Suspendido', 'Inactivo', 'Baneado'];
+    const areasPermitidas = ['Fidelizacion', 'Administracion', 'DBA'];
+  
+    if (administradorActual && estadosRestringidos.includes(administradorActual.estado_cuenta)) {
+      setModalMessage(
+        `No puede usar este boton porque su cuenta tiene el estado: "${administradorActual.estado_cuenta}"\n
+         Por favor, contacte al DBA o a algun otro Administrador para poder resolver este problema.`
+      );
+      setmostrarMensajeModalAutorizacion(true);
+      return false;
+    }
+  
+    if (!administradorActual || !areasPermitidas.includes(administradorActual.area_Trabajo)) {
+      setModalMessage(
+        `No puede usar este boton debido a que no tiene el area de trabajo necesario para poder usar estos botones.\n
+        Solo los usuarios con las areas de trabajo: ${areasPermitidas.join(', ')} tienen acceso.\n
+        Su area de trabajo actual es: ${administradorActual ? administradorActual.area_Trabajo : 'Desconocida'}.`
+      );
+      setmostrarMensajeModalAutorizacion(true);
+      return false;
+    }
+  
+    return true;
+  };
+
+  const asignarRangoInicial = async () => {
+    if (!verificarPermisosAdministrador()) return;
+    try {
+      const response = await axios.get("http://localhost:5000/api/fidelizacion/asigrnginiauto");
+      alert(response.data.mensaje || "Clientes nuevos añadidos exitosamente");
+      console.log("Clientes nuevos añadidos:", response.data);
+    } catch (error) {
+      console.error("Error al añadir clientes nuevos:", error.response?.data || error.message);
+      alert("Hubo un error al intentar añadir clientes nuevos.");
+    }
+  };
 
   useEffect(() => {
     FidelizacionData()
@@ -75,6 +162,21 @@ export function Fidelizacion() {
       >
         Fidelizacion y Marketing
       </motion.h1>
+      <br />
+      <div className="flex justify-center mt-4">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1, transition: { delay: 0.6 } }}
+          className="text-center"
+        >
+          <button
+            onClick={asignarRangoInicial}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+          >
+            Añadir clientes nuevos
+          </button>
+        </motion.div>
+      </div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2 p-4 md:p-8">
           {/* Recuadro - Cliente actual */}
@@ -248,12 +350,12 @@ export function Fidelizacion() {
                           <td className="py-2 px-4 border-b text-center">
                             {rangoCliente
                               ? rangoCliente.nombre_rango
-                              : "Este cliente NO puede obtener rango debido al estado de su cuenta."}
+                              : "Este cliente NO puede obtener rango debido al estado de su cuenta. (No se encuentra en la BD o en la tabla)"}
                           </td>
                           <td className="py-2 px-4 border-b text-center">
                             {puntosCliente
                               ? puntosCliente.total_puntos
-                              : "Este Cliente NO puede obtener puntos debido al estado de su cuenta."}
+                              : "Este Cliente NO puede obtener puntos debido al estado de su cuenta. (No se encuentra en la BD o en la tabla)"}
                           </td>
                           <td className="py-2 px-4 border-b text-center">
                             {cliente.estado_cuenta}
@@ -261,12 +363,12 @@ export function Fidelizacion() {
                           <td className="py-2 px-4 border-b text-center">
                             {puntosCliente
                               ? puntosCliente.ultima_actualizacionPuntos
-                              : "Este Cliente NO puede consultar su ultimo movimiento de puntos debido al estado de su cuenta."}
+                              : "Este Cliente NO puede consultar su ultimo movimiento de puntos debido al estado de su cuenta. (No se encuentra en la BD o en la tabla)"}
                           </td>
                           <td className="py-2 px-4 border-b text-center">
                             {puntosCliente
                               ? puntosCliente.ultima_actualizacionRangos
-                              : "Este Cliente NO puede consultar su ultimo movimiento de rangos debido al estado de su cuenta."}
+                              : "Este Cliente NO puede consultar su ultimo movimiento de rangos debido al estado de su cuenta. (No se encuentra en la BD o en la tabla)"}
                           </td>
                           <td className="py-2 px-4 border-b text-center">
                             {puntosCliente && puntosCliente.habilitado
@@ -308,16 +410,16 @@ export function Fidelizacion() {
                       </th>
                       <th className="py-2 px-4 border-b text-center">
                         Porcentaje de Puntos
-                        <br />a obtener de una Compra
+                        <br />a obtener de una Compra (%)
                       </th>
                       <th className="py-2 px-4 border-b text-center">
                         Porcentaje de Puntos
-                        <br />a obtener de una Devolucion
+                        <br />a obtener de una Devolucion (%)
                       </th>
                       <th className="py-2 px-4 border-b text-center">
                         Numero Total de
                         <br />
-                        Compras Realizadas
+                        Compras Necesarias
                         <br />
                         para obtener este Rango
                       </th>
@@ -355,6 +457,31 @@ export function Fidelizacion() {
           </div>
         </div>
       </div>
+      {/* Modal - autorizacion */}
+      {mostrarMensajeModalAutorizacion && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-4 text-center">Acceso Denegado</h2>
+              <p className="mb-4 text-center">
+                {modalMessage.split('\n').map((line, index) => (
+                  <span key={index}>
+                    {line.trim()}
+                    <br />
+                  </span>
+                ))}
+              </p>
+              <div className="flex justify-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => setmostrarMensajeModalAutorizacion(false)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 }

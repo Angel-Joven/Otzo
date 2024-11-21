@@ -47,6 +47,34 @@ class ClientesService(ClientesModelo):
             conexion.close()
 
     @staticmethod
+    def altaClienteLogin(data):
+        try:
+            conexion = get_connection()
+            with conexion.cursor() as cursor:
+                #Comenzamos la transaccion
+                conexion.begin()
+                cursor.execute(
+                    """
+                    INSERT INTO clientes (
+                        nombre, apellido_paterno, apellido_materno, contacto_correo, contraseña, fechaDe_Alta, estado_cuenta
+                    )
+                    VALUES (%s, %s, %s, %s, %s, NOW(), 'Activo')
+                    """,
+                    (
+                        data['nombre'], data['apellido_paterno'], data['apellido_materno'], data['contacto_correo'], data['contraseña']
+                    )
+                )
+                #Confirmamos la transaccion
+                conexion.commit()
+            return {"mensaje": "Cliente creado exitosamente"}
+        except Exception as e:
+            #Deshacemos la transaccion en caso de error
+            conexion.rollback()
+            raise DatabaseError(str(e))
+        finally:
+            conexion.close()
+
+    @staticmethod
     def bajaCliente(id_cliente):
         try:
             conexion = get_connection()
