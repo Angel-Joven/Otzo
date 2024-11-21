@@ -36,7 +36,7 @@ export function LoginAdministradores() {
       if (response.status === 200) {
         setUserType('administrador');
         localStorage.setItem('administrador', JSON.stringify(response.data));
-        localStorage.setItem('cliente', JSON.stringify(response.data.cliente));
+        localStorage.setItem('cliente', JSON.stringify(response.data));
         navigate('/indexAdministradores');
       }
     } catch (err) {
@@ -76,7 +76,7 @@ export function LoginAdministradores() {
               placeholder="Nombre de usuario"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <motion.input
               initial={{ x: 50, opacity: 0 }}
@@ -85,13 +85,13 @@ export function LoginAdministradores() {
               placeholder="Contraseña"
               value={contraseña}
               onChange={(e) => setContraseña(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <motion.button
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1, transition: { delay: 0.6 } }}
               type="submit"
-              className="w-full py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition"
+              className="w-full py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition"
             >
               Ingresar
             </motion.button>

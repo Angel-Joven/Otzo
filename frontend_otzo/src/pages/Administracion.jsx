@@ -76,7 +76,6 @@ export function Administracion() {
   };
 
   const manejarConfirmarCambios = () => {
-    // Validaciones
     const {
       nombre,
       apellido_paterno,

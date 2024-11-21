@@ -35,7 +35,8 @@ export function LoginClientes() {
       if (response.status === 200) {
         //Guardamos la informacion del cliente en el estado o en el 'localStorage' y le asignamos el tipo de usuario
         setUserType('cliente');
-        localStorage.setItem('cliente', JSON.stringify(response.data.cliente));
+        localStorage.setItem('administrador', JSON.stringify(response.data));
+        localStorage.setItem('cliente', JSON.stringify(response.data));
         //Lo mandamos a la ruta de clientes
         navigate('/indexClientes');
       }

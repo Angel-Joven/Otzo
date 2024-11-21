@@ -68,7 +68,7 @@ export function IndexAdministradores() {
           <Card
             title={"Módulo de clientes"}
             image={"clientes.png"}
-            route={"/clientes"}
+            route={"/clientesadmin"}
             animation_delay={1.3}
           />
           <Card title={"Módulo de administración"}

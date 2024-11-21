@@ -5,7 +5,8 @@ import { IndexPrincipal } from "./pages/Index"; //Index Principal
 import { Ventas } from "./pages/Ventas";
 import { Fidelizacion } from "./pages/Fidelizacion";
 import { Reportes } from "./pages/Reportes";
-import { Clientes } from "./pages/Clientes";
+import { Clientes } from "./pages/Clientes"; //Clientes - Para solo clientes
+import { ClientesAdministracion } from "./pages/ClientesAdministracion"; //Clientes - Para solo administradores
 import { Administracion } from "./pages/Administracion";
 import { Atencion } from "./pages/Atencion";
 import { LoginClientes } from "./pages/loginClientes"; //Login Clientes
@@ -50,7 +51,8 @@ function AppContent() {
         <Route path="/fidelizacion" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Fidelizacion /> </RutaProtegida>} />
         <Route path="/reportes" element={<RutaProtegida allowedUserTypes={['administrador']}> <Reportes /> </RutaProtegida>} />
         <Route path="/atencion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Atencion /> </RutaProtegida>} />
-        <Route path="/clientes" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Clientes /> </RutaProtegida>} />
+        <Route path="/clientes" element={<RutaProtegida allowedUserTypes={['cliente']}> <Clientes /> </RutaProtegida>} />
+        <Route path="/clientesadmin" element={<RutaProtegida allowedUserTypes={['administrador']}> <ClientesAdministracion /> </RutaProtegida>} />
         <Route path="/administracion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Administracion /> </RutaProtegida>} />
       </Routes>
     </>

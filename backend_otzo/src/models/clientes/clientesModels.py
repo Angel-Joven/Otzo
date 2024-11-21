@@ -20,6 +20,11 @@ class ClientesModelo(ABC):
         pass
 
     @abstractmethod
+    def suspenderCliente(self, id_cliente):
+        """Generamos el poder de suspender a un cliente"""
+        pass
+
+    @abstractmethod
     def modificarCliente(self, id_cliente, nombre, apellido_paterno, apellido_materno, fecha_nacimiento, genero, direccion_calle, direccion_colonia, direccion_codigopostal, direccion_estado, direccion_municipio, contacto_correo, contraseña, contacto_telefono):
         """Generamos el poder de modificar la informacion de un cliente"""
         pass
@@ -32,6 +37,11 @@ class ClientesModelo(ABC):
     @abstractmethod
     def devolverCliente(self, id_cliente):
         """Devolvemos la informacion de un cliente cualquiera"""
+        pass
+
+    @abstractmethod
+    def devolverListaClientes(self):
+        """Devolvemos la lista de todos los Clientes"""
         pass
 
 # ---------------------------------------------------------------------------------------------------------------------------

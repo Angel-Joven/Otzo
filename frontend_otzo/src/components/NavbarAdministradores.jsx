@@ -98,9 +98,9 @@ export function NavbarAdministradores() {
             </li>
             <li>
               <Link
-                to={"/clientes"}
+                to={"/clientesadmin"}
                 className={`block py-2 px-3 mb-2 ${
-                  location.pathname === "/clientes"
+                  location.pathname === "/clientesadmin"
                     ? "text-black font-bold md:text-blue-500 underline"
                     : "text-white"
                 } bg-yellow-500 rounded md:bg-transparent md:p-0`}
@@ -163,7 +163,7 @@ export function NavbarAdministradores() {
             </li>
             <li>
               <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">
-                Cerrar Sesión
+                Cerrar Sesion
               </button>
             </li>
           </ul>
