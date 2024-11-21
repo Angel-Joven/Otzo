@@ -305,7 +305,7 @@ class AdministracionService(AdministracionModelo):
 # ---------------------------------------------------------------------------------------------------------------------------
 
 # -> ¡PARA TODOS LOS MODULOS! <-
-# FUNCIONALIDAD QUE DEVUELVE INFORMACION DE LOS ADMINISTRADORES
+# FUNCIONALIDADES QUE DEVUELVEN INFORMACION DE LOS ADMINISTRADORES DEPENDIENDO DEL CASO
 
 # REQUISITOS
 # id_empleado

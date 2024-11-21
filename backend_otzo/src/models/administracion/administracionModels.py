@@ -20,6 +20,16 @@ class AdministracionModelo(ABC):
         pass
 
     @abstractmethod
+    def suspenderAdministrador(self, id_empleado):
+        """Generamos el poder de suspender a un Administrador"""
+        pass
+
+    @abstractmethod
+    def banearAdministrador(self, id_empleado):
+        """Generamos el poder de banear a un Administrador"""
+        pass
+
+    @abstractmethod
     def modificarAdministrador(self, id_empleado, nombre, apellido_paterno, apellido_materno, fecha_nacimiento, genero, direccion_calle, direccion_colonia, direccion_codigopostal, direccion_estado, direccion_municipio, contacto_correo, contraseña, contacto_telefono, area_Trabajo):
         """Generamos el poder de modificar la informacion de un Administrador"""
         pass
@@ -32,6 +42,11 @@ class AdministracionModelo(ABC):
     @abstractmethod
     def devolverAdministrador(self, id_empleado):
         """Devolvemos la informacion de un Administrador cualquiera"""
+        pass
+
+    @abstractmethod
+    def devolverListaAdministradores(self):
+        """Devolvemos la lista de todos los Administradores"""
         pass
 
 # ---------------------------------------------------------------------------------------------------------------------------

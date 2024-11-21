@@ -78,7 +78,7 @@ export function Fidelizacion() {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2 p-4 md:p-8">
           {/* Recuadro - Cliente actual */}
-          <div className="w-full flex justify-center">
+          {/*<div className="w-full flex justify-center">
             <motion.div
               initial={{ x: 0, opacity: 0 }}
               animate={{ x: 0, opacity: 1, transition: { delay: 0.8 } }}
@@ -93,7 +93,7 @@ export function Fidelizacion() {
                   </h2>
                 </center>
               </div>
-              <div className="overflow-x-auto">
+               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white">
                   <thead>
                     <tr>
@@ -177,7 +177,7 @@ export function Fidelizacion() {
                 </table>
               </div>
             </motion.div>
-          </div>
+          </div>*/}
 
           {/* div para los recuadros inferiores */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,7 +191,7 @@ export function Fidelizacion() {
                 <center>
                   <h2 className="font-bold text-white">
                     <i className="align-middle fi fi-sr-document"></i>{" "}
-                    Informacion de todos los clientes
+                    Informacion de todos los clientes que se encuentran en la tabla "puntos"
                   </h2>
                 </center>
               </div>
