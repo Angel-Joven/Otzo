@@ -24,3 +24,6 @@ class ReportesService(ReportesModelo):
 
 print("prueba 1")
 ReportesService.crear_reporte_puntos()
+
+
+print("hola")
