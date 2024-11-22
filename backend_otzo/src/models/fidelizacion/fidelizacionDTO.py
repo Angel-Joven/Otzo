@@ -126,7 +126,7 @@ class RangosDTO(Serializable):
         return self._porcentaje_devolucionPuntos
     
     @property
-    def num_ComprasRequisitos(self):
+    def num_ComprasRequisito(self):
         return self._num_ComprasRequisito
 
     # Setters
@@ -154,11 +154,11 @@ class RangosDTO(Serializable):
             raise ValueError("El porcentaje de devolucion de puntos debe estar entre 0 y 100")
         self._porcentaje_devolucionPuntos = value
     
-    @num_ComprasRequisitos.setter
-    def num_ComprasRequisitos(self, value):
+    @num_ComprasRequisito.setter
+    def num_ComprasRequisito(self, value):
         if not value:
             raise ValueError("El numero de compras minimas para alcancar el rango no puede estar vacio")
-        self._num_ComprasRequisitos = value
+        self._num_ComprasRequisito = value
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
