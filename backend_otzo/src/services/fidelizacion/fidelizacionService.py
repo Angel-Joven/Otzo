@@ -6,6 +6,8 @@
 from src.models.fidelizacion.fidelizacionModels import *
 from src.db import get_connection
 from pymysql import DatabaseError
+import json
+from datetime import datetime
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -490,16 +492,13 @@ class ObtenerRangoService(ObtenerRangoModelo):
 # ---------------------------------------------------------------------------------------------------------------------------
 
 # -> ¡PARA EL MODULO DE REPORTES! <-
-# FUNCIONALIDAD QUE DEVUELVE TODA LA INFORMACION DE UN CLIENTE DE LA TABLA 'PUNTOS'
-# EN BASE AL 'id_cliente' PROPORCIONADO.
+# FUNCIONALIDAD QUE DEVUELVE TODA LA INFORMACION DE TODOS LOS CLIENTES DE LA TABLA 'PUNTOS'
 
 # REQUISITOS
-# id_cliente
-
-# ESTE REQUISITO ES NECESARIO PARA QUE FUNCIONE ESTE SERVICIO.
+# NINGUNO
 
 class ObtenerInfoClientesPuntosService(ObtenerInfoClientesPuntosModelo):
-    def obtener_info_clientes_puntos(self, id_cliente):
+    def obtener_info_clientes_puntos(self):
         conexion = get_connection()
         try:
             with conexion.cursor() as cursor:
@@ -510,17 +509,27 @@ class ObtenerInfoClientesPuntosService(ObtenerInfoClientesPuntosModelo):
                     """
                     SELECT idclientes_puntos, idrango, total_puntos, ultima_actualizacionPuntos, ultima_actualizacionRangos, habilitado
                     FROM puntos
-                    WHERE idclientes_puntos = %s
-                    """, (id_cliente,)
+                    """
                 )
                 #Confirmamos la transaccion
                 conexion.commit()
 
-                resultado = cursor.fetchone()
+                resultado = cursor.fetchall()
 
                 if resultado:
-                    print(f"idcliente_puntos: {resultado[0]}, idrango: {resultado[1]}, total_puntos: {resultado[2]}, ultima_actualizacionPuntos: {resultado[3]}, ultima_actualizacionRangos: {resultado[4]}, habilitado: {resultado[5]}")
-                    return {"idcliente_puntos": resultado[0], "idrango": resultado[1], "total_puntos": resultado[2], "ultima_actualizacionPuntos": resultado[3], "ultima_actualizacionRangos": resultado[4], "habilitado": resultado[5]}
+                    resultado_lista = []
+                    for info in resultado:
+                        resultado_lista.append({
+                            "idcliente_puntos": info[0],
+                            "idrango": info[1],
+                            "total_puntos": info[2],
+                            "ultima_actualizacionPuntos": info[3].isoformat() if isinstance(info[3], datetime) else info[3],
+                            "ultima_actualizacionRangos": info[4].isoformat() if isinstance(info[4], datetime) else info[4],
+                            "habilitado": info[5],
+                        })
+                    resultado = resultado_lista       
+                    print(json.dumps(resultado, indent=4, ensure_ascii=False))
+                    return resultado
                 else:
                     return {"mensaje": "Cliente no encontrado en la tabla 'puntos'. Esto se debe a que su cuenta esta Inactiva/Suspendida y por ende no se le asigno un rango."}
 
@@ -532,12 +541,12 @@ class ObtenerInfoClientesPuntosService(ObtenerInfoClientesPuntosModelo):
             conexion.close()
 
 # EJEMPLO DE USO
-# PARA QUE RETORNE TODA LA INFORMACION DE ALGUN CLIENTE EN ESPECIFICO DE LA TABLA 'PUNTOS',
-# ES NECESARIO INGRESAR O TENER ALMACENADO LA INFORMACION DEL 'id_cliente' PARA PASARLO A ESTE SERVICIO.
+# PARA PODER VISUALIZAR LA INFORMACION, SOLAMENTE ES NECESARIO MANDAR A LLAMAR A ESTE SERVICIO.
+# NO REQUIERE DE MANDARLE VARIABLES NI NADA
 
 # LA ESTRUCTURA ES LA SIGUIENTE:
 
-# ObtenerInfoClientesPuntosService().obtener_info_clientes_puntos(id_cliente)
+# ObtenerInfoClientesPuntosService().obtener_info_clientes_puntos()
 
 # ---------------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------------
