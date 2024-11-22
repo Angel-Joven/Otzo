@@ -1,28 +1,26 @@
+from src.models.reportes.reportesModels import *
 from src.services.fidelizacion.fidelizacionService import ObtenerInfoClientesPuntosService
 from datetime import datetime
-from src.models.reportes.reportesModels import obtener_datos_puntos, guardar_reporte_diario
-from src.models.reportes.reportesDTO import ReporteDTO
+from src.db import get_connection
+import json
 
-def generar_reporte_diario():
-    """Genera el reporte diario de puntos."""
-    datos_puntos = obtener_datos_puntos()
+class ReportesService(ReportesModelo):
+    @staticmethod
+    def crear_reporte_puntos():
+        datos_puntos = ObtenerInfoClientesPuntosService().obtener_info_clientes_puntos()
 
-    # Crear el DTO del reporte
-    reporte = ReporteDTO(
-        fecha_generacion=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        clientes=[punto.to_dict() for punto in datos_puntos]
-    )
+        if isinstance(datos_puntos, list):
+            datos_filtrados = [
+                {
+                    "idcliente_puntos": dato["idcliente_puntos"],
+                    "total_puntos": dato["total_puntos"],
+                    "ultima_actualizacionPuntos": dato["ultima_actualizacionPuntos"].split("T")[0],
+                }
+                for dato in datos_puntos
+            ]
+            print(json.dumps(datos_filtrados, indent=4, ensure_ascii=False))
+        else:
+            return {"error": datos_puntos}
 
-    # Guardar el reporte en la base de datos
-    guardar_reporte_diario(reporte)
-    return reporte
-
-def crear_reporte_puntos(fecha_dia):
-    datos_puntos=ObtenerInfoClientesPuntosService().obtener_info_clientes_puntos()
-    clientes=datos_puntos[0]
-    puntos=datos_puntos[2]
-    ultima_fecha_actualizacion_puntos=datos_puntos[3]
-    print("prueba 1")
-    print(clientes)
-
-crear_reporte_puntos(fecha_dia="1")
+print("prueba 1")
+ReportesService.crear_reporte_puntos()
