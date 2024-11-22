@@ -1,5 +1,5 @@
 from datetime import datetime
-#from src.models.fidelizacion.fidelizacionDTO import PuntosDTO, obtener_conexion
+from src.models.fidelizacion.fidelizacionDTO import PuntosDTO, obtener_conexion
 
 def obtener_datos_puntos():
     """Consulta los puntos de los clientes desde la base de datos y los convierte a DTOs."""
