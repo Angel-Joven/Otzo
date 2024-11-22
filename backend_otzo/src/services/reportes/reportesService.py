@@ -26,3 +26,4 @@ def crear_reporte_puntos(fecha_dia):
     print(clientes)
 
 crear_reporte_puntos(fecha_dia="1")
+print("hola")
