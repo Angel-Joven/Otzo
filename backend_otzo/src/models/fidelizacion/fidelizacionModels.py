@@ -110,3 +110,12 @@ class ObtenerRangoModelo(ABC):
         pass
 
 # ---------------------------------------------------------------------------------------------------------------------------
+
+#Clase abstracta para la funcionalidad de obtencion de toda la informacion de la tabla puntos
+class ObtenerInfoClientesPuntosModelo(ABC):
+    @abstractmethod
+    def obtener_info_clientes_puntos(self, id_cliente):
+        """Obtenemos toda la informacion de un cliente especifico"""
+        pass
+
+# ---------------------------------------------------------------------------------------------------------------------------

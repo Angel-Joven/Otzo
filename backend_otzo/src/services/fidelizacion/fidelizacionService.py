@@ -483,5 +483,63 @@ class ObtenerRangoService(ObtenerRangoModelo):
 # LA ESTRUCTURA ES LA SIGUIENTE:
 
 # ObtenerRangoService().obtener_rango_cliente_atencion(id_cliente)
-    
+
+# ---------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------
+
+# -> ¡PARA EL MODULO DE REPORTES! <-
+# FUNCIONALIDAD QUE DEVUELVE TODA LA INFORMACION DE UN CLIENTE DE LA TABLA 'PUNTOS'
+# EN BASE AL 'id_cliente' PROPORCIONADO.
+
+# REQUISITOS
+# id_cliente
+
+# ESTE REQUISITO ES NECESARIO PARA QUE FUNCIONE ESTE SERVICIO.
+
+class ObtenerInfoClientesPuntosService(ObtenerInfoClientesPuntosModelo):
+    def obtener_info_clientes_puntos(self, id_cliente):
+        conexion = get_connection()
+        try:
+            with conexion.cursor() as cursor:
+                #Comenzamos la transaccion
+                conexion.begin()
+
+                cursor.execute(
+                    """
+                    SELECT idclientes_puntos, idrango, total_puntos, ultima_actualizacionPuntos, ultima_actualizacionRangos, habilitado
+                    FROM puntos
+                    WHERE idclientes_puntos = %s
+                    """, (id_cliente,)
+                )
+                #Confirmamos la transaccion
+                conexion.commit()
+
+                resultado = cursor.fetchone()
+
+                if resultado:
+                    print(f"idcliente_puntos: {resultado[0]}, idrango: {resultado[1]}, total_puntos: {resultado[2]}, ultima_actualizacionPuntos: {resultado[3]}, ultima_actualizacionRangos: {resultado[4]}, habilitado: {resultado[5]}")
+                    return {"idcliente_puntos": resultado[0], "idrango": resultado[1], "total_puntos": resultado[2], "ultima_actualizacionPuntos": resultado[3], "ultima_actualizacionRangos": resultado[4], "habilitado": resultado[5]}
+                else:
+                    return {"mensaje": "Cliente no encontrado en la tabla 'puntos'. Esto se debe a que su cuenta esta Inactiva/Suspendida y por ende no se le asigno un rango."}
+
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            conexion.rollback()
+            raise e
+        finally:
+            conexion.close()
+
+# EJEMPLO DE USO
+# PARA QUE RETORNE TODA LA INFORMACION DE ALGUN CLIENTE EN ESPECIFICO DE LA TABLA 'PUNTOS',
+# ES NECESARIO INGRESAR O TENER ALMACENADO LA INFORMACION DEL 'id_cliente' PARA PASARLO A ESTE SERVICIO.
+
+# LA ESTRUCTURA ES LA SIGUIENTE:
+
+# ObtenerInfoClientesPuntosService().obtener_info_clientes_puntos(id_cliente)
+
+# ---------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------------
