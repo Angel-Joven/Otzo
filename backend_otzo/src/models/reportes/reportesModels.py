@@ -1,9 +1,10 @@
 from datetime import datetime
-#from src.models.fidelizacion.fidelizacionDTO import PuntosDTO, obtener_conexion
+from src.models.fidelizacion.fidelizacionDTO import PuntosDTO 
+from src.db import get_connection
 
 def obtener_datos_puntos():
     """Consulta los puntos de los clientes desde la base de datos y los convierte a DTOs."""
-    conexion = obtener_conexion()
+    conexion = get_connection()
     cursor = conexion.cursor(dictionary=True)
 
     consulta = """
@@ -37,7 +38,7 @@ def obtener_datos_puntos():
 
 def guardar_reporte_diario(reporte):
     """Guarda el reporte diario en la base de datos."""
-    conexion = obtener_conexion()
+    conexion = get_connection()
     cursor = conexion.cursor()
     query = """
     INSERT INTO ReportePuntos (fecha_generacion, reporte)
@@ -50,7 +51,7 @@ def guardar_reporte_diario(reporte):
 
 def obtener_reporte_mas_reciente():
     """Obtiene el reporte más reciente de la base de datos."""
-    conexion = obtener_conexion()
+    conexion = get_connection()
     cursor = conexion.cursor(dictionary=True)
     cursor.execute("SELECT * FROM ReportePuntos ORDER BY fecha_generacion DESC LIMIT 1")
     resultado = cursor.fetchone()

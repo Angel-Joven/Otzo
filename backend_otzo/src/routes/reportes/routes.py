@@ -1,11 +1,10 @@
-from flask import Blueprint, jsonify
 from src.models.reportes.reportesModels import obtener_reporte_mas_reciente
 from src.models.reportes.reportesDTO import ReporteDTO
+from flask import request,jsonify 
+from . import reportes_bp
+import json
 
-# Crear un Blueprint para las rutas de reportes
-reportes_bp = Blueprint('reportes', __name__)
-
-@reportes_bp.route('/api/reporte_diario', methods=['GET'])
+@reportes_bp.route('/reporte_diario', methods=['GET'])
 def obtener_reporte_diario():
     """Devuelve el último reporte generado."""
     reporte_db = obtener_reporte_mas_reciente()
