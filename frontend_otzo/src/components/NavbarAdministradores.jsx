@@ -10,7 +10,7 @@ Temas Especiales de Programacion 2 | 1061
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { UsarAutenticadorNombre } from '../context/Autenticacion';
+import { UsarAutenticadorNombre } from "../context/Autenticacion";
 
 export function NavbarAdministradores() {
   const { logout } = UsarAutenticadorNombre();
@@ -19,7 +19,7 @@ export function NavbarAdministradores() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const [isNavbarVisible, setIsNavbarVisible] = useState(false);
@@ -81,6 +81,19 @@ export function NavbarAdministradores() {
                 aria-current="page"
               >
                 Inicio
+              </Link>
+            </li>
+            <li>
+              <Link
+                to={"/inventario"}
+                className={`block py-2 px-3 mb-2 ${
+                  location.pathname === "/inventario"
+                    ? "text-white font-bold md:text-blue-500 underline"
+                    : "text-white"
+                } bg-slate-600 rounded md:bg-transparent md:p-0`}
+                aria-current="page"
+              >
+                Inventario
               </Link>
             </li>
             <li>
@@ -162,7 +175,10 @@ export function NavbarAdministradores() {
               </Link>
             </li>
             <li>
-              <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
                 Cerrar Sesion
               </button>
             </li>

@@ -1,6 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { ObtenerAutenticadorNombre, UsarAutenticadorNombre } from "./context/Autenticacion"; //Para saber quien se autentico
+import {
+  ObtenerAutenticadorNombre,
+  UsarAutenticadorNombre,
+} from "./context/Autenticacion"; //Para saber quien se autentico
 import { IndexPrincipal } from "./pages/Index"; //Index Principal
 import { Ventas } from "./pages/Ventas";
 import { Fidelizacion } from "./pages/Fidelizacion";
@@ -17,7 +20,8 @@ import "./App.css";
 import { Navbar } from "./components/Navbar"; //Navbar general
 import { NavbarClientes } from "./components/NavbarClientes"; //Navbar para clientes
 import { NavbarAdministradores } from "./components/NavbarAdministradores"; //Navbar para los administradores
-import { RutaProtegida } from './components/RutasProtegidas'; //Proteger rutas para que solo puedan acceder usuarios logeados
+import { RutaProtegida } from "./components/RutasProtegidas"; //Proteger rutas para que solo puedan acceder usuarios logeados
+import Inventario from "./pages/Inventario";
 
 function AppContent() {
   const location = useLocation();
@@ -28,15 +32,15 @@ function AppContent() {
   //Si fue un cliente, le carga el navbar de clientes
   //Si fue un administrador, le carga el navbar de administradores
   //Si no fue nadie, entonces le carga el navbar generico
-  if (userType === 'cliente') {
+  if (userType === "cliente") {
     navbarToRender = <NavbarClientes />;
-  } else if (userType === 'administrador') {
+  } else if (userType === "administrador") {
     navbarToRender = <NavbarAdministradores />;
   } else {
     navbarToRender = <Navbar />;
   }
 
-  console.log(userType)
+  console.log(userType);
 
   return (
     <>
@@ -44,17 +48,101 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<IndexPrincipal />} />
         <Route path="/loginClientes" element={<LoginClientes />} />
-        <Route path="/loginAdministradores" element={<LoginAdministradores />} />
-        <Route path="/indexClientes" element={<RutaProtegida allowedUserTypes={['cliente']} > <IndexClientes /> </RutaProtegida>} />
-        <Route path="/indexAdministradores" element={<RutaProtegida allowedUserTypes={['administrador']}> <IndexAdministradores /> </RutaProtegida>} />
-        <Route path="/ventas" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Ventas /> </RutaProtegida>} />
+        <Route
+          path="/loginAdministradores"
+          element={<LoginAdministradores />}
+        />
+        <Route
+          path="/indexClientes"
+          element={
+            <RutaProtegida allowedUserTypes={["cliente"]}>
+              {" "}
+              <IndexClientes />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/indexAdministradores"
+          element={
+            <RutaProtegida allowedUserTypes={["administrador"]}>
+              {" "}
+              <IndexAdministradores />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/ventas"
+          element={
+            <RutaProtegida allowedUserTypes={["cliente", "administrador"]}>
+              {" "}
+              <Ventas />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/inventario"
+          element={
+            <RutaProtegida allowedUserTypes={["administrador"]}>
+              {" "}
+              <Inventario />{" "}
+            </RutaProtegida>
+          }
+        />
         {/* <Route path="/fidelizacion" element={<RutaProtegida allowedUserTypes={['cliente', 'administrador']}> <Fidelizacion /> </RutaProtegida>} /> */}
-        <Route path="/fidelizacion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Fidelizacion /> </RutaProtegida>} />
-        <Route path="/reportes" element={<RutaProtegida allowedUserTypes={['administrador']}> <Reportes /> </RutaProtegida>} />
-        <Route path="/atencion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Atencion /> </RutaProtegida>} />
-        <Route path="/clientes" element={<RutaProtegida allowedUserTypes={['cliente']}> <Clientes /> </RutaProtegida>} />
-        <Route path="/clientesadmin" element={<RutaProtegida allowedUserTypes={['administrador']}> <ClientesAdministracion /> </RutaProtegida>} />
-        <Route path="/administracion" element={<RutaProtegida allowedUserTypes={['administrador']}> <Administracion /> </RutaProtegida>} />
+        <Route
+          path="/fidelizacion"
+          element={
+            <RutaProtegida allowedUserTypes={["administrador"]}>
+              {" "}
+              <Fidelizacion />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/reportes"
+          element={
+            <RutaProtegida allowedUserTypes={["administrador"]}>
+              {" "}
+              <Reportes />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/atencion"
+          element={
+            <RutaProtegida allowedUserTypes={["administrador"]}>
+              {" "}
+              <Atencion />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/clientes"
+          element={
+            <RutaProtegida allowedUserTypes={["cliente"]}>
+              {" "}
+              <Clientes />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/clientesadmin"
+          element={
+            <RutaProtegida allowedUserTypes={["administrador"]}>
+              {" "}
+              <ClientesAdministracion />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/administracion"
+          element={
+            <RutaProtegida allowedUserTypes={["administrador"]}>
+              {" "}
+              <Administracion />{" "}
+            </RutaProtegida>
+          }
+        />
       </Routes>
     </>
   );

@@ -41,6 +41,7 @@ export function IndexAdministradores() {
           <Card
             title={"Módulo de inventario"}
             image={"inventario.png"}
+            route={"/inventario"}
             animation_delay={0.8}
           />
           <Card
@@ -55,10 +56,10 @@ export function IndexAdministradores() {
             route={"/atencion"}
             animation_delay={1}
           />
-          <Card 
+          <Card
             title={"Módulo de reportes y análisis"}
             image={"reportes.png"}
-            route={"/reportes"} 
+            route={"/reportes"}
             animation_delay={1.1}
           />
           <Card
@@ -71,7 +72,8 @@ export function IndexAdministradores() {
             route={"/clientesadmin"}
             animation_delay={1.3}
           />
-          <Card title={"Módulo de administración"}
+          <Card
+            title={"Módulo de administración"}
             image={"administracion.png"}
             route={"/administracion"}
             animation_delay={1.4}
