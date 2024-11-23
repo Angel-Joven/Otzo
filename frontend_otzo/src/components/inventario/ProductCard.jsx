@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 export default function ProductCard({
   imagen,
@@ -8,7 +9,11 @@ export default function ProductCard({
   descripcion,
 }) {
   return (
-    <div className="bg-slate-800 text-white p-2 w-64 rounded-xl">
+    <motion.div
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1, transition: { delay: 0.2 } }}
+      className="bg-slate-800 text-white p-2 w-64 rounded-xl"
+    >
       <div className="relative">
         <img src={imagen} alt="producto" className="w-24 m-auto" />
         <p
@@ -28,15 +33,15 @@ export default function ProductCard({
       </div>
       <div className="flex justify-center gap-4 py-2">
         <button className="bg-green-500 rounded-2xl p-2">
-          <i class="align-middle fi fi-br-plus"></i>
+          <i className="align-middle fi fi-br-plus"></i>
         </button>
         <button className="bg-blue-500 rounded-2xl p-2">
-          <i class="align-middle fi fi-sr-pencil"></i>
+          <i className="align-middle fi fi-sr-pencil"></i>
         </button>
         <button className="bg-red-500 rounded-2xl p-2">
-          <i class="align-middle fi fi-br-minus"></i>
+          <i className="align-middle fi fi-br-minus"></i>
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
