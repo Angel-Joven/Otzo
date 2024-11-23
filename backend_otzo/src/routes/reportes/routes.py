@@ -32,3 +32,19 @@ def generar_reporte_puntos():
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+@reportes_bp.route("/reporte-ventas", methods=["GET"])
+def generar_reporte_ventas():
+    try:
+        fecha_reporte = request.args.get("fecha")  # Obtener fecha desde los parámetros de consulta
+        if not fecha_reporte:
+            return jsonify({"error": "La fecha es obligatoria"}), 400
+
+        reporte = ReportesService.crear_reporte_ventas(fecha_reporte)
+        return jsonify(reporte), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
