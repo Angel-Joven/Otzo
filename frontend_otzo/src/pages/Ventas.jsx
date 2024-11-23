@@ -5,6 +5,8 @@ import "@flaticon/flaticon-uicons/css/all/all.css";
 import Spinner from "../components/ventas/Spinner";
 import axios from "axios";
 
+import { obtenerTodosLosProductos } from "../api/inventario.api";
+
 export function Ventas() {
   // TABLA PRODUCTOS:
   const [records, setRecords] = useState([]);
@@ -95,12 +97,11 @@ export function Ventas() {
 
   // TODO: CARGAR DATA DEL BACKEND
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setRecords(data);
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timeout);
+    obtenerTodosLosProductos()
+      .then((res) => console.log(res.data))
+      .catch((error) => {
+        console.error("Error al obtener los productos:", error);
+      });
   }, []);
 
   const handleChange = (e) => {
