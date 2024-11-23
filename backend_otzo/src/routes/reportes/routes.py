@@ -48,3 +48,28 @@ def generar_reporte_ventas():
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+@reportes_bp.route("/reporte-rangos", methods=["GET"])
+def generar_reporte_rangos():
+    """
+    Genera un reporte con los rangos y la cantidad de clientes en cada uno.
+    """
+    conexion = get_connection()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            query = """
+                SELECT r.nombre_rango, COUNT(p.idclientes_puntos) AS total_personas
+                FROM puntos p
+                JOIN rangos r ON p.idrango = r.idrango
+                GROUP BY r.nombre_rango
+                ORDER BY total_personas DESC
+            """
+            cursor.execute(query)
+            resultado = cursor.fetchall()
+            return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": f"Error al generar el reporte: {str(e)}"}), 500
+    finally:
+        conexion.close()

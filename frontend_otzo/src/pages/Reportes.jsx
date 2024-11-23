@@ -6,25 +6,28 @@ export function Reportes() {
     const [fecha, setFecha] = useState(""); // Fecha seleccionada por el usuario
     const [reportePuntos, setReportePuntos] = useState(null); // Estado para el reporte de puntos
     const [reporteVentas, setReporteVentas] = useState(null); // Estado para el reporte de ventas
+    const [reporteRangos, setReporteRangos] = useState(null); // Estado para el reporte de rangos
     const [error, setError] = useState(""); // Estado para manejar errores
     const [reporteActivo, setReporteActivo] = useState("puntos"); // Estado para controlar el tipo de reporte
 
     // Obtener el reporte de puntos
     const obtenerReportePuntos = async () => {
-        setReporteVentas(null); // Limpiar el reporte de ventas cuando se cambie a puntos
+        setReporteVentas(null);
+        setReporteRangos(null);
         try {
             const response = await axios.get(`http://127.0.0.1:5000/api/reportes/reporte-puntos?fecha=${fecha}`);
             setReportePuntos(response.data);
         } catch (error) {
             console.error("Error al obtener el reporte de puntos:", error);
+            setError("Ocurrió un error al obtener el reporte de puntos.");
         }
     };
 
     // Obtener el reporte de ventas
     const obtenerReporteVentas = async () => {
-        setReportePuntos(null); // Limpiar el reporte de puntos cuando se cambie a ventas
-        setError(""); // Limpiar errores
-        setReporteVentas(null); // Limpiar el reporte de ventas previo
+        setReportePuntos(null);
+        setReporteRangos(null);
+        setError("");
 
         if (!fecha) {
             setError("Por favor selecciona una fecha.");
@@ -36,7 +39,21 @@ export function Reportes() {
             setReporteVentas(response.data);
         } catch (error) {
             console.error("Error al obtener el reporte de ventas:", error);
-            setError("Ocurrió un error al obtener el reporte. Por favor, intenta de nuevo.");
+            setError("Ocurrió un error al obtener el reporte de ventas.");
+        }
+    };
+
+    // Obtener el reporte de rangos
+    const obtenerReporteRangos = async () => {
+        setReportePuntos(null);
+        setReporteVentas(null);
+        setError("");
+        try {
+            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-rangos");
+            setReporteRangos(response.data);
+        } catch (error) {
+            console.error("Error al obtener el reporte de rangos:", error);
+            setError("Ocurrió un error al obtener el reporte de rangos.");
         }
     };
 
@@ -57,6 +74,7 @@ export function Reportes() {
                         setReporteActivo("puntos");
                         setReportePuntos(null);
                         setReporteVentas(null);
+                        setReporteRangos(null);
                     }}
                     className={`px-4 py-2 mr-2 ${reporteActivo === "puntos" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
                 >
@@ -67,14 +85,26 @@ export function Reportes() {
                         setReporteActivo("ventas");
                         setReportePuntos(null);
                         setReporteVentas(null);
+                        setReporteRangos(null);
                     }}
-                    className={`px-4 py-2 ${reporteActivo === "ventas" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
+                    className={`px-4 py-2 mr-2 ${reporteActivo === "ventas" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
                 >
                     Reporte de Ventas
                 </button>
+                <button
+                    onClick={() => {
+                        setReporteActivo("rangos");
+                        setReportePuntos(null);
+                        setReporteVentas(null);
+                        setReporteRangos(null);
+                    }}
+                    className={`px-4 py-2 ${reporteActivo === "rangos" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
+                >
+                    Reporte de Rangos
+                </button>
             </div>
 
-            {/* Sección de Reporte de Puntos o Reporte de Ventas */}
+            {/* Sección de Reporte Activo */}
             <div className="bg-white p-6 rounded shadow-lg mb-8">
                 {reporteActivo === "puntos" ? (
                     <>
@@ -95,7 +125,6 @@ export function Reportes() {
                         >
                             Generar Reporte
                         </button>
-
                         {/* Tabla de resultados */}
                         <div className="mt-6">
                             {reportePuntos ? (
@@ -126,7 +155,7 @@ export function Reportes() {
                             )}
                         </div>
                     </>
-                ) : (
+                ) : reporteActivo === "ventas" ? (
                     <>
                         <h2 className="text-2xl font-bold mb-4">Reporte de Ventas</h2>
                         <div className="mb-4">
@@ -185,6 +214,38 @@ export function Reportes() {
                                 ) : (
                                     <div className="text-red-500 font-semibold mt-4">{reporteVentas.mensaje}</div>
                                 )
+                            ) : (
+                                <p className="text-gray-500">Genera un reporte para ver los datos.</p>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h2 className="text-2xl font-bold mb-4">Reporte de Rangos</h2>
+                        <button
+                            onClick={obtenerReporteRangos}
+                            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+                        >
+                            Generar Reporte
+                        </button>
+                        <div className="mt-6">
+                            {reporteRangos ? (
+                                <table className="table-auto w-full border-collapse border border-gray-400">
+                                    <thead>
+                                        <tr>
+                                            <th className="border px-4 py-2">Rango</th>
+                                            <th className="border px-4 py-2">Total de Personas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reporteRangos.map((rango, index) => (
+                                            <tr key={index}>
+                                                <td className="border px-4 py-2">{rango.nombre_rango}</td>
+                                                <td className="border px-4 py-2">{rango.total_personas}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             ) : (
                                 <p className="text-gray-500">Genera un reporte para ver los datos.</p>
                             )}
