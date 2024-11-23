@@ -25,21 +25,6 @@ export function Fidelizacion() {
   const [loadingPuntos, setLoadingPuntos] = useState(true);
   const [loadingRangos, setLoadingRangos] = useState(true);
 
-  useEffect(() => {
-    //Para obtener la lista de todos los administradores
-    axios.get('http://localhost:5000/api/administracion/administradores')
-      .then(respuesta => {
-        if (Array.isArray(respuesta.data)) {
-          setListaAdministradores(respuesta.data);
-        } else {
-          console.error("Error en la respuesta del servidor para la lista de administradores:", respuesta.data);
-        }
-      })
-      .catch(error => {
-        console.error("Error al obtener la lista de todos los administradores:", error);
-      });
-  }, [idEmpleado]);
-
   const verificarPermisosAdministrador = () => {
     const estadosRestringidos = ['Suspendido', 'Inactivo', 'Baneado'];
     const areasPermitidas = ['Fidelizacion', 'Administracion', 'DBA'];
