@@ -30,7 +30,7 @@ def index():
 
     # Convierte el resultado a JSON usando el conversor personalizado
     json_data = json.dumps(
-        {"inventario": tipos_productos},
+        tipos_productos,
         ensure_ascii=False,
         default=custom_json_serializer,
     )
