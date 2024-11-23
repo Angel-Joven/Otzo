@@ -530,7 +530,7 @@ class ObtenerInfoClientesPuntosService(ObtenerInfoClientesPuntosModelo):
                             "habilitado": info[5],
                         })
                     resultado = resultado_lista       
-                    print(json.dumps(resultado, indent=4, ensure_ascii=False))
+                    #print(json.dumps(resultado, indent=4, ensure_ascii=False))
                     return resultado
                 else:
                     return {"mensaje": "Cliente no encontrado en la tabla 'puntos'. Esto se debe a que su cuenta esta Inactiva/Suspendida y por ende no se le asigno un rango."}
@@ -589,7 +589,7 @@ class ObtenerRangoClientesService(ObtenerRangoClientesModelo):
                             "nombre_rango": info[2],
                         })
                     resultado = resultado_lista       
-                    print(json.dumps(resultado, indent=4, ensure_ascii=False))
+                    #print(json.dumps(resultado, indent=4, ensure_ascii=False))
                     return resultado
                 else:
                     return {"mensaje": "Cliente no encontrado en la tabla 'puntos'. Esto se debe a que su cuenta esta Inactiva/Suspendida y por ende no se le asigno un rango."}
