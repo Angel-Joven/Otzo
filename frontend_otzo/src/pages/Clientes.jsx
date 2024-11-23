@@ -10,60 +10,16 @@ Temas Especiales de Programación 2 | 1061
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+//Si quieres tener la funcionalidad de poder obtener los datos del usuario que ha iniciado sesion, importa esto:
+import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function Clientes() {
-  const [clienteActual, setClienteActual] = useState(null);
+  const { clienteActual, idCliente } = ObtenerTipoUsuario(); // Aqui mandamos a llamar a las variables que contienen la info del que inicio sesion.
   const [clienteParaEditar, setClienteParaEditar] = useState(null);
-  const [idCliente, setIdCliente] = useState(null);
-  const [listaClientes, setListaClientes] = useState([]);
   const [puntos, setPuntos] = useState([]);
   const [rangos, setRangos] = useState([]);
 
   useEffect(() => {
-    const clienteAlmacenado = localStorage.getItem('cliente');
-    if (clienteAlmacenado && clienteAlmacenado !== 'undefined') {
-      try {
-        const clienteParseado = JSON.parse(clienteAlmacenado);
-        console.log("Datos del cliente almacenado:", clienteParseado);
-        if (clienteParseado && clienteParseado.idCliente) {
-          setIdCliente(clienteParseado.idCliente);
-        }
-      } catch (error) {
-        console.error('Error al parsear el cliente del localStorage:', error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    //Para obtener el id del cliente actual (el que inicio sesion)
-    if (idCliente) {
-      axios.get(`http://localhost:5000/api/clientes/sesionactualcliente/${idCliente}`)
-        .then(respuesta => {
-          if (respuesta.data && !respuesta.data.error) {
-            console.log("Datos del cliente actual:", respuesta.data);
-            setClienteActual(respuesta.data);
-          } else {
-            console.error("Error en la respuesta del servidor para el cliente actual:", respuesta.data);
-          }
-        })
-        .catch(error => {
-          console.error("Error al obtener el cliente actual:", error);
-        });
-    }
-
-    //Para obtener la lista de todos los clientes
-    axios.get('http://localhost:5000/api/clientes/clientes')
-      .then(respuesta => {
-        if (Array.isArray(respuesta.data)) {
-          setListaClientes(respuesta.data);
-        } else {
-          console.error("Error en la respuesta del servidor para la lista de clientes:", respuesta.data);
-        }
-      })
-      .catch(error => {
-        console.error("Error al obtener la lista de todos los clientes:", error);
-      });
-
     //Para obtener los puntos y los rangos
     axios.get('http://localhost:5000/api/fidelizacion/obtenerpuntos')
       .then(response => {
@@ -82,20 +38,7 @@ export function Clientes() {
       });
   }, [idCliente]);
 
-  const manejarClickModificar = (cliente) => {
-    //Convertimos la fecha de nacimiento a formato "YYYY-MM-DD"
-    if (cliente.fecha_nacimiento) {
-      const fechaNacimiento = new Date(cliente.fecha_nacimiento);
-      const dia = String(fechaNacimiento.getDate() + 1).padStart(2, '0');
-      const mes = String(fechaNacimiento.getMonth() + 1).padStart(2, '0');
-      const año = fechaNacimiento.getFullYear();
-      cliente.fecha_nacimiento = `${año}-${mes}-${dia}`;
-    }
-
-    setClienteParaEditar(cliente);
-  };
-
-  const manejarConfirmarCambios = () => {
+  const validarCliente = (cliente) => {
     const {
       nombre,
       apellido_paterno,
@@ -110,42 +53,57 @@ export function Clientes() {
       contacto_correo,
       contraseña,
       contacto_telefono,
-    } = clienteParaEditar;
+    } = cliente;
 
-    if (!nombre || !apellido_paterno || !contraseña) {
-      alert("Por favor, completa todos los campos obligatorios.");
-      return;
+    if (!nombre || !apellido_paterno || !apellido_materno) {
+      return "Por favor, complete los campos: Nombre, Apellido Paterno y Apellido Materno.";
     }
 
-    if (contraseña.length > 255) {
-      alert("La contraseña no puede tener mas de 255 caracteres.");
-      return;
+    if (fecha_nacimiento && !/^\d{4}-\d{2}-\d{2}$/.test(fecha_nacimiento)) {
+      return "La fecha de nacimiento debe tener el formato AAAA-MM-DD.";
     }
 
-    if (isNaN(direccion_codigopostal)) {
-      alert("El codigo postal debe ser un numero.");
-      return;
+    if (!fecha_nacimiento) {
+      return "Ingrese una fecha de nacimiento.";
     }
 
-    if (genero !== 'Masculino' && genero !== 'Femenino') {
-      alert("El genero debe ser 'Masculino' o 'Femenino'.");
-      return;
+    if (genero !== "Masculino" && genero !== "Femenino") {
+      return "El genero debe ser 'Masculino' o 'Femenino'.";
     }
 
-    axios.put(`http://localhost:5000/api/clientes/modificarcliente/${clienteParaEditar.idCliente}`, clienteParaEditar)
-      .then(respuesta => {
-        alert("Cambios realizados exitosamente");
-        setClienteParaEditar(null);
-        window.location.reload();
-      })
-      .catch(error => {
-        console.error("Error al modificar el cliente:", error);
-        if (error.response) {
-          alert("Error al modificar el cliente: " + (error.response.data.error || ''));
-        } else {
-          alert("Error al modificar el cliente");
-        }
-      });
+    if (!direccion_calle || !direccion_colonia || !direccion_codigopostal || !direccion_estado || !direccion_municipio) {
+      return "Por favor, complete los campos: Calle, Colonia, Codigo Postal, Estado y Municipio.";
+    }
+
+    if (direccion_codigopostal && (!/^\d{5,8}$/.test(direccion_codigopostal) || direccion_codigopostal.length > 10)) {
+      return "El codigo postal debe tener entre 5 y 8 digitos.";
+    }
+
+    if (!contacto_correo) {
+      return "Ingrese un correo electronico";
+    }
+
+    if (contacto_correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacto_correo)) {
+      return "Ingrese un correo electronico valido.";
+    }
+
+    if (!contraseña) {
+      return "Ingrese una contraseña";
+    }
+
+    if (contraseña && (contraseña.length > 255 || contraseña.length < 6)) {
+      return "La contraseña debe tener entre 6 y 255 caracteres.";
+    }
+
+    if (!contacto_telefono) {
+      return "Ingrese un numero telefonico";
+    }
+
+    if (contacto_telefono && !/^\d{8,15}$/.test(contacto_telefono)) {
+      return "El telefono debe ser un numero valido de entre 8 y 15 digitos.";
+    }
+
+    return null;
   };
 
   const manejarCambioEntrada = (e) => {
@@ -153,6 +111,31 @@ export function Clientes() {
     if (clienteParaEditar) {
       setClienteParaEditar({ ...clienteParaEditar, [name]: value });
     }
+  };
+
+  const manejarConfirmarCambios = () => {
+    const error = validarCliente(clienteParaEditar);
+    if (error) {
+      alert(error);
+      return;
+    }
+
+  const datosActualizados = { ...clienteParaEditar };
+
+  axios.put(`http://localhost:5000/api/clientes/modificarcliente/${clienteParaEditar.idCliente}`, datosActualizados)
+      .then(() => {
+        alert("Cambios realizados exitosamente.");
+        setClienteParaEditar(null);
+        window.location.reload();
+      })
+      .catch(error => {
+        console.error("Error al modificar el cliente:", error);
+        alert("Error al modificar el cliente.");
+      });
+  };
+  
+  const manejarClickModificar = (cliente) => {
+    setClienteParaEditar(cliente);
   };
 
   return (
@@ -341,7 +324,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="nombre"
-                  value={clienteParaEditar?.nombre ?? ''}
+                  value={clienteParaEditar?.nombre || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Nombre"
                   className="p-2 border rounded"
@@ -350,7 +333,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="apellido_paterno"
-                  value={clienteParaEditar?.apellido_paterno ?? ''}
+                  value={clienteParaEditar?.apellido_paterno || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Apellido Paterno"
                   className="p-2 border rounded"
@@ -359,7 +342,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="apellido_materno"
-                  value={clienteParaEditar?.apellido_materno ?? ''}
+                  value={clienteParaEditar?.apellido_materno || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Apellido Materno"
                   className="p-2 border rounded"
@@ -368,14 +351,14 @@ export function Clientes() {
                 <input
                   type="date"
                   name="fecha_nacimiento"
-                  value={clienteParaEditar?.fecha_nacimiento ?? ''}
+                  value={clienteParaEditar?.fecha_nacimiento || ''}
                   onChange={manejarCambioEntrada}
                   className="p-2 border rounded"
                 />
                 <label>Genero</label>
                 <select
                   name="genero"
-                  value={clienteParaEditar?.genero ?? ''}
+                  value={clienteParaEditar?.genero || ''}
                   onChange={manejarCambioEntrada}
                   className="p-2 border rounded"
                 >
@@ -387,7 +370,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="direccion_calle"
-                  value={clienteParaEditar?.direccion_calle ?? ''}
+                  value={clienteParaEditar?.direccion_calle || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Calle"
                   className="p-2 border rounded"
@@ -396,7 +379,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="direccion_colonia"
-                  value={clienteParaEditar?.direccion_colonia ?? ''}
+                  value={clienteParaEditar?.direccion_colonia || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Colonia"
                   className="p-2 border rounded"
@@ -405,7 +388,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="direccion_codigopostal"
-                  value={clienteParaEditar?.direccion_codigopostal ?? ''}
+                  value={clienteParaEditar?.direccion_codigopostal || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Codigo Postal"
                   className="p-2 border rounded"
@@ -414,7 +397,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="direccion_estado"
-                  value={clienteParaEditar?.direccion_estado ?? ''}
+                  value={clienteParaEditar?.direccion_estado || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Estado"
                   className="p-2 border rounded"
@@ -423,7 +406,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="direccion_municipio"
-                  value={clienteParaEditar?.direccion_municipio ?? ''}
+                  value={clienteParaEditar?.direccion_municipio || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Municipio"
                   className="p-2 border rounded"
@@ -432,7 +415,7 @@ export function Clientes() {
                 <input
                   type="email"
                   name="contacto_correo"
-                  value={clienteParaEditar?.contacto_correo ?? ''}
+                  value={clienteParaEditar?.contacto_correo || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Correo Electronico"
                   className="p-2 border rounded"
@@ -441,7 +424,7 @@ export function Clientes() {
                 <input
                   type="password"
                   name="contraseña"
-                  value={clienteParaEditar?.contraseña ?? ''}
+                  value={clienteParaEditar?.contraseña || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Contraseña"
                   className="p-2 border rounded"
@@ -450,7 +433,7 @@ export function Clientes() {
                 <input
                   type="text"
                   name="contacto_telefono"
-                  value={clienteParaEditar?.contacto_telefono ?? ''}
+                  value={clienteParaEditar?.contacto_telefono || ''}
                   onChange={manejarCambioEntrada}
                   placeholder="Telefono"
                   className="p-2 border rounded"

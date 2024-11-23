@@ -85,8 +85,19 @@ def crear_administrador():
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
+#Ruta para activar un administrador (dar de alta estatus)
+@administracion_bp.route('/daraltaadmin/<int:id_empleado>', methods=['POST'])
+def alta_administrador(id_empleado):
+    try:
+        resultado = AdministracionService.altaAdministradorBoton(id_empleado)
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
 #Ruta para inactivar un administrador (dar de baja)
-@administracion_bp.route('/darbajaadmin/<int:id_empleado>', methods=['DELETE'])
+@administracion_bp.route('/darbajaadmin/<int:id_empleado>', methods=['POST'])
 def baja_administrador(id_empleado):
     try:
         resultado = AdministracionService.bajaAdministrador(id_empleado)

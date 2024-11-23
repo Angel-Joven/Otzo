@@ -10,59 +10,31 @@ Temas Especiales de Programacion 2 | 1061
 import { React, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+//Si quieres tener la funcionalidad de poder obtener los datos del usuario que ha iniciado sesion, importa esto:
+import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function Administracion() {
-  const [administradorActual, setAdministradorActual] = useState(null);
+  const { administradorActual, idEmpleado } = ObtenerTipoUsuario(); // Aqui mandamos a llamar a las variables que contienen la info del que inicio sesion.
   const [listaAdministradores, setListaAdministradores] = useState([]);
   const [administradorParaEditar, setAdministradorParaEditar] = useState(null);
   const [administradorParaAñadir, setAdministradorParaAñadir] = useState(null);
   const [mostrarMensajeModalAutorizacion, setmostrarMensajeModalAutorizacion] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const administradorAlmacenado = localStorage.getItem('administrador');
-  let idEmpleado = null;
 
-  if (administradorAlmacenado && administradorAlmacenado !== 'undefined') {
-    try {
-      const administradorParseado = JSON.parse(administradorAlmacenado);
-      console.log("Datos del administrador almacenado:", administradorParseado);
-      if (administradorParseado && administradorParseado.id_empleado) {
-        idEmpleado = administradorParseado.id_empleado;
-      }
-    } catch (error) {
-      console.error('Error al parsear el administrador del localStorage:', error);
-    }
-  }
-  console.log("ID del empleado obtenido:", idEmpleado);
-
-  useEffect(() => {
-    //Para obtener el id del administrador actual (el que inicio sesion)
-    if (idEmpleado) {
-      axios.get(`http://localhost:5000/api/administracion/sesionactualadmin/${idEmpleado}`)
-        .then(respuesta => {
-          if (respuesta.data && !respuesta.data.error) {
-            setAdministradorActual(respuesta.data);
-          } else {
-            console.error("Error en la respuesta del servidor para el administrador actual:", respuesta.data);
-          }
-        })
-        .catch(error => {
-          console.error("Error al obtener el administrador actual:", error);
-        });
-    }
-
+  useEffect (() => {
     //Para obtener la lista de todos los administradores
     axios.get('http://localhost:5000/api/administracion/administradores')
-      .then(respuesta => {
-        if (Array.isArray(respuesta.data)) {
-          setListaAdministradores(respuesta.data);
-        } else {
-          console.error("Error en la respuesta del servidor para la lista de administradores:", respuesta.data);
-        }
-      })
-      .catch(error => {
-        console.error("Error al obtener la lista de todos los administradores:", error);
-      });
-  }, [idEmpleado]);
+    .then(respuesta => {
+      if (Array.isArray(respuesta.data)) {
+        setListaAdministradores(respuesta.data);
+      } else {
+        console.error("Error en la respuesta del servidor para la lista de administradores:", respuesta.data);
+      }
+    })
+    .catch(error => {
+      console.error("Error al obtener la lista de todos los administradores:", error);
+    });
+  }, []);
 
   const verificarPermisosAdministrador = () => {
     const estadosRestringidos = ['Suspendido', 'Inactivo', 'Baneado'];
@@ -90,47 +62,74 @@ export function Administracion() {
     return true;
   };
 
-  const manejarClickModificar = (administrador) => {
-    if (!verificarPermisosAdministrador()) return;
-    //Convertimos la fecha de nacimiento a formato "YYYY-MM-DD"
-    if (administrador.fecha_nacimiento) {
-      const fechaNacimiento = new Date(administrador.fecha_nacimiento);
-      const dia = String(fechaNacimiento.getDate() + 1).padStart(2, '0');
-      const mes = String(fechaNacimiento.getMonth() + 1).padStart(2, '0');
-      const año = fechaNacimiento.getFullYear();
-      administrador.fecha_nacimiento = `${año}-${mes}-${dia}`;
-    }
-    setAdministradorParaEditar(administrador);
-  }
-
-  const manejarConfirmarCambios = () => {
+  const validarAdministracion = (administrador) => {
     const {
       nombre,
       apellido_paterno,
-      contraseña,
-      direccion_codigopostal,
+      apellido_materno,
+      fecha_nacimiento,
       genero,
+      direccion_calle,
+      direccion_colonia,
+      direccion_codigopostal,
+      direccion_estado,
+      direccion_municipio,
+      contacto_correo,
+      contraseña,
+      contacto_telefono,
       area_Trabajo,
-    } = administradorParaEditar;
+    } = administrador;
 
-    if (!nombre || !apellido_paterno || !contraseña) {
-      alert("Por favor, completa todos los campos obligatorios.");
-      return;
+    if (!nombre || !apellido_paterno || !apellido_materno) {
+      return "Por favor, complete los campos: Nombre, Apellido Paterno y Apellido Materno.";
     }
 
-    if (contraseña.length > 255) {
-      alert("La contraseña no puede tener mas de 255 caracteres.");
-      return;
+    if (fecha_nacimiento && !/^\d{4}-\d{2}-\d{2}$/.test(fecha_nacimiento)) {
+      return "La fecha de nacimiento debe tener el formato AAAA-MM-DD.";
     }
 
-    if (isNaN(direccion_codigopostal)) {
-      alert("El codigo postal debe ser un numero.");
-      return;
+    if (!fecha_nacimiento) {
+      return "Ingrese una fecha de nacimiento.";
     }
 
-    if (genero !== 'Masculino' && genero !== 'Femenino') {
-      alert("El genero debe ser 'Masculino' o 'Femenino'.");
-      return;
+    if (genero !== "Masculino" && genero !== "Femenino") {
+      return "El genero debe ser 'Masculino' o 'Femenino'.";
+    }
+
+    if (!direccion_calle || !direccion_colonia || !direccion_codigopostal || !direccion_estado || !direccion_municipio) {
+      return "Por favor, complete los campos: Calle, Colonia, Codigo Postal, Estado y Municipio.";
+    }
+
+    if (direccion_codigopostal && (!/^\d{5,8}$/.test(direccion_codigopostal) || direccion_codigopostal.length > 10)) {
+      return "El codigo postal debe tener entre 5 y 8 digitos.";
+    }
+
+    if (!contacto_correo) {
+      return "Ingrese un correo electronico";
+    }
+
+    if (contacto_correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacto_correo)) {
+      return "Ingrese un correo electronico valido.";
+    }
+
+    if (!contraseña) {
+      return "Ingrese una contraseña";
+    }
+
+    if (contraseña && (contraseña.length > 255 || contraseña.length < 6)) {
+      return "La contraseña debe tener entre 6 y 255 caracteres.";
+    }
+
+    if (!contacto_telefono) {
+      return "Ingrese un numero telefonico";
+    }
+
+    if (contacto_telefono && !/^\d{8,15}$/.test(contacto_telefono)) {
+      return "El telefono debe ser un numero valido de entre 8 y 15 digitos.";
+    }
+
+    if (!area_Trabajo) {
+      return "Seleccione un area de trabajo para el administrador.";
     }
 
     const areasValidas = ['Almacen', 'Administracion', 'Clientes', 'DBA', 'Fidelizacion', 'Reabastecimiento', 'Ventas', 'Servicio al cliente'];
@@ -139,20 +138,47 @@ export function Administracion() {
       return;
     }
 
-    axios.put(`http://localhost:5000/api/administracion/modificaradmin/${administradorParaEditar.id_empleado}`, administradorParaEditar)
-      .then(respuesta => {
-        alert("Cambios realizados exitosamente");
+    return null;
+  };
+
+  const manejarConfirmarCambios = () => {
+    const error = validarAdministracion(administradorParaEditar);
+    if (error) {
+      alert(error);
+      return;
+    }
+
+    const datosActualizados = { ...administradorParaEditar };
+
+    axios.put(`http://localhost:5000/api/administracion/modificaradmin/${administradorParaEditar.id_empleado}`, datosActualizados)
+      .then(() => {
+        alert("Cambios realizados exitosamente.");
         setAdministradorParaEditar(null);
         window.location.reload();
       })
       .catch(error => {
         console.error("Error al modificar el administrador:", error);
-        if (error.response) {
-          alert("Error al modificar el administrador: " + (error.response.data.error || ''));
-        } else {
-          alert("Error al modificar el administrador");
-        }
+        alert("Error al modificar el administrador.");
       });
+  };
+
+  const manejarConfirmarAñadir = () => {
+    const error = validarAdministracion(administradorParaAñadir);
+    if (error) {
+      alert(error);
+      return;
+    }
+
+    axios.post("http://localhost:5000/api/administracion/crearadmin", administradorParaAñadir)
+    .then(() => {
+      alert("Administrador añadido exitosamente.");
+      setAdministradorParaAñadir(null);
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error("Error al añadir el administrador:", error);
+      alert("Error al añadir el administrador.");
+    });
   };
 
   const manejarCambioEntrada = (e) => {
@@ -164,90 +190,93 @@ export function Administracion() {
     }
   };
 
+  const manejarClickModificar = (administrador) => {
+    if (!verificarPermisosAdministrador()) return;
+    setAdministradorParaEditar(administrador);
+  };
+
+  const manejarClickAñadirAdministrador = () => {
+    if (!verificarPermisosAdministrador()) return;
+    setAdministradorParaAñadir({
+      nombre: "",
+      apellido_paterno: "",
+      apellido_materno: "",
+      fecha_nacimiento: "",
+      genero: "",
+      direccion_calle: "",
+      direccion_colonia: "",
+      direccion_codigopostal: "",
+      direccion_estado: "",
+      direccion_municipio: "",
+      contacto_correo: "",
+      contraseña: "",
+      contacto_telefono: "",
+      area_Trabajo: "",
+    });
+  };
+
+  const manejarDarDeAltaAdminActual = (id_empleado) => {
+    if (!verificarPermisosAdministrador()) return;
+    axios.post(`http://localhost:5000/api/administracion/daraltaadmin/${id_empleado}`)
+      .then(respuesta => {
+        alert(respuesta.data.mensaje);
+        window.location.reload();
+      })
+    .catch(error => {
+      console.error("Error al dar de alta al administrador:", error);
+    });
+  }
+
+  const manejarSuspenderAdminActual = (id_empleado) => {
+    if (!verificarPermisosAdministrador()) return;
+    axios.post(`http://localhost:5000/api/administracion/suspenderadmin/${id_empleado}`)
+      .then(respuesta => {
+        alert(respuesta.data.mensaje);
+        window.location.reload();
+      })
+    .catch(error => {
+      console.error("Error al suspender al administrador:", error);
+    });
+  }
+
+  const manejarDarDeAlta = (id_empleado) => {
+    if (!verificarPermisosAdministrador()) return;
+    axios.post(`http://localhost:5000/api/administracion/daraltaadmin/${id_empleado}`)
+      .then(respuesta => {
+        alert(respuesta.data.mensaje);
+        window.location.reload();
+      })
+    .catch(error => {
+      console.error("Error al dar de alta al administrador:", error);
+      alert("Error al dar de alta al administrador.");
+    });
+  }
+
+  const manejarSuspender = (id_empleado) => {
+    if (!verificarPermisosAdministrador()) return;
+    axios.post(`http://localhost:5000/api/administracion/suspenderadmin/${id_empleado}`)
+      .then(respuesta => {
+        alert(respuesta.data.mensaje);
+        window.location.reload();
+      })
+    .catch(error => {
+      console.error("Error al suspender al administrador:", error);
+      alert("Error al suspender al administrador.");
+    });
+  }
+
   const manejarDarDeBaja = (id_empleado) => {
     if (!verificarPermisosAdministrador()) return;
-    axios.delete(`http://localhost:5000/api/administracion/darbajaadmin/${id_empleado}`)
+    axios.post(`http://localhost:5000/api/administracion/darbajaadmin/${id_empleado}`)
       .then(respuesta => {
         alert(respuesta.data.mensaje);
         window.location.reload();
       })
     .catch(error => {
       console.error("Error al dar de baja al administrador:", error);
+      alert("Error al dar de baja al administrador.");
     });
   }
-
-  const manejarClickAñadirAdministrador = () => {
-    if (!verificarPermisosAdministrador()) return;
-    setAdministradorParaAñadir({
-    nombre: "",
-    apellido_paterno: "",
-    apellido_materno: "",
-    fecha_nacimiento: "",
-    genero: "",
-    direccion_calle: "",
-    direccion_colonia: "",
-    direccion_codigopostal: "",
-    direccion_estado: "",
-    direccion_municipio: "",
-    contacto_correo: "",
-    contraseña: "",
-    contacto_telefono: "",
-    area_Trabajo: ""
-    });
-  }
-
-  const manejarConfirmarAñadir = () => {
-    const {
-      nombre,
-      apellido_paterno,
-      contraseña,
-      direccion_codigopostal,
-      genero,
-      area_Trabajo,
-    } = administradorParaAñadir;
-
-    if (!nombre || !apellido_paterno || !contraseña) {
-      alert("Por favor, completa todos los campos obligatorios.");
-      return;
-    }
-
-    if (contraseña.length > 255) {
-      alert("La contraseña no puede tener mas de 255 caracteres.");
-      return;
-    }
-
-    if (isNaN(direccion_codigopostal)) {
-      alert("El codigo postal debe ser un numero.");
-      return;
-    }
-
-    if (genero !== 'Masculino' && genero !== 'Femenino') {
-      alert("El genero debe ser 'Masculino' o 'Femenino'.");
-      return;
-    }
-
-    const areasValidas = ['Almacen', 'Administracion', 'Clientes', 'DBA', 'Fidelizacion', 'Reabastecimiento', 'Ventas', 'Servicio al cliente'];
-    if (!areasValidas.includes(area_Trabajo)) {
-      alert("Area de Trabajo invalida.");
-      return;
-    }
-
-    console.log(administradorParaAñadir);
-    axios.post('http://localhost:5000/api/administracion/crearadmin', administradorParaAñadir)
-      .then(respuesta => {
-        alert("Administrador añadido exitosamente");
-        setAdministradorParaAñadir(null);
-        window.location.reload();
-      })
-      .catch(error => {
-        console.error("Error al Añadir el administrador:", error);
-        if (error.response) {
-          alert("Error al Añadir el administrador: " + (error.response.data.error || ''));
-        } else {
-          alert("Error al Añadir el administrador");
-        }
-      });
-  };
 
   return (
     <div className='bg-gradient-to-r from-red-400 to-red-500 w-full min-h-screen z-0 relative'>
@@ -280,6 +309,7 @@ export function Administracion() {
                     <th className="py-2 px-4 border-b text-center">Telefono</th>
                     <th className="py-2 px-4 border-b text-center">Area de Trabajo</th>
                     <th className="py-2 px-4 border-b text-center">Estado de Cuenta</th>
+                    <th className="py-2 px-4 border-b text-center">Accion</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -293,6 +323,12 @@ export function Administracion() {
                       <td className="py-2 px-4 border-b text-center">{administradorActual.contacto_telefono}</td>
                       <td className="py-2 px-4 border-b text-center">{administradorActual.area_Trabajo}</td>
                       <td className="py-2 px-4 border-b text-center">{administradorActual.estado_cuenta}</td>
+                      <td className="py-2 px-4 border-b text-center">
+                        <button onClick={() => manejarClickModificar(administradorActual)} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Modificar</button>
+                        <button onClick={() => manejarDarDeAltaAdminActual(administradorActual.id_empleado)} className="bg-green-500 text-white px-2 py-1 rounded mr-2">Dar de Alta</button>
+                        <button onClick={() => manejarSuspenderAdminActual(administradorActual.id_empleado)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">Suspender</button>
+                        <button onClick={() => manejarDarDeBaja(administradorActual.id_empleado)} className="bg-red-500 text-white px-2 py-1 rounded mr-2">Dar de Baja</button>
+                      </td>
                     </tr>
                   ) : (
                     <tr>
@@ -350,7 +386,9 @@ export function Administracion() {
                         <td className="py-2 px-4 border-b text-center">{administrador.estado_cuenta}</td>
                         <td className="py-2 px-4 border-b text-center">
                           <button onClick={() => manejarClickModificar(administrador)} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Modificar</button>
-                          <button onClick={() => manejarDarDeBaja(administrador.id_empleado)} className="bg-red-500 text-white px-2 py-1 rounded">Dar de Baja</button>
+                          <button onClick={() => manejarDarDeAlta(administrador.id_empleado)} className="bg-green-500 text-white px-2 py-1 rounded mr-2">Dar de Alta</button>
+                          <button onClick={() => manejarSuspender(administrador.id_empleado)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">Suspender</button>
+                          <button onClick={() => manejarDarDeBaja(administrador.id_empleado)} className="bg-red-500 text-white px-2 py-1 rounded mr-2">Dar de Baja</button>
                         </td>
                       </tr>
                     ))

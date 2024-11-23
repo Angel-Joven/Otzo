@@ -75,6 +75,27 @@ class ClientesService(ClientesModelo):
             conexion.close()
 
     @staticmethod
+    def altaClienteBoton(id_cliente):
+        try:
+            conexion = get_connection()
+            with conexion.cursor() as cursor:
+                #Comenzamos la transaccion
+                conexion.begin()
+                cursor.execute(
+                    "UPDATE clientes SET estado_cuenta = 'Activo' WHERE idCliente = %s",
+                    (id_cliente,)
+                )
+                #Confirmamos la transaccion
+                conexion.commit()
+            return {"mensaje": "Cliente dado de alta satisfactoriamente"}
+        except Exception as e:
+            #Deshacemos la transaccion en caso de error
+            conexion.rollback()
+            raise DatabaseError(str(e))
+        finally:
+            conexion.close()
+
+    @staticmethod
     def bajaCliente(id_cliente):
         try:
             conexion = get_connection()
@@ -108,7 +129,7 @@ class ClientesService(ClientesModelo):
                 )
                 #Confirmamos la transaccion
                 conexion.commit()
-            return {"mensaje": "Cliente suspendido"}
+            return {"mensaje": "Cliente suspendido satisfactoriamente"}
         except Exception as e:
             #Deshacemos la transaccion en caso de error
             conexion.rollback()
@@ -123,22 +144,29 @@ class ClientesService(ClientesModelo):
             with conexion.cursor() as cursor:
                 #Comenzamos la transaccion
                 conexion.begin()
-                cursor.execute(
-                    """
+                campos = []
+                valores = []
+                for campo in [
+                    "nombre", "apellido_paterno", "apellido_materno", "fecha_nacimiento", 
+                    "genero", "direccion_calle", "direccion_colonia", "direccion_codigopostal", 
+                    "direccion_estado", "direccion_municipio", "contacto_correo", 
+                    "contraseña", "contacto_telefono"
+                ]:
+                    if data.get(campo) is not None:
+                        campos.append(f"{campo} = %s")
+                        valores.append(data[campo])
+                
+                if not campos:
+                    raise ValueError("No se enviaron campos para actualizar")
+
+                consulta = f"""
                     UPDATE clientes
-                    SET nombre = %s, apellido_paterno = %s, apellido_materno = %s, fecha_nacimiento = %s, genero = %s,
-                        direccion_calle = %s, direccion_colonia = %s, direccion_codigopostal = %s, direccion_estado = %s,
-                        direccion_municipio = %s, contacto_correo = %s, contraseña = %s, contacto_telefono = %s
+                    SET {', '.join(campos)}
                     WHERE idCliente = %s
-                    """,
-                    (
-                        data['nombre'], data['apellido_paterno'], data['apellido_materno'],
-                        data['fecha_nacimiento'], data['genero'], data['direccion_calle'],
-                        data['direccion_colonia'], data['direccion_codigopostal'], data['direccion_estado'],
-                        data['direccion_municipio'], data['contacto_correo'], data['contraseña'],
-                        data['contacto_telefono'], id_cliente
-                    )
-                )
+                """
+                valores.append(id_cliente)
+                cursor.execute(consulta, valores)
+
                 #Confirmamos la transaccion
                 conexion.commit()
             return {"mensaje": "Cliente modificado exitosamente"}
@@ -158,8 +186,9 @@ class ClientesService(ClientesModelo):
                 conexion.begin()
                 cursor.execute(
                     """
-                    SELECT idCliente, nombre, apellido_paterno, apellido_materno,
-                        contacto_correo, contacto_telefono, estado_cuenta
+                    SELECT idCliente, nombre, apellido_paterno, apellido_materno, fecha_nacimiento, genero, direccion_calle,
+                        direccion_colonia, direccion_codigopostal, direccion_estado, direccion_municipio, contacto_correo,
+                        contraseña, contacto_telefono, fechaDe_Alta, ultimo_acceso, estado_cuenta
                     FROM clientes
                     WHERE idCliente = %s
                     """,
@@ -177,9 +206,19 @@ class ClientesService(ClientesModelo):
                     "nombre": cliente[1],
                     "apellido_paterno": cliente[2],
                     "apellido_materno": cliente[3],
-                    "contacto_correo": cliente[4],
-                    "contacto_telefono": cliente[5],
-                    "estado_cuenta": cliente[6],
+                    "fecha_nacimiento": str(cliente[4]),
+                    "genero": cliente[5],
+                    "direccion_calle": cliente[6],
+                    "direccion_colonia": cliente[7],
+                    "direccion_codigopostal": cliente[8],
+                    "direccion_estado": cliente[9],
+                    "direccion_municipio": cliente[10],
+                    "contacto_correo": cliente[11],
+                    "contraseña": cliente[12],
+                    "contacto_telefono": cliente[13],
+                    "fechaDe_Alta": str(cliente[14]),
+                    "ultimo_acceso": str(cliente[15]),
+                    "estado_cuenta": cliente[16],
                 }
 
             print(json.dumps(resultado, indent=4, ensure_ascii=False))

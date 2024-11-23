@@ -10,96 +10,20 @@ Temas Especiales de Programacion 2 | 1061
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+//Si quieres tener la funcionalidad de poder obtener los datos del usuario que ha iniciado sesion, importa esto:
+import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function ClientesAdministracion() {
-  const [clienteActual, setClienteActual] = useState(null);
-  const [administradorActual, setAdministradorActual] = useState(null);
-  const administradorAlmacenado = localStorage.getItem('administrador');
-  let idEmpleado = null;
+  const { clienteActual, idCliente, administradorActual, idEmpleado } = ObtenerTipoUsuario(); // Aqui mandamos a llamar a las variables que contienen la info del que inicio sesion.
   const [listaClientes, setListaClientes] = useState([]);
   const [clienteParaEditar, setClienteParaEditar] = useState(null);
   const [clienteParaAñadir, setClienteParaAñadir] = useState(null);
   const [mostrarMensajeModalAutorizacion, setmostrarMensajeModalAutorizacion] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-
-  if (administradorAlmacenado && administradorAlmacenado !== 'undefined') {
-    try {
-      const administradorParseado = JSON.parse(administradorAlmacenado);
-      console.log("Datos del administrador almacenado:", administradorParseado);
-      if (administradorParseado && administradorParseado.id_empleado) {
-        idEmpleado = administradorParseado.id_empleado;
-      }
-    } catch (error) {
-      console.error('Error al parsear el administrador del localStorage:', error);
-    }
-  }
-  console.log("ID del empleado obtenido:", idEmpleado);
-
-  useEffect(() => {
-    //Para obtener el id del administrador actual (el que inicio sesion)
-    if (idEmpleado) {
-      axios.get(`http://localhost:5000/api/administracion/sesionactualadmin/${idEmpleado}`)
-        .then(respuesta => {
-          if (respuesta.data && !respuesta.data.error) {
-            setAdministradorActual(respuesta.data);
-          } else {
-            console.error("Error en la respuesta del servidor para el administrador actual:", respuesta.data);
-          }
-        })
-        .catch(error => {
-          console.error("Error al obtener el administrador actual:", error);
-        });
-    }
-
-    //Para obtener la lista de todos los administradores
-    axios.get('http://localhost:5000/api/administracion/administradores')
-      .then(respuesta => {
-        if (Array.isArray(respuesta.data)) {
-          setListaAdministradores(respuesta.data);
-        } else {
-          console.error("Error en la respuesta del servidor para la lista de administradores:", respuesta.data);
-        }
-      })
-      .catch(error => {
-        console.error("Error al obtener la lista de todos los administradores:", error);
-      });
-  }, [idEmpleado]);
-
-  const clienteAlmacenado = localStorage.getItem('cliente');
-  let idCliente = null;
-
   const [puntos, setPuntos] = useState([]);
   const [rangos, setRangos] = useState([]);
 
-  if (clienteAlmacenado && clienteAlmacenado !== 'undefined') {
-    try {
-      const clienteParseado = JSON.parse(clienteAlmacenado);
-      console.log("Datos del cliente almacenado:", clienteParseado);
-      if (clienteParseado && clienteParseado.idCliente) {
-        idCliente = clienteParseado.idCliente;
-      }
-    } catch (error) {
-      console.error('Error al parsear el cliente del localStorage:', error);
-    }
-  }
-  console.log("ID del cliente obtenido:", idCliente);
-
   useEffect(() => {
-    //Para obtener el id del cliente actual (el que inicio sesion)
-    if (idCliente) {
-      axios.get(`http://localhost:5000/api/clientes/sesionactualcliente/${idCliente}`)
-        .then(respuesta => {
-          if (respuesta.data && !respuesta.data.error) {
-            setClienteActual(respuesta.data);
-          } else {
-            console.error("Error en la respuesta del servidor para el cliente actual:", respuesta.data);
-          }
-        })
-        .catch(error => {
-          console.error("Error al obtener el cliente actual:", error);
-        });
-    }
-
     //Para obtener la lista de todos los clientes
     axios.get('http://localhost:5000/api/clientes/clientes')
       .then(respuesta => {
@@ -158,73 +82,111 @@ export function ClientesAdministracion() {
     return true;
   };
 
-  const manejarClickModificar = (cliente) => {
-    if (!verificarPermisosCliente()) return;
-    //Convertimos la fecha de nacimiento a formato "YYYY-MM-DD"
-    if (cliente.fecha_nacimiento) {
-      const fechaNacimiento = new Date(cliente.fecha_nacimiento);
-      const dia = String(fechaNacimiento.getDate() + 1).padStart(2, '0');
-      const mes = String(fechaNacimiento.getMonth() + 1).padStart(2, '0');
-      const año = fechaNacimiento.getFullYear();
-      cliente.fecha_nacimiento = `${año}-${mes}-${dia}`;
-    }
-
-    setClienteParaEditar(cliente);
-  };
-
-  const manejarConfirmarCambios = () => {
+  const validarCliente = (cliente) => {
     const {
       nombre,
       apellido_paterno,
+      apellido_materno,
+      fecha_nacimiento,
+      genero,
+      direccion_calle,
+      direccion_colonia,
+      direccion_codigopostal,
+      direccion_estado,
+      direccion_municipio,
+      contacto_correo,
       contraseña,
-      direccion_codigopostal,
-      genero,
-    } = clienteParaEditar;
+      contacto_telefono,
+    } = cliente;
 
-    if (!nombre || !apellido_paterno) {
-      alert("Por favor, completa todos los campos obligatorios.");
+    if (!nombre || !apellido_paterno || !apellido_materno) {
+      return "Por favor, complete los campos: Nombre, Apellido Paterno y Apellido Materno.";
+    }
+
+    if (fecha_nacimiento && !/^\d{4}-\d{2}-\d{2}$/.test(fecha_nacimiento)) {
+      return "La fecha de nacimiento debe tener el formato AAAA-MM-DD.";
+    }
+
+    if (!fecha_nacimiento) {
+      return "Ingrese una fecha de nacimiento.";
+    }
+
+    if (genero !== "Masculino" && genero !== "Femenino") {
+      return "El genero debe ser 'Masculino' o 'Femenino'.";
+    }
+
+    if (!direccion_calle || !direccion_colonia || !direccion_codigopostal || !direccion_estado || !direccion_municipio) {
+      return "Por favor, complete los campos: Calle, Colonia, Codigo Postal, Estado y Municipio.";
+    }
+
+    if (direccion_codigopostal && (!/^\d{5,8}$/.test(direccion_codigopostal) || direccion_codigopostal.length > 10)) {
+      return "El codigo postal debe tener entre 5 y 8 digitos.";
+    }
+
+    if (!contacto_correo) {
+      return "Ingrese un correo electronico";
+    }
+
+    if (contacto_correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacto_correo)) {
+      return "Ingrese un correo electronico valido.";
+    }
+
+    if (!contraseña) {
+      return "Ingrese una contraseña";
+    }
+
+    if (contraseña && (contraseña.length > 255 || contraseña.length < 6)) {
+      return "La contraseña debe tener entre 6 y 255 caracteres.";
+    }
+
+    if (!contacto_telefono) {
+      return "Ingrese un numero telefonico";
+    }
+
+    if (contacto_telefono && !/^\d{8,15}$/.test(contacto_telefono)) {
+      return "El telefono debe ser un numero valido de entre 8 y 15 digitos.";
+    }
+
+    return null;
+  };
+
+  const manejarConfirmarCambios = () => {
+    const error = validarCliente(clienteParaEditar);
+    if (error) {
+      alert(error);
       return;
     }
 
-    if (contraseña && contraseña.length > 255) {
-      alert("La contraseña no puede tener más de 255 caracteres.");
-      return;
-    }
-
-    if (isNaN(direccion_codigopostal)) {
-      alert("El código postal debe ser un número.");
-      return;
-    }
-
-    if (genero !== 'Masculino' && genero !== 'Femenino') {
-      alert("El género debe ser 'Masculino' o 'Femenino'.");
-      return;
-    }
-
-    const datosActualizados = {
-      nombre,
-      apellido_paterno,
-      direccion_codigopostal,
-      genero,
-    };
-
-    if (contraseña && contraseña.trim() !== '') {
-      datosActualizados.contraseña = contraseña;
-    }
+    const datosActualizados = { ...clienteParaEditar };
 
     axios.put(`http://localhost:5000/api/clientes/modificarcliente/${clienteParaEditar.idCliente}`, datosActualizados)
-      .then(respuesta => {
-        alert("Cambios realizados exitosamente");
+      .then(() => {
+        alert("Cambios realizados exitosamente.");
         setClienteParaEditar(null);
         window.location.reload();
       })
       .catch(error => {
         console.error("Error al modificar el cliente:", error);
-        if (error.response) {
-          alert("Error al modificar el cliente: " + (error.response.data.error || ''));
-        } else {
-          alert("Error al modificar el cliente");
-        }
+        alert("Error al modificar el cliente.");
+      });
+  };
+
+  const manejarConfirmarAñadir = () => {
+    const error = validarCliente(clienteParaAñadir);
+    if (error) {
+      alert(error);
+      return;
+    }
+
+    axios.post("http://localhost:5000/api/clientes/crearcliente", clienteParaAñadir)
+      .then(() => {
+        alert("Cliente añadido exitosamente.");
+        setClienteParaAñadir(null);
+        window.location.reload();
+      })
+      .catch(error => {
+        console.error("Error al añadir el cliente:", error);
+        alert("Error al añadir el cliente.");
       });
   };
 
@@ -237,16 +199,9 @@ export function ClientesAdministracion() {
     }
   };
 
-  const manejarDarDeBaja = (idCliente) => {
+  const manejarClickModificar = (cliente) => {
     if (!verificarPermisosCliente()) return;
-    axios.delete(`http://localhost:5000/api/clientes/darbajacliente/${idCliente}`)
-      .then(respuesta => {
-        alert(respuesta.data.mensaje);
-        window.location.reload();
-      })
-      .catch(error => {
-        console.error("Error al dar de baja al cliente:", error);
-      });
+    setClienteParaEditar(cliente);
   };
 
   const manejarClickAñadirCliente = () => {
@@ -268,49 +223,42 @@ export function ClientesAdministracion() {
     });
   };
 
-  const manejarConfirmarAñadir = () => {
-    const {
-      nombre,
-      apellido_paterno,
-      contraseña,
-      direccion_codigopostal,
-      genero,
-    } = clienteParaAñadir;
-
-    if (!nombre || !apellido_paterno || !contraseña) {
-      alert("Por favor, completa todos los campos obligatorios.");
-      return;
-    }
-
-    if (contraseña.length > 255) {
-      alert("La contraseña no puede tener mas de 255 caracteres.");
-      return;
-    }
-
-    if (isNaN(direccion_codigopostal)) {
-      alert("El código postal debe ser un nimero.");
-      return;
-    }
-
-    if (genero !== 'Masculino' && genero !== 'Femenino') {
-      alert("El genero debe ser 'Masculino' o 'Femenino'.");
-      return;
-    }
-
-    console.log(clienteParaAñadir);
-    axios.post('http://localhost:5000/api/clientes/crearcliente', clienteParaAñadir)
+  const manejarDarDeAlta = (idCliente) => {
+    if (!verificarPermisosCliente()) return;
+    axios.post(`http://localhost:5000/api/clientes/daraltacliente/${idCliente}`)
       .then(respuesta => {
-        alert("Cliente añadido exitosamente");
-        setClienteParaAñadir(null);
+        alert(respuesta.data.mensaje);
+        window.location.reload();
+      })
+    .catch(error => {
+      console.error("Error al dar de alta al cliente:", error);
+      alert("Error al dar de alta al cliente.");
+    });
+  }
+
+  const manejarSuspender = (idCliente) => {
+    if (!verificarPermisosCliente()) return;
+    axios.post(`http://localhost:5000/api/clientes/suspendercliente/${idCliente}`)
+      .then(respuesta => {
+        alert(respuesta.data.mensaje);
+        window.location.reload();
+      })
+    .catch(error => {
+      console.error("Error al suspender al cliente:", error);
+      alert("Error al suspender al cliente.");
+    });
+  }
+
+  const manejarDarDeBaja = (idCliente) => {
+    if (!verificarPermisosCliente()) return;
+    axios.post(`http://localhost:5000/api/clientes/darbajacliente/${idCliente}`)
+      .then(() => {
+        alert("Cliente dado de baja exitosamente.");
         window.location.reload();
       })
       .catch(error => {
-        console.error("Error al añadir el cliente:", error);
-        if (error.response) {
-          alert("Error al añadir el cliente: " + (error.response.data.error || ''));
-        } else {
-          alert("Error al añadir el cliente");
-        }
+        console.error("Error al dar de baja al cliente:", error);
+        alert("Error al dar de baja al cliente.");
       });
   };
 
@@ -453,6 +401,8 @@ export function ClientesAdministracion() {
                         <td className="py-2 px-4 border-b text-center">{cliente.estado_cuenta}</td>
                         <td className="py-2 px-4 border-b text-center">
                           <button onClick={() => manejarClickModificar(cliente)} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Modificar</button>
+                          <button onClick={() => manejarDarDeAlta(cliente.idCliente)} className="bg-green-500 text-white px-2 py-1 rounded mr-2">Dar de Alta</button>
+                        <button onClick={() => manejarSuspender(cliente.idCliente)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">Suspender</button>
                           <button onClick={() => manejarDarDeBaja(cliente.idCliente)} className="bg-red-500 text-white px-2 py-1 rounded">Dar de Baja</button>
                         </td>
                       </tr>
