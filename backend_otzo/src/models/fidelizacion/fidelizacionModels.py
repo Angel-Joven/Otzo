@@ -102,7 +102,7 @@ class PagarPuntosActualizarRangoModelo(ABC):
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
-#Clase abstracta para la funcionalidad de obtencion del idrango y nombre_rango
+#Clase abstracta para la funcionalidad de obtencion del idrango y nombre_rango - ATENCION
 class ObtenerRangoModelo(ABC):
     @abstractmethod
     def obtener_rango_cliente_atencion(self, id_cliente):
@@ -116,6 +116,15 @@ class ObtenerInfoClientesPuntosModelo(ABC):
     @abstractmethod
     def obtener_info_clientes_puntos(self, id_cliente):
         """Obtenemos toda la informacion de un cliente especifico"""
+        pass
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+#Clase abstracta para la funcionalidad de obtencion del idrango y nombre_rango - REPORTES
+class ObtenerRangoClientesModelo(ABC):
+    @abstractmethod
+    def obtener_rango_cliente_reportes(self, id_cliente):
+        """Obtenemos el idrango y el nombre_rango de todos los clientes"""
         pass
 
 # ---------------------------------------------------------------------------------------------------------------------------

@@ -554,3 +554,63 @@ class ObtenerInfoClientesPuntosService(ObtenerInfoClientesPuntosModelo):
 # ---------------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------------
+
+# -> ¡PARA EL MODULO DE REPORTES! <-
+# FUNCIONALIDAD QUE DEVUELVE EL 'idrango' Y EL 'nombre_rango' DE TODOS LOS CLIENTES
+
+# REQUISITOS
+# NINGUNO
+
+class ObtenerRangoClientesService(ObtenerRangoClientesModelo):
+    def obtener_rango_cliente_reportes(self):
+        conexion = get_connection()
+        try:
+            with conexion.cursor() as cursor:
+                #Comenzamos la transaccion
+                conexion.begin()
+
+                cursor.execute(
+                    """
+                    SELECT p.idclientes_puntos, p.idrango, r.nombre_rango, p.habilitado FROM puntos p
+                    JOIN rangos r ON p.idrango = r.idrango
+                    """
+                )
+                #Confirmamos la transaccion
+                conexion.commit()
+
+                resultado = cursor.fetchall()
+
+                if resultado:
+                    resultado_lista = []
+                    for info in resultado:
+                        resultado_lista.append({
+                            "idclientes_puntos": info[0],
+                            "idrango": info[1],
+                            "nombre_rango": info[2],
+                        })
+                    resultado = resultado_lista       
+                    print(json.dumps(resultado, indent=4, ensure_ascii=False))
+                    return resultado
+                else:
+                    return {"mensaje": "Cliente no encontrado en la tabla 'puntos'. Esto se debe a que su cuenta esta Inactiva/Suspendida y por ende no se le asigno un rango."}
+
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            conexion.rollback()
+            raise e
+        finally:
+            conexion.close()
+
+
+# EJEMPLO DE USO
+# PARA PODER VISUALIZAR LA INFORMACION, SOLAMENTE ES NECESARIO MANDAR A LLAMAR A ESTE SERVICIO.
+# NO REQUIERE DE MANDARLE VARIABLES NI NADA
+
+# LA ESTRUCTURA ES LA SIGUIENTE:
+
+# ObtenerRangoClientesService().obtener_rango_cliente_reportes()
+
+# ---------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------
