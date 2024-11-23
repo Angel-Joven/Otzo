@@ -172,8 +172,19 @@ def resetear_contraseña():
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
+#Ruta para dar de alta a un cliente (dar de alta estatus)
+@clientes_bp.route('/daraltacliente/<int:id_cliente>', methods=['POST'])
+def alta_cliente(id_cliente):
+    try:
+        resultado = ClientesService.altaClienteBoton(id_cliente)
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
 #Ruta para dar de baja un cliente (dar de baja)
-@clientes_bp.route('/darbajacliente/<int:id_cliente>', methods=['DELETE'])
+@clientes_bp.route('/darbajacliente/<int:id_cliente>', methods=['POST'])
 def baja_cliente(id_cliente):
     try:
         resultado = ClientesService.bajaCliente(id_cliente)

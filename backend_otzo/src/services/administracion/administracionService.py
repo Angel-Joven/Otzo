@@ -47,6 +47,27 @@ class AdministracionService(AdministracionModelo):
             conexion.close()
 
     @staticmethod
+    def altaAdministradorBoton(id_empleado):
+        try:
+            conexion = get_connection()
+            with conexion.cursor() as cursor:
+                #Comenzamos la transaccion
+                conexion.begin()
+                cursor.execute(
+                    "UPDATE administracion SET estado_cuenta = 'Activo' WHERE id_empleado = %s",
+                    (id_empleado,)
+                )
+                #Confirmamos la transaccion
+                conexion.commit()
+            return {"mensaje": "Administrador dado de alta satisfactoriamente"}
+        except Exception as e:
+            #Deshacemos la transaccion en caso de error
+            conexion.rollback()
+            raise DatabaseError(str(e))
+        finally:
+            conexion.close()
+
+    @staticmethod
     def bajaAdministrador(id_empleado):
         try:
             conexion = get_connection()
@@ -80,7 +101,7 @@ class AdministracionService(AdministracionModelo):
                 )
                 #Confirmamos la transaccion
                 conexion.commit()
-            return {"mensaje": "Administrador suspendido"}
+            return {"mensaje": "Administrador suspendido satisfactoriamente"}
         except Exception as e:
             #Deshacemos la transaccion en caso de error
             conexion.rollback()
@@ -151,8 +172,9 @@ class AdministracionService(AdministracionModelo):
                 conexion.begin()
                 cursor.execute(
                     """
-                    SELECT id_empleado, nombre, apellido_paterno, apellido_materno,
-                        contacto_correo, contacto_telefono, area_Trabajo, estado_cuenta
+                    SELECT id_empleado, nombre, apellido_paterno, apellido_materno, fecha_nacimiento, genero, direccion_calle,
+                        direccion_colonia, direccion_codigopostal, direccion_estado, direccion_municipio, contacto_correo,
+                        contraseña, contacto_telefono, area_Trabajo, fechaDe_Alta, ultimo_acceso, estado_cuenta
                     FROM administracion
                     WHERE id_empleado = %s
                     """,
@@ -163,17 +185,27 @@ class AdministracionService(AdministracionModelo):
                 administrador = cursor.fetchone()
 
             if not administrador:
-                resultado = {"error": "No se encontró el administrador actual"}
+                resultado = {"error": "No se encontro el administrador actual"}
             else:
                 resultado = {
                     "id_empleado": administrador[0],
                     "nombre": administrador[1],
                     "apellido_paterno": administrador[2],
                     "apellido_materno": administrador[3],
-                    "contacto_correo": administrador[4],
-                    "contacto_telefono": administrador[5],
-                    "area_Trabajo": administrador[6],
-                    "estado_cuenta": administrador[7],
+                    "fecha_nacimiento": str(administrador[4]),
+                    "genero": administrador[5],
+                    "direccion_calle": administrador[6],
+                    "direccion_colonia": administrador[7],
+                    "direccion_codigopostal": administrador[8],
+                    "direccion_estado": administrador[9],
+                    "direccion_municipio": administrador[10],
+                    "contacto_correo": administrador[11],
+                    "contraseña": administrador[12],
+                    "contacto_telefono": administrador[13],
+                    "area_Trabajo": administrador[14],
+                    "fechaDe_Alta": str(administrador[15]),
+                    "ultimo_acceso": str(administrador[16]),
+                    "estado_cuenta": administrador[17],
                 }
 
             print(json.dumps(resultado, indent=4, ensure_ascii=False))

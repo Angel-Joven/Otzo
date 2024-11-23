@@ -11,24 +11,12 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UsarAutenticadorNombre } from '../context/Autenticacion';
 import { motion } from 'framer-motion';
-import axios from "axios";
 
 export function IndexPrincipal() {
   const navigate = useNavigate();
   const { userType, setUserType } = UsarAutenticadorNombre();
 
-  //Le asignamos un rango a todos los clientes que se hayan registrado de manera automatizada
-  const asignarRangoInicial = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/fidelizacion/asigrnginiauto");
-      console.log("Rango inicial asignado automaticamente:", response.data.mensaje);
-    } catch (error) {
-      console.error("Error al asignar rango inicial automatico:", error.response?.data || error.message);
-    }
-  };
-
   useEffect(() => {
-    asignarRangoInicial();
     if (userType) {
       if (userType === 'cliente') {
         navigate('/indexClientes');

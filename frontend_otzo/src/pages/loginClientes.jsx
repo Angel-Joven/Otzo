@@ -14,6 +14,16 @@ import { UsarAutenticadorNombre } from '../context/Autenticacion';
 import { motion } from 'framer-motion';
 
 export function LoginClientes() {
+  //Le asignamos un rango a todos los clientes que se hayan registrado de manera automatizada
+  const asignarRangoInicial = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/fidelizacion/asigrnginiauto");
+      console.log("Rango inicial asignado automaticamente:", response.data.mensaje);
+    } catch (error) {
+      console.error("Error al asignar rango inicial automatico:", error.response?.data || error.message);
+    }
+  };
+
   const [nombre, setNombre] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [error, setError] = useState('');
@@ -48,6 +58,7 @@ export function LoginClientes() {
     try {
       const response = await axios.post('http://localhost:5000/api/clientes/login', { nombre, contraseña });
       if (response.status === 200) {
+        asignarRangoInicial(); // Asignamos el rango default
         setUserType('cliente');
         localStorage.setItem('administrador', JSON.stringify(response.data));
         localStorage.setItem('cliente', JSON.stringify(response.data));
@@ -67,7 +78,7 @@ export function LoginClientes() {
     const { nombre, apellido_paterno, apellido_materno, contacto_correo, contraseña } = nuevaCuenta;
 
     if (!nombre || !apellido_paterno || !contacto_correo || !contraseña) {
-      alert('Por favor, complete todos los campos obligatorios.');
+      alert("Por favor, completa todos los campos obligatorios.");
       return;
     }
 

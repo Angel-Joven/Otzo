@@ -11,50 +11,21 @@ import { React, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FidelizacionData } from "../api/fidelizacionData.api.js";
 import axios from "axios";
+//Si quieres tener la funcionalidad de poder obtener los datos del usuario que ha iniciado sesion, importa esto:
+import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function Fidelizacion() {
-  const [administradorActual, setAdministradorActual] = useState(null);
-  const [listaAdministradores, setListaAdministradores] = useState([]);
+  const { clienteActual, idCliente, administradorActual, idEmpleado } = ObtenerTipoUsuario(); // Aqui mandamos a llamar a las variables que contienen la info del que inicio sesion.
   const [mostrarMensajeModalAutorizacion, setmostrarMensajeModalAutorizacion] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const administradorAlmacenado = localStorage.getItem('administrador');
   const [clientes, setClientes] = useState([]);
   const [puntos, setPuntos] = useState([]);
   const [rangos, setRangos] = useState([]);
   const [loadingClientes, setLoadingClientes] = useState(true);
   const [loadingPuntos, setLoadingPuntos] = useState(true);
   const [loadingRangos, setLoadingRangos] = useState(true);
-  let idEmpleado = null;
-
-  if (administradorAlmacenado && administradorAlmacenado !== 'undefined') {
-    try {
-      const administradorParseado = JSON.parse(administradorAlmacenado);
-      console.log("Datos del administrador almacenado:", administradorParseado);
-      if (administradorParseado && administradorParseado.id_empleado) {
-        idEmpleado = administradorParseado.id_empleado;
-      }
-    } catch (error) {
-      console.error('Error al parsear el administrador del localStorage:', error);
-    }
-  }
-  console.log("ID del empleado obtenido:", idEmpleado);
 
   useEffect(() => {
-    //Para obtener el id del administrador actual (el que inicio sesion)
-    if (idEmpleado) {
-      axios.get(`http://localhost:5000/api/administracion/sesionactualadmin/${idEmpleado}`)
-        .then(respuesta => {
-          if (respuesta.data && !respuesta.data.error) {
-            setAdministradorActual(respuesta.data);
-          } else {
-            console.error("Error en la respuesta del servidor para el administrador actual:", respuesta.data);
-          }
-        })
-        .catch(error => {
-          console.error("Error al obtener el administrador actual:", error);
-        });
-    }
-
     //Para obtener la lista de todos los administradores
     axios.get('http://localhost:5000/api/administracion/administradores')
       .then(respuesta => {
@@ -101,6 +72,7 @@ export function Fidelizacion() {
       const response = await axios.get("http://localhost:5000/api/fidelizacion/asigrnginiauto");
       alert(response.data.mensaje || "Clientes nuevos añadidos exitosamente");
       console.log("Clientes nuevos añadidos:", response.data);
+      window.location.reload();
     } catch (error) {
       console.error("Error al añadir clientes nuevos:", error.response?.data || error.message);
       alert("Hubo un error al intentar añadir clientes nuevos.");
