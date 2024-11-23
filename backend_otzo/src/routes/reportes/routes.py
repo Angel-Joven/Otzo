@@ -73,3 +73,31 @@ def generar_reporte_rangos():
         return jsonify({"error": f"Error al generar el reporte: {str(e)}"}), 500
     finally:
         conexion.close()
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+@reportes_bp.route("/reporte-administracion", methods=["GET"])
+def generar_reporte_administracion():
+    """
+    Genera un reporte con las áreas de trabajo, el número de empleados en cada una,
+    y los ID de los empleados.
+    """
+    conexion = get_connection()
+    try:
+        with conexion.cursor(DictCursor) as cursor:
+            query = """
+                SELECT 
+                    area_Trabajo AS area,
+                    COUNT(id_empleado) AS total_empleados,
+                    GROUP_CONCAT(id_empleado) AS empleados
+                FROM administracion
+                GROUP BY area_Trabajo
+                ORDER BY total_empleados DESC
+            """
+            cursor.execute(query)
+            resultado = cursor.fetchall()
+            return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({"error": f"Error al generar el reporte: {str(e)}"}), 500
+    finally:
+        conexion.close()

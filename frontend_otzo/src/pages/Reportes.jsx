@@ -7,8 +7,25 @@ export function Reportes() {
     const [reportePuntos, setReportePuntos] = useState(null); // Estado para el reporte de puntos
     const [reporteVentas, setReporteVentas] = useState(null); // Estado para el reporte de ventas
     const [reporteRangos, setReporteRangos] = useState(null); // Estado para el reporte de rangos
+    const [reporteAdministracion, setReporteAdministracion] = useState(null); // Estado para el reporte de administración
     const [error, setError] = useState(""); // Estado para manejar errores
     const [reporteActivo, setReporteActivo] = useState("puntos"); // Estado para controlar el tipo de reporte
+
+    // Obtener el reporte de administración
+    const obtenerReporteAdministracion = async () => {
+        setReportePuntos(null);
+        setReporteVentas(null);
+        setReporteRangos(null);
+        setError("");
+
+        try {
+            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-administracion");
+            setReporteAdministracion(response.data);
+        } catch (error) {
+            console.error("Error al obtener el reporte de administración:", error);
+            setError("Ocurrió un error al obtener el reporte de administración.");
+        }
+    };
 
     // Obtener el reporte de puntos
     const obtenerReportePuntos = async () => {
@@ -75,6 +92,7 @@ export function Reportes() {
                         setReportePuntos(null);
                         setReporteVentas(null);
                         setReporteRangos(null);
+                        setReporteAdministracion(null);
                     }}
                     className={`px-4 py-2 mr-2 ${reporteActivo === "puntos" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
                 >
@@ -86,6 +104,7 @@ export function Reportes() {
                         setReportePuntos(null);
                         setReporteVentas(null);
                         setReporteRangos(null);
+                        setReporteAdministracion(null);
                     }}
                     className={`px-4 py-2 mr-2 ${reporteActivo === "ventas" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
                 >
@@ -97,16 +116,63 @@ export function Reportes() {
                         setReportePuntos(null);
                         setReporteVentas(null);
                         setReporteRangos(null);
+                        setReporteAdministracion(null);
                     }}
-                    className={`px-4 py-2 ${reporteActivo === "rangos" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
+                    className={`px-4 py-2 mr-2 ${reporteActivo === "rangos" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
                 >
                     Reporte de Rangos
+                </button>
+                <button
+                    onClick={() => {
+                        setReporteActivo("administracion");
+                        setReportePuntos(null);
+                        setReporteVentas(null);
+                        setReporteRangos(null);
+                        setReporteAdministracion(null);
+                    }}
+                    className={`px-4 py-2 ${reporteActivo === "administracion" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
+                >
+                    Reporte de Administración
                 </button>
             </div>
 
             {/* Sección de Reporte Activo */}
             <div className="bg-white p-6 rounded shadow-lg mb-8">
-                {reporteActivo === "puntos" ? (
+                {reporteActivo === "administracion" ? (
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">Reporte de Administración</h2>
+                        <button
+                            onClick={obtenerReporteAdministracion}
+                            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+                        >
+                            Generar Reporte
+                        </button>
+                        <div className="mt-6">
+                            {reporteAdministracion ? (
+                                <table className="table-auto w-full border-collapse border border-gray-400">
+                                    <thead>
+                                        <tr>
+                                            <th className="border px-4 py-2">Área</th>
+                                            <th className="border px-4 py-2">Total Empleados</th>
+                                            <th className="border px-4 py-2">IDs de Empleados</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reporteAdministracion.map((area, index) => (
+                                            <tr key={index}>
+                                                <td className="border px-4 py-2">{area.area}</td>
+                                                <td className="border px-4 py-2">{area.total_empleados}</td>
+                                                <td className="border px-4 py-2">{area.empleados}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p className="text-gray-500">Genera un reporte para ver los datos.</p>
+                            )}
+                        </div>
+                    </div>
+                ) : reporteActivo === "puntos" ? (
                     <>
                         <h2 className="text-2xl font-bold mb-4">Reporte de Puntos</h2>
                         <div className="mb-4">
@@ -125,7 +191,6 @@ export function Reportes() {
                         >
                             Generar Reporte
                         </button>
-                        {/* Tabla de resultados */}
                         <div className="mt-6">
                             {reportePuntos ? (
                                 Array.isArray(reportePuntos) ? (
@@ -174,8 +239,6 @@ export function Reportes() {
                         >
                             Generar Reporte
                         </button>
-
-                        {/* Tabla de resultados */}
                         <div className="mt-6">
                             {reporteVentas ? (
                                 Array.isArray(reporteVentas) ? (
