@@ -105,3 +105,41 @@ class VentaDTO:
 
     def to_json(self):
         return json.dumps(self.to_dict())
+
+class QuejasReporteDTO:
+    """DTO para el reporte de quejas."""
+    def __init__(self, categoria=None, cantidad=0, ids_quejas=None):
+        self._categoria = categoria
+        self._cantidad = cantidad
+        self._ids_quejas = ids_quejas or []
+
+    @property
+    def categoria(self):
+        return self._categoria
+
+    @categoria.setter
+    def categoria(self, value):
+        self._categoria = value
+
+    @property
+    def cantidad(self):
+        return self._cantidad
+
+    @cantidad.setter
+    def cantidad(self, value):
+        self._cantidad = value
+
+    @property
+    def ids_quejas(self):
+        return self._ids_quejas
+
+    @ids_quejas.setter
+    def ids_quejas(self, value):
+        self._ids_quejas = value
+
+    def to_dict(self):
+        return {
+            "categoria": self._categoria,
+            "cantidad": self._cantidad,
+            "ids_quejas": self._ids_quejas,
+        }

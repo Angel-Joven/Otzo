@@ -8,7 +8,7 @@ import json
 from pymysql.cursors import DictCursor  # Importar DictCursor
 from src.models.reportes.reportesDTO import VentaDTO  # Importar VentaDTO
 from src.db import get_connection  # Importar la conexión a la base de datos 
-
+from src.models.reportes.reportesDTO import QuejasReporteDTO
 
 class ReportesService(ReportesModelo):
     @staticmethod
@@ -92,6 +92,37 @@ class ReportesService(ReportesModelo):
         finally:
             conexion.close()
 
+    @staticmethod
+    def crear_reporte_quejas():
+        """
+        Genera un reporte de quejas agrupadas por categoría.
+        """
+        conexion = get_connection()
+        try:
+            with conexion.cursor(DictCursor) as cursor:
+                query = """
+                    SELECT categoria, COUNT(id_queja) AS cantidad, GROUP_CONCAT(id_queja) AS ids_quejas
+                    FROM quejas
+                    GROUP BY categoria
+                    ORDER BY cantidad DESC
+                """
+                cursor.execute(query)
+                resultados = cursor.fetchall()
+
+            reporte = [
+                QuejasReporteDTO(
+                    categoria=resultado["categoria"],
+                    cantidad=resultado["cantidad"],
+                    ids_quejas=resultado["ids_quejas"].split(","),
+                ).to_dict()
+                for resultado in resultados
+            ]
+
+            return reporte
+        except Exception as e:
+            return {"error": f"Error al generar el reporte de quejas: {str(e)}"}
+        finally:
+            conexion.close()
 # prueba de funcionalidad fecha del reporte
 # print("Prueba con fecha específica")
 # fecha_prueba = "2024-11-21"  # Cambia esta fecha para tus pruebas

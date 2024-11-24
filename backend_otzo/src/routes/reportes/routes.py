@@ -101,3 +101,16 @@ def generar_reporte_administracion():
         return jsonify({"error": f"Error al generar el reporte: {str(e)}"}), 500
     finally:
         conexion.close()
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+@reportes_bp.route("/reporte-quejas", methods=["GET"])
+def generar_reporte_quejas():
+    """
+    Genera un reporte de quejas agrupadas por categoría.
+    """
+    try:
+        reporte = ReportesService.crear_reporte_quejas()
+        return jsonify(reporte), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
