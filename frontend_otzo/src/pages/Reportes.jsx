@@ -4,23 +4,15 @@ import axios from "axios";
 
 export function Reportes() {
     const [fecha, setFecha] = useState("");
+    const [reporteActivo, setReporteActivo] = useState("puntos");
     const [reportePuntos, setReportePuntos] = useState(null);
     const [reporteVentas, setReporteVentas] = useState(null);
     const [reporteRangos, setReporteRangos] = useState(null);
     const [reporteAdministracion, setReporteAdministracion] = useState(null);
     const [reporteQuejas, setReporteQuejas] = useState([]);
-    const [error, setError] = useState("");
-    const [reporteActivo, setReporteActivo] = useState("puntos");
+    const [reporteInventario, setReporteInventario] = useState([]);
 
-    const obtenerReporteAdministracion = async () => {
-        resetReportes();
-        try {
-            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-administracion");
-            setReporteAdministracion(response.data);
-        } catch (error) {
-            manejarError("administración");
-        }
-    };
+    const [error, setError] = useState("");
 
     const obtenerReportePuntos = async () => {
         resetReportes();
@@ -60,6 +52,16 @@ export function Reportes() {
         }
     };
 
+    const obtenerReporteAdministracion = async () => {
+        resetReportes();
+        try {
+            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-administracion");
+            setReporteAdministracion(response.data);
+        } catch (error) {
+            manejarError("administración");
+        }
+    };
+
     const obtenerReporteQuejas = async () => {
         resetReportes();
         try {
@@ -71,12 +73,23 @@ export function Reportes() {
         }
     };
 
+    const obtenerReporteInventario = async () => {
+        resetReportes();
+        try {
+            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-inventario");
+            setReporteInventario(response.data);
+        } catch (error) {
+            manejarError("inventario");
+        }
+    };
+
     const resetReportes = () => {
         setReportePuntos(null);
         setReporteVentas(null);
         setReporteRangos(null);
         setReporteAdministracion(null);
         setReporteQuejas([]);
+        setReporteInventario(null);
         setError("");
     };
 
@@ -94,7 +107,6 @@ export function Reportes() {
             >
                 Reportes y Análisis
             </motion.h1>
-
             <div className="mb-4">
                 <button
                     onClick={() => setReporteActivo("puntos")}
@@ -122,9 +134,15 @@ export function Reportes() {
                 </button>
                 <button
                     onClick={() => setReporteActivo("quejas")}
-                    className={`px-4 py-2 ${reporteActivo === "quejas" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
+                    className={`px-4 py-2 mr-2 ${reporteActivo === "quejas" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
                 >
                     Reporte de Quejas
+                </button>
+                <button
+                    onClick={() => setReporteActivo("inventario")}
+                    className={`px-4 py-2 ${reporteActivo === "inventario" ? "bg-blue-500 text-white" : "bg-gray-200"} rounded`}
+                >
+                    Reporte de Inventario
                 </button>
             </div>
 
@@ -152,28 +170,24 @@ export function Reportes() {
                         </button>
                         <div className="mt-6">
                             {reportePuntos ? (
-                                Array.isArray(reportePuntos) ? (
-                                    <table className="table-auto w-full border-collapse border border-gray-400">
-                                        <thead>
-                                            <tr>
-                                                <th className="border px-4 py-2">ID Cliente</th>
-                                                <th className="border px-4 py-2">Total Puntos</th>
-                                                <th className="border px-4 py-2">Última Actualización</th>
+                                <table className="table-auto w-full border-collapse border border-gray-400">
+                                    <thead>
+                                        <tr>
+                                            <th className="border px-4 py-2">ID Cliente</th>
+                                            <th className="border px-4 py-2">Total Puntos</th>
+                                            <th className="border px-4 py-2">Última Actualización</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reportePuntos.map((item, index) => (
+                                            <tr key={index}>
+                                                <td className="border px-4 py-2">{item.idcliente_puntos}</td>
+                                                <td className="border px-4 py-2">{item.total_puntos}</td>
+                                                <td className="border px-4 py-2">{item.ultima_actualizacionPuntos}</td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {reportePuntos.map((item, index) => (
-                                                <tr key={index} className="hover:bg-gray-100">
-                                                    <td className="border px-4 py-2">{item.idcliente_puntos}</td>
-                                                    <td className="border px-4 py-2">{item.total_puntos}</td>
-                                                    <td className="border px-4 py-2">{item.ultima_actualizacionPuntos}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                ) : (
-                                    <div className="text-red-500 font-semibold mt-4">{reportePuntos.mensaje}</div>
-                                )
+                                        ))}
+                                    </tbody>
+                                </table>
                             ) : (
                                 <p className="text-gray-500">Genera un reporte para ver los datos.</p>
                             )}
@@ -184,16 +198,6 @@ export function Reportes() {
                 {reporteActivo === "ventas" && (
                     <div>
                         <h2 className="text-2xl font-bold mb-4">Reporte de Ventas</h2>
-                        <div className="mb-4">
-                            <label htmlFor="fecha" className="block text-gray-700 mb-2">Selecciona una fecha:</label>
-                            <input
-                                id="fecha"
-                                type="date"
-                                value={fecha}
-                                onChange={(e) => setFecha(e.target.value)}
-                                className="p-2 border border-gray-300 rounded w-full"
-                            />
-                        </div>
                         <button
                             onClick={obtenerReporteVentas}
                             className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
@@ -202,42 +206,38 @@ export function Reportes() {
                         </button>
                         <div className="mt-6">
                             {reporteVentas ? (
-                                Array.isArray(reporteVentas) ? (
-                                    <table className="table-auto w-full border-collapse border border-gray-400">
-                                        <thead>
-                                            <tr>
-                                                <th className="border px-4 py-2">ID Venta</th>
-                                                <th className="border px-4 py-2">Total</th>
-                                                <th className="border px-4 py-2">Fecha</th>
-                                                <th className="border px-4 py-2">Cliente</th>
-                                                <th className="border px-4 py-2">Empleado</th>
-                                                <th className="border px-4 py-2">Detalles</th>
+                                <table className="table-auto w-full border-collapse border border-gray-400">
+                                    <thead>
+                                        <tr>
+                                            <th className="border px-4 py-2">ID Venta</th>
+                                            <th className="border px-4 py-2">Total</th>
+                                            <th className="border px-4 py-2">Fecha</th>
+                                            <th className="border px-4 py-2">Cliente</th>
+                                            <th className="border px-4 py-2">Empleado</th>
+                                            <th className="border px-4 py-2">Detalles</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reporteVentas.map((venta, index) => (
+                                            <tr key={index}>
+                                                <td className="border px-4 py-2">{venta.id_venta}</td>
+                                                <td className="border px-4 py-2">${venta.total_venta}</td>
+                                                <td className="border px-4 py-2">{venta.fecha_venta}</td>
+                                                <td className="border px-4 py-2">{venta.cliente}</td>
+                                                <td className="border px-4 py-2">{venta.empleado}</td>
+                                                <td className="border px-4 py-2">
+                                                    <ul>
+                                                        {venta.detalles.map((detalle, i) => (
+                                                            <li key={i}>
+                                                                {detalle.nombre_producto} - ${detalle.precio_unitario} x {detalle.cantidad}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {reporteVentas.map((venta, index) => (
-                                                <tr key={index} className="hover:bg-gray-100">
-                                                    <td className="border px-4 py-2">{venta.id_venta}</td>
-                                                    <td className="border px-4 py-2">${venta.total_venta}</td>
-                                                    <td className="border px-4 py-2">{venta.fecha_venta}</td>
-                                                    <td className="border px-4 py-2">{venta.cliente}</td>
-                                                    <td className="border px-4 py-2">{venta.empleado}</td>
-                                                    <td className="border px-4 py-2">
-                                                        <ul>
-                                                            {venta.detalles.map((detalle, i) => (
-                                                                <li key={i}>
-                                                                    {detalle.nombre_producto} - ${detalle.precio_unitario} x {detalle.cantidad}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                ) : (
-                                    <div className="text-red-500 font-semibold mt-4">{reporteVentas.mensaje}</div>
-                                )
+                                        ))}
+                                    </tbody>
+                                </table>
                             ) : (
                                 <p className="text-gray-500">Genera un reporte para ver los datos.</p>
                             )}
@@ -336,7 +336,7 @@ export function Reportes() {
                                     </thead>
                                     <tbody>
                                         {reporteQuejas.map((queja, index) => (
-                                            <tr key={index} className="hover:bg-gray-100">
+                                            <tr key={index}>
                                                 <td className="border px-4 py-2">{queja.categoria}</td>
                                                 <td className="border px-4 py-2">{queja.cantidad}</td>
                                                 <td className="border px-4 py-2">{queja.ids_quejas.join(", ")}</td>
@@ -350,6 +350,43 @@ export function Reportes() {
                         </div>
                     </div>
                 )}
+                    {reporteActivo === "inventario" && (
+                        <div>
+                            <h2 className="text-2xl font-bold mb-4">Reporte de Inventario</h2>
+                            <button
+                                onClick={obtenerReporteInventario}
+                                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+                            >
+                                Generar Reporte
+                            </button>
+                            <div className="mt-6">
+                                {reporteInventario && reporteInventario.length > 0 ? (
+                                    <table className="table-auto w-full border-collapse border border-gray-400">
+                                        <thead>
+                                            <tr>
+                                                <th className="border px-4 py-2">ID Producto</th>
+                                                <th className="border px-4 py-2">ID Inventario</th>
+                                                <th className="border px-4 py-2">Nombre Producto</th>
+                                                <th className="border px-4 py-2">Cantidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {reporteInventario.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td className="border px-4 py-2">{item.id_producto}</td>
+                                                    <td className="border px-4 py-2">{item.id_inventario}</td>
+                                                    <td className="border px-4 py-2">{item.nombre_producto}</td>
+                                                    <td className="border px-4 py-2">{item.cantidad_producto}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                ) : (
+                                    <p className="text-gray-500">No hay datos disponibles. Genera un reporte para ver los datos.</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
             </div>
         </div>
     );
