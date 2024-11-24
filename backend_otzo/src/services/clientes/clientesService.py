@@ -221,7 +221,7 @@ class ClientesService(ClientesModelo):
                     "estado_cuenta": cliente[16],
                 }
 
-            print(json.dumps(resultado, indent=4, ensure_ascii=False))
+            #print(json.dumps(resultado, indent=4, ensure_ascii=False))
             return resultado
 
         except Exception as e:
@@ -275,7 +275,7 @@ class ClientesService(ClientesModelo):
                     "estado_cuenta": cliente[16],
                 }
 
-            print(json.dumps(resultado, indent=4, ensure_ascii=False))
+            #print(json.dumps(resultado, indent=4, ensure_ascii=False))
             return resultado
 
         except Exception as e:
@@ -330,7 +330,7 @@ class ClientesService(ClientesModelo):
                     })
                 resultado = clientes_lista
 
-            print(json.dumps(resultado, indent=4, ensure_ascii=False))
+            #print(json.dumps(resultado, indent=4, ensure_ascii=False))
             return resultado
 
         except Exception as e:

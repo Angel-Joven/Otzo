@@ -208,7 +208,7 @@ class AdministracionService(AdministracionModelo):
                     "estado_cuenta": administrador[17],
                 }
 
-            print(json.dumps(resultado, indent=4, ensure_ascii=False))
+            #print(json.dumps(resultado, indent=4, ensure_ascii=False))
             return resultado
 
         except Exception as e:
@@ -264,7 +264,7 @@ class AdministracionService(AdministracionModelo):
                     "estado_cuenta": administrador[17],
                 }
 
-            print(json.dumps(resultado, indent=4, ensure_ascii=False))
+            #print(json.dumps(resultado, indent=4, ensure_ascii=False))
             return resultado
 
         except Exception as e:
@@ -321,7 +321,7 @@ class AdministracionService(AdministracionModelo):
                     })
                 resultado = administradores_lista
 
-            print(json.dumps(resultado, indent=4, ensure_ascii=False))
+            #print(json.dumps(resultado, indent=4, ensure_ascii=False))
             return resultado
 
         except Exception as e:
