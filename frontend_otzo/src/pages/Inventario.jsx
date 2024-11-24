@@ -1,50 +1,18 @@
-import { obtenerTodosLosProductos } from "../api/inventario.api";
+import {
+  obtenerTodosLosProductos,
+  crearTipoProducto,
+} from "../api/inventario.api";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ProductCard from "../components/inventario/ProductCard";
+import { useLocation } from "react-router-dom";
 
 function Inventario() {
-  const columns = [
-    {
-      name: "ID",
-      selector: (row) => row.id_inventario,
-    },
-    {
-      name: "Imagen",
-      cell: (row) => <img src={row.imagen_producto} className="max-w-20" />,
-    },
-    {
-      name: "Nombre",
-      selector: (row) => row.nombre_producto,
-    },
-    {
-      name: "Categoria",
-      selector: (row) => row.categoria_producto,
-    },
-    {
-      name: "Cantidad",
-      selector: (row) => row.cantidad_producto,
-    },
-    {
-      name: "Descripción",
-      selector: (row) => row.descripcion_producto,
-    },
-    {
-      name: "Acciones",
-      cell: (row) => (
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => agregarAlCarrito(row)}
-          className="bg-green-500 p-2 rounded-xl text-white font-bold"
-        >
-          <i className="fi fi-sr-shopping-cart-add"></i> Agregar
-        </motion.button>
-      ),
-    },
-  ];
   const [data, setData] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Controla el diálogo
+  const location = useLocation(); // Detecta cambios en la ruta
+  const [recargarProductos, setRecargarProductos] = useState(false);
 
   useEffect(() => {
     obtenerTodosLosProductos()
@@ -57,17 +25,118 @@ function Inventario() {
         console.error("Error al obtener los productos:", error);
         setIsLoading(false);
       });
-  }, []);
+  }, [recargarProductos]);
+
+  // Cierra el diálogo al cambiar de página
+  useEffect(() => {
+    setIsDialogOpen(false);
+  }, [location]);
+
+  const handleModalAddNewTipeProductClick = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalAddProduct") {
+      setIsDialogOpen(false);
+    }
+  };
+
+  const handleFormModalAddNewTipeProduct = async (e) => {
+    e.preventDefault();
+
+    const nuevoProducto = {
+      nombre_tipo_producto: e.target.add_product_title_input.value,
+      imagen_tipo_producto: e.target.add_product_image_input.value,
+      categoria_tipo_producto: e.target.add_product_category_input.value,
+      descripcion_tipo_producto: e.target.add_product_description_input.value,
+    };
+
+    try {
+      crearTipoProducto(nuevoProducto);
+      console.log("Producto agregado con éxito.");
+      setIsDialogOpen(false);
+      setRecargarProductos(!recargarProductos);
+    } catch (error) {
+      console.error("Error al agregar el producto:", error);
+    }
+  };
 
   return (
     <>
       <div className="bg-gradient-to-r from-slate-600 to-gray-500 w-full h-full min-h-[calc(100vh-5rem)] z-0 relative">
+        {/* Diálogo */}
+        {isDialogOpen && (
+          <dialog
+            id="modalAddProduct"
+            className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
+            onClick={handleModalAddNewTipeProductClick}
+          >
+            <div
+              className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
+              onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
+            >
+              <p className="font-bold text-xl">Agrega un producto:</p>
+              <form onSubmit={handleFormModalAddNewTipeProduct}>
+                <label htmlFor="add_product_title_input" className="block">
+                  Titulo del producto:
+                </label>
+                <input
+                  id="add_product_title_input"
+                  type="text"
+                  placeholder="Escribe aquí..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="add_product_image_input" className="block">
+                  Imagen del producto:
+                </label>
+                <input
+                  id="add_product_image_input"
+                  type="text"
+                  placeholder="Escribe aquí..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="add_product_category_input" className="block">
+                  Categoria del producto:
+                </label>
+                <select
+                  name="add_product_category_input"
+                  id="category"
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                >
+                  <option value="Bebidas">Bebidas</option>
+                </select>
+                <label
+                  htmlFor="add_product_description_input"
+                  className="block"
+                >
+                  Descripción del producto:
+                </label>
+                <textarea
+                  id="add_product_description_input"
+                  type="text"
+                  placeholder="Escribe aquí..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                ></textarea>
+                <input
+                  type="submit"
+                  value="Crear producto"
+                  className="block bg-blue-500 rounded-lg p-2 text-white font-bold"
+                />
+              </form>
+            </div>
+          </dialog>
+        )}
+
+        {/* Barra superior */}
         <div className="flex justify-between text-center bg-slate-800 text-white py-4 px-8">
           <h1 className="text-2xl font-bold">Inventario de productos</h1>
-          <button className="bg-green-500 p-2 rounded-xl">
+          <button
+            className="bg-green-500 p-2 rounded-xl"
+            onClick={() => setIsDialogOpen(true)} // Abre el diálogo
+          >
             <i className="align-middle fi fi-br-plus"></i> Añadir producto
           </button>
         </div>
+
+        {/* Contenido principal */}
         {isLoading ? (
           <div className="flex justify-center my-10">
             <svg
@@ -88,7 +157,7 @@ function Inventario() {
             </svg>
           </div>
         ) : (
-          <div className="flex p-4">
+          <div className="flex p-4 gap-4 flex-wrap">
             {data.map((producto, index) => {
               return (
                 <ProductCard
