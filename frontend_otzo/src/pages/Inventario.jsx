@@ -10,7 +10,7 @@ import { useLocation } from "react-router-dom";
 function Inventario() {
   const [data, setData] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // Controla el diálogo
+  const [isDialogAddTypeProductOpen, setIsDialogOpen] = useState(false); // Controla el diálogo
   const location = useLocation(); // Detecta cambios en la ruta
   const [recargarProductos, setRecargarProductos] = useState(false);
 
@@ -47,6 +47,7 @@ function Inventario() {
       imagen_tipo_producto: e.target.add_product_image_input.value,
       categoria_tipo_producto: e.target.add_product_category_input.value,
       descripcion_tipo_producto: e.target.add_product_description_input.value,
+      precio_unitario: e.target.add_price_unit_input.value,
     };
 
     try {
@@ -62,8 +63,8 @@ function Inventario() {
   return (
     <>
       <div className="bg-gradient-to-r from-slate-600 to-gray-500 w-full h-full min-h-[calc(100vh-5rem)] z-0 relative">
-        {/* Diálogo */}
-        {isDialogOpen && (
+        {/* Diálogos */}
+        {isDialogAddTypeProductOpen && (
           <dialog
             id="modalAddProduct"
             className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
@@ -115,10 +116,19 @@ function Inventario() {
                   placeholder="Escribe aquí..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 ></textarea>
+                <label htmlFor="add_price_unit_input" className="block">
+                  Precio del producto:
+                </label>
+                <input
+                  id="add_price_unit_input"
+                  type="number"
+                  placeholder="Introduce tu precio..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
                 <input
                   type="submit"
                   value="Crear producto"
-                  className="block bg-blue-500 rounded-lg p-2 text-white font-bold"
+                  className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2"
                 />
               </form>
             </div>
@@ -167,6 +177,7 @@ function Inventario() {
                   cantidad={producto.cantidad_producto}
                   categoria={producto.categoria_producto}
                   descripcion={producto.descripcion_producto}
+                  precio={producto.precio_unitario}
                 />
               );
             })}

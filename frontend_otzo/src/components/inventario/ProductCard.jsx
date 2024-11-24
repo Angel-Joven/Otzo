@@ -7,6 +7,7 @@ export default function ProductCard({
   categoria,
   cantidad,
   descripcion,
+  precio,
 }) {
   return (
     <motion.div
@@ -17,7 +18,7 @@ export default function ProductCard({
       {/* Contenedor superior con imagen y etiquetas */}
       <div className="relative">
         <div className="w-full flex justify-center">
-          <img src={imagen} alt="producto" className="w-1/3 object-contain" />
+          <img src={imagen} alt="producto" className="w-1/2 object-contain" />
         </div>
         <p
           className={`absolute top-0 right-0 p-2 font-bold ${
@@ -34,6 +35,9 @@ export default function ProductCard({
       {/* Texto del producto */}
       <div className="text-center flex-1 flex flex-col justify-center">
         <p className="font-bold text-xl truncate">{titulo}</p>
+        <p className="font-bold text-sm truncate text-yellow-300">
+          {precio} MXN
+        </p>
         <p className="text-sm overflow-hidden text-ellipsis line-clamp-2">
           {descripcion}
         </p>

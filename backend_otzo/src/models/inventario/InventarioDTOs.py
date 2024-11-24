@@ -9,7 +9,9 @@ class InventarioDTO:
     _imagen_producto: str
     _categoria_producto: str
     _descripcion_producto: str
+    _precio_unitario: Decimal
     _cantidad_producto: int = 0
+    _id_inventario: int = None
 
     @property
     def nombre_producto(self) -> str:
@@ -51,6 +53,22 @@ class InventarioDTO:
     def descripcion_producto(self, descripcion_producto: str):
         self._descripcion_producto = descripcion_producto
 
+    @property
+    def precio_unitario(self) -> Decimal:
+        return self._precio_unitario
+
+    @precio_unitario.setter
+    def precio_unitario(self, precio_unitario: Decimal):
+        self.precio_unitario = precio_unitario
+
+    @property
+    def id_inventario(self) -> int:
+        return self._id_inventario
+
+    @id_inventario.setter
+    def id_inventario(self, id_inventario: int):
+        self._id_inventario = id_inventario
+
 
 @dataclass
 class DetalleInventarioDTO:
@@ -59,7 +77,6 @@ class DetalleInventarioDTO:
     _fecha_producto: datetime
     _caducidad_producto: datetime
     _costo_unitario: Decimal
-    _precio_unitario: Decimal
     _vendido: bool = False
 
     @property
@@ -101,14 +118,6 @@ class DetalleInventarioDTO:
     @costo_unitario.setter
     def costo_unitario(self, costo_unitario: Decimal):
         self.costo_unitario = costo_unitario
-
-    @property
-    def precio_unitario(self) -> Decimal:
-        return self._precio_unitario
-
-    @precio_unitario.setter
-    def precio_unitario(self, precio_unitario: Decimal):
-        self.precio_unitario = precio_unitario
 
     @property
     def vendido(self) -> bool:

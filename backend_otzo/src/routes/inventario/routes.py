@@ -50,6 +50,7 @@ def agregar_tipo_producto():
         data["imagen_tipo_producto"],
         data["categoria_tipo_producto"],
         data["descripcion_tipo_producto"],
+        data["precio_unitario"],
     )
 
     resultado = inventario_servicio.agregarTipoProducto(nuevo_tipo_producto)
@@ -58,3 +59,29 @@ def agregar_tipo_producto():
         return jsonify({"mensaje": "Tipo de producto agregado correctamente"}), 200
     else:
         return jsonify({"error": "No se pudo agregar el tipo de producto"}), 500
+
+
+@inventario_bp.route("/actualizar_tipo_producto", methods=["PUT"])
+@cross_origin()
+def actualizar_tipo_producto():
+
+    data = request.json
+
+    inventario_servicio = InventarioServicio()
+
+    nuevo_tipo_producto = InventarioDTO(
+        data["nombre_tipo_producto"],
+        data["imagen_tipo_producto"],
+        data["categoria_tipo_producto"],
+        data["descripcion_tipo_producto"],
+        data["precio_unitario"],
+        data["cantidad_tipo_producto"],
+        data["id_inventario"],
+    )
+
+    resultado = inventario_servicio.actualizarTipoProducto(nuevo_tipo_producto)
+
+    if resultado:
+        return jsonify({"mensaje": "Tipo de producto actualizado correctamente"}), 200
+    else:
+        return jsonify({"error": "No se pudo actualizar el tipo de producto"}), 500
