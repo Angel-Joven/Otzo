@@ -9,6 +9,7 @@ from pymysql.cursors import DictCursor  # Importar DictCursor
 from src.models.reportes.reportesDTO import VentaDTO  # Importar VentaDTO
 from src.db import get_connection  # Importar la conexión a la base de datos 
 from src.models.reportes.reportesDTO import QuejasReporteDTO
+from src.models.reportes.reportesDTO import InventarioReporteDTO
 
 class ReportesService(ReportesModelo):
     @staticmethod
@@ -121,6 +122,43 @@ class ReportesService(ReportesModelo):
             return reporte
         except Exception as e:
             return {"error": f"Error al generar el reporte de quejas: {str(e)}"}
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def crear_reporte_inventario():
+        """
+        Genera un reporte de inventario con los campos:
+        id_producto, id_inventario, nombre_producto y cantidad_producto.
+        """
+        conexion = get_connection()
+        try:
+            with conexion.cursor(DictCursor) as cursor:
+                query = """
+                    SELECT 
+                        i.id_producto,
+                        i.id_inventario,
+                        i.nombre_producto,
+                        i.cantidad_producto
+                    FROM inventario i
+                """
+                cursor.execute(query)
+                resultados = cursor.fetchall()
+
+                # Transformar resultados al formato DTO
+                reporte = [
+                    InventarioReporteDTO(
+                        id_producto=row["id_producto"],
+                        id_inventario=row["id_inventario"],
+                        nombre_producto=row["nombre_producto"],
+                        cantidad_producto=row["cantidad_producto"]
+                    ).to_dict()
+                    for row in resultados
+                ]
+
+                return reporte
+        except Exception as e:
+            return {"error": f"Error al generar el reporte de inventario: {str(e)}"}
         finally:
             conexion.close()
 # prueba de funcionalidad fecha del reporte

@@ -62,7 +62,7 @@ def generar_reporte_rangos():
             query = """
                 SELECT r.nombre_rango, COUNT(p.idclientes_puntos) AS total_personas
                 FROM puntos p
-                JOIN rangos r ON p.idrango = r.idrango
+                JOIN rangos r ON p.idrango = r.idrango                              
                 GROUP BY r.nombre_rango
                 ORDER BY total_personas DESC
             """
@@ -73,7 +73,7 @@ def generar_reporte_rangos():
         return jsonify({"error": f"Error al generar el reporte: {str(e)}"}), 500
     finally:
         conexion.close()
-
+# linea 65 where > on 
 # ---------------------------------------------------------------------------------------------------------------------------
 
 @reportes_bp.route("/reporte-administracion", methods=["GET"])
@@ -114,3 +114,16 @@ def generar_reporte_quejas():
         return jsonify(reporte), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------------------------------------------------------
+
+@reportes_bp.route("/reporte-inventario", methods=["GET"])
+def generar_reporte_inventario():
+    """
+    Genera un reporte del inventario.
+    """
+    try:
+        reporte = ReportesService.crear_reporte_inventario()
+        return jsonify(reporte), 200
+    except Exception as e:
+        return jsonify({"error": f"Error al generar el reporte de inventario: {str(e)}"}), 500

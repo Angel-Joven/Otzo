@@ -1,4 +1,5 @@
 import json
+from dataclasses import dataclass
 
 class ReporteDTO:
     """DTO para los reportes diarios de puntos."""
@@ -142,4 +143,19 @@ class QuejasReporteDTO:
             "categoria": self._categoria,
             "cantidad": self._cantidad,
             "ids_quejas": self._ids_quejas,
+        }
+
+@dataclass
+class InventarioReporteDTO:
+    id_producto: int
+    id_inventario: int
+    nombre_producto: str
+    cantidad_producto: int
+
+    def to_dict(self):
+        return {
+            "id_producto": self.id_producto,
+            "id_inventario": self.id_inventario,
+            "nombre_producto": self.nombre_producto,
+            "cantidad_producto": self.cantidad_producto
         }

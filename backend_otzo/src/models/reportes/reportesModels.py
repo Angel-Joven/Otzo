@@ -10,3 +10,4 @@ class ReportesModelo(ABC):
     def crear_reporte_ventas(self):
         """Info"""
         pass
+
