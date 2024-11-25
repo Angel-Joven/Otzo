@@ -37,6 +37,22 @@ def index():
     return Response(json_data, content_type="application/json; charset=utf-8")
 
 
+@inventario_bp.route("/listar_descontinuados", methods=["GET"])
+def listar_descontinuados():
+
+    inventario_servicio = InventarioServicio()
+
+    tipos_productos = inventario_servicio.listarTipoProductosDescontinuados()
+
+    # Convierte el resultado a JSON usando el conversor personalizado
+    json_data = json.dumps(
+        tipos_productos,
+        ensure_ascii=False,
+        default=custom_json_serializer,
+    )
+    return Response(json_data, content_type="application/json; charset=utf-8")
+
+
 @inventario_bp.route("/agregar_tipo_producto", methods=["POST"])
 @cross_origin()
 def agregar_tipo_producto():
