@@ -10,6 +10,7 @@ class InventarioDTO:
     _categoria_producto: str
     _descripcion_producto: str
     _precio_unitario: Decimal
+    _descontinuado: bool = False
     _cantidad_producto: int = 0
     _id_inventario: int = None
 
@@ -68,6 +69,14 @@ class InventarioDTO:
     @id_inventario.setter
     def id_inventario(self, id_inventario: int):
         self._id_inventario = id_inventario
+
+    @property
+    def descontinuado(self) -> bool:
+        return self._descontinuado
+
+    @descontinuado.setter
+    def descontinuado(self, descontinuado: bool):
+        self.descontinuado = descontinuado
 
 
 @dataclass

@@ -75,6 +75,7 @@ def actualizar_tipo_producto():
         data["categoria_tipo_producto"],
         data["descripcion_tipo_producto"],
         data["precio_unitario"],
+        data["descontinuado"],
         data["cantidad_tipo_producto"],
         data["id_inventario"],
     )
@@ -85,3 +86,30 @@ def actualizar_tipo_producto():
         return jsonify({"mensaje": "Tipo de producto actualizado correctamente"}), 200
     else:
         return jsonify({"error": "No se pudo actualizar el tipo de producto"}), 500
+
+
+@inventario_bp.route("/descontinuar_tipo_producto", methods=["PATCH"])
+@cross_origin()
+def descontinuar_tipo_producto():
+
+    data = request.json
+
+    inventario_servicio = InventarioServicio()
+
+    producto_a_descontinuar = InventarioDTO(
+        data["nombre_tipo_producto"],
+        data["imagen_tipo_producto"],
+        data["categoria_tipo_producto"],
+        data["descripcion_tipo_producto"],
+        data["precio_unitario"],
+        data["descontinuado"],
+        data["cantidad_tipo_producto"],
+        data["id_inventario"],
+    )
+
+    resultado = inventario_servicio.eliminarTipoProducto(producto_a_descontinuar)
+
+    if resultado:
+        return jsonify({"mensaje": "Tipo de producto descontinuado correctamente"}), 200
+    else:
+        return jsonify({"error": "No se pudo descontinuar el tipo de producto"}), 500

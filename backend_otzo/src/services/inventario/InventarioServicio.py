@@ -20,7 +20,17 @@ class InventarioServicio(InventarioModelo):
             conexion.begin()
 
             cursor.execute(
-                "INSERT INTO inventario (nombre_producto, imagen_producto, categoria_producto, cantidad_producto, descripcion_producto, precio_unitario) VALUES (%s, %s, %s, %s, %s, %s)",
+                "SELECT 1 FROM inventario WHERE nombre_producto = %s",
+                tipo_producto.nombre_producto,
+            )
+
+            resultado = cursor.fetchone()
+
+            if resultado:
+                raise Exception("No se puede agregar un producto que ya existe")
+
+            cursor.execute(
+                "INSERT INTO inventario (nombre_producto, imagen_producto, categoria_producto, cantidad_producto, descripcion_producto, precio_unitario, descontinuado) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 (
                     tipo_producto.nombre_producto,
                     tipo_producto.imagen_producto,
@@ -28,6 +38,7 @@ class InventarioServicio(InventarioModelo):
                     tipo_producto.cantidad_producto,
                     tipo_producto.descripcion_producto,
                     tipo_producto.precio_unitario,
+                    tipo_producto.descontinuado,
                 ),
             )
 
@@ -50,7 +61,7 @@ class InventarioServicio(InventarioModelo):
             conexion.begin()
 
             cursor.execute(
-                "UPDATE inventario SET nombre_producto = %s, imagen_producto = %s, categoria_producto = %s, cantidad_producto = %s, descripcion_producto = %s, precio_unitario = %s WHERE id_inventario = %s",
+                "UPDATE inventario SET nombre_producto = %s, imagen_producto = %s, categoria_producto = %s, cantidad_producto = %s, descripcion_producto = %s, precio_unitario = %s, descontinuado = %s WHERE id_inventario = %s",
                 (
                     datos_producto.nombre_producto,
                     datos_producto.imagen_producto,
@@ -58,6 +69,7 @@ class InventarioServicio(InventarioModelo):
                     datos_producto.cantidad_producto,
                     datos_producto.descripcion_producto,
                     datos_producto.precio_unitario,
+                    datos_producto.descontinuado,
                     datos_producto.id_inventario,  # El identificador del producto
                 ),
             )
@@ -73,20 +85,41 @@ class InventarioServicio(InventarioModelo):
         finally:
             conexion.close()
 
-    def eliminarTipoProducto(self):
-        pass
+    def eliminarTipoProducto(self, tipo_producto: InventarioDTO):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            conexion.begin()
+
+            cursor.execute(
+                "UPDATE inventario SET descontinuado = %s WHERE id_inventario = %s",
+                (tipo_producto.descontinuado, tipo_producto.id_inventario),
+            )
+
+            conexion.commit()
+
+            return True
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
 
     def listarTipoProductos(self) -> dict:
         try:
             conexion = get_connection()
             cursor = conexion.cursor(DictCursor)
 
-            cursor.execute("SELECT * FROM inventario")
+            cursor.execute("SELECT * FROM inventario where descontinuado = 0")
 
             return cursor.fetchall()
 
         except Exception as e:
             print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
             return None
         finally:
             conexion.close()
