@@ -27,53 +27,28 @@ export function Ventas() {
       ),
     },
     {
-      name: "Producto",
-      selector: (row) => row.producto,
+      name: "ID",
+      selector: (row) => row.id_inventario,
     },
     {
-      name: "Cantidad",
-      selector: (row) => row.disponibles,
+      name: "Imagen",
+      cell: (row) => <img src={row.imagen_producto} width={50} />,
+    },
+    {
+      name: "Nombre",
+      selector: (row) => row.nombre_producto,
+    },
+    {
+      name: "Disponibles",
+      selector: (row) => row.cantidad_producto,
     },
     {
       name: "Precio",
-      selector: (row) => "$" + row.precio + " MXN",
+      selector: (row) => "$" + row.precio_unitario + " MXN",
     },
     {
       name: "Categoria",
-      selector: (row) => row.categoria,
-    },
-  ];
-
-  const data = [
-    {
-      producto: "Coca cola",
-      disponibles: 10,
-      precio: 12.5,
-      categoria: "Bebida",
-    },
-    {
-      producto: "Sabritas",
-      disponibles: 15,
-      precio: 18.5,
-      categoria: "Snack",
-    },
-    {
-      producto: "Donitas",
-      disponibles: 15,
-      precio: 18.5,
-      categoria: "Snack",
-    },
-    {
-      producto: "Pepsi",
-      disponibles: 15,
-      precio: 18.5,
-      categoria: "Snack",
-    },
-    {
-      producto: "Maruchan",
-      disponibles: 15,
-      precio: 18.5,
-      categoria: "Snack",
+      selector: (row) => row.categoria_producto,
     },
   ];
 
@@ -98,7 +73,11 @@ export function Ventas() {
   // TODO: CARGAR DATA DEL BACKEND
   useEffect(() => {
     obtenerTodosLosProductos()
-      .then((res) => console.log(res.data))
+      .then((res) => {
+        console.log(res.data);
+        setRecords(res.data);
+        setLoading(false);
+      })
       .catch((error) => {
         console.error("Error al obtener los productos:", error);
       });
@@ -123,16 +102,19 @@ export function Ventas() {
     setCarrito((prevCarrito) => {
       // Verifica si el producto ya está en el carrito
       const productoExistente = prevCarrito.find(
-        (item) => item.producto === producto.producto
+        (item) => item.nombre_producto === producto.nombre_producto
       );
 
       if (productoExistente) {
         // Si el producto ya existe, incrementa la cantidad sin exceder el máximo disponible
         return prevCarrito.map((item) =>
-          item.producto === producto.producto
+          item.nombre_producto === producto.nombre_producto
             ? {
                 ...item,
-                cantidad: Math.min(item.cantidad + 1, item.disponibles),
+                cantidad_producto: Math.min(
+                  item.cantidad_producto + 1,
+                  item.cantidad_producto
+                ),
               }
             : item
         );
@@ -147,10 +129,13 @@ export function Ventas() {
   const actualizarCantidad = (producto, nuevaCantidad) => {
     setCarrito((prevCarrito) =>
       prevCarrito.map((item) =>
-        item.producto === producto.producto
+        item.nombre_producto === producto.nombre_producto
           ? {
               ...item,
-              cantidad: Math.min(Math.max(nuevaCantidad, 1), item.disponibles),
+              cantidad: Math.min(
+                Math.max(nuevaCantidad, 1),
+                item.cantidad_producto
+              ),
             }
           : item
       )
@@ -161,7 +146,7 @@ export function Ventas() {
   const eliminarDelCarrito = (producto) => {
     setCarrito((prevCarrito) => {
       const nuevoCarrito = prevCarrito.filter(
-        (item) => item.producto !== producto.producto
+        (item) => item.nombre_producto !== producto.nombre_producto
       );
       return nuevoCarrito;
     });
@@ -170,7 +155,10 @@ export function Ventas() {
   // Función para calcular el total de la compra
   const calcularTotal = () => {
     return carrito
-      .reduce((total, item) => total + item.precio * item.cantidad, 0)
+      .reduce(
+        (total, item) => total + item.precio_unitario * item.cantidad_producto,
+        0
+      )
       .toFixed(2);
   };
 
@@ -200,9 +188,9 @@ export function Ventas() {
   const manejarCompra = async () => {
     const datosCompra = {
       detalles_venta: carrito.map((item) => ({
-        producto: item.producto,
-        cantidad: item.cantidad,
-        precio: item.precio,
+        producto: item.nombre_producto,
+        cantidad: item.cantidad_producto,
+        precio: item.precio_unitario,
       })),
       metodo_pago: metodoPago,
       total: calcularTotal(),
@@ -294,12 +282,12 @@ export function Ventas() {
                       key={index}
                       className="flex justify-between items-center mb-2 px-4 py-2"
                     >
-                      <span className="font-bold">{item.producto}</span>
+                      <span className="font-bold">{item.nombre_producto}</span>
                       <div className="flex items-center gap-2">
                         <input
                           type="number"
                           className="w-16 text-center border rounded-md"
-                          value={item.cantidad}
+                          value={item.cantidad_producto}
                           onChange={(e) =>
                             actualizarCantidad(
                               item,
@@ -307,7 +295,7 @@ export function Ventas() {
                             )
                           }
                         />
-                        <span>x ${item.precio.toFixed(2)} MXN</span>
+                        <span>x ${item.precio_unitario.toFixed(2)} MXN</span>
                         <button
                           onClick={() => eliminarDelCarrito(item)}
                           className="bg-red-500 p-1 rounded-full text-white"

@@ -1,6 +1,7 @@
 import {
   obtenerTodosLosProductos,
   crearTipoProducto,
+  obtenerTodosLosProductosDescontinuados,
 } from "../api/inventario.api";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -13,6 +14,9 @@ function Inventario() {
   const [isDialogAddTypeProductOpen, setIsDialogOpen] = useState(false); // Controla el diálogo
   const location = useLocation(); // Detecta cambios en la ruta
   const [recargarProductos, setRecargarProductos] = useState(false);
+
+  const [descontinuados, setDescontinuados] = useState(false);
+  const [productosDescontinuados, setProductosDescontinuados] = useState();
 
   useEffect(() => {
     obtenerTodosLosProductos()
@@ -27,10 +31,25 @@ function Inventario() {
       });
   }, [recargarProductos]);
 
+  useEffect(() => {
+    obtenerTodosLosProductosDescontinuados()
+      .then((res) => {
+        console.log(res.data);
+        setProductosDescontinuados(res.data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los productos descontinuados:", error);
+      });
+  }, [descontinuados]);
+
   // Cierra el diálogo al cambiar de página
   useEffect(() => {
     setIsDialogOpen(false);
   }, [location]);
+
+  const changeProductsToDiscontinued = () => {
+    setDescontinuados(!descontinuados);
+  };
 
   const handleModalAddNewTipeProductClick = (e) => {
     // Cierra el diálogo si se hace clic fuera del recuadro
@@ -146,6 +165,21 @@ function Inventario() {
           </button>
         </div>
 
+        <div className="bg-slate-700 text-white p-4">
+          <div className="flex">
+            <button
+              onClick={changeProductsToDiscontinued}
+              className={`${
+                descontinuados ? "bg-green-500" : "bg-red-500"
+              } p-2 rounded-xl`}
+            >
+              {descontinuados
+                ? "Ver productos disponibles"
+                : "Ver productos descontinuados"}
+            </button>
+          </div>
+        </div>
+
         {/* Contenido principal */}
         {isLoading ? (
           <div className="flex justify-center my-10">
@@ -168,19 +202,33 @@ function Inventario() {
           </div>
         ) : (
           <div className="flex p-4 gap-4 flex-wrap">
-            {data.map((producto, index) => {
-              return (
-                <ProductCard
-                  key={index}
-                  imagen={producto.imagen_producto}
-                  titulo={producto.nombre_producto}
-                  cantidad={producto.cantidad_producto}
-                  categoria={producto.categoria_producto}
-                  descripcion={producto.descripcion_producto}
-                  precio={producto.precio_unitario}
-                />
-              );
-            })}
+            {descontinuados
+              ? productosDescontinuados.map((producto, index) => {
+                  return (
+                    <ProductCard
+                      key={index}
+                      imagen={producto.imagen_producto}
+                      titulo={producto.nombre_producto}
+                      cantidad={producto.cantidad_producto}
+                      categoria={producto.categoria_producto}
+                      descripcion={producto.descripcion_producto}
+                      precio={producto.precio_unitario}
+                    />
+                  );
+                })
+              : data.map((producto, index) => {
+                  return (
+                    <ProductCard
+                      key={index}
+                      imagen={producto.imagen_producto}
+                      titulo={producto.nombre_producto}
+                      cantidad={producto.cantidad_producto}
+                      categoria={producto.categoria_producto}
+                      descripcion={producto.descripcion_producto}
+                      precio={producto.precio_unitario}
+                    />
+                  );
+                })}
           </div>
         )}
       </div>

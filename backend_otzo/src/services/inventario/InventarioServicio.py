@@ -20,8 +20,8 @@ class InventarioServicio(InventarioModelo):
             conexion.begin()
 
             cursor.execute(
-                "SELECT 1 FROM inventario WHERE nombre_producto = %s",
-                tipo_producto.nombre_producto,
+                "SELECT 1 FROM inventario WHERE nombre_producto = %s OR descripcion_producto = %s",
+                (tipo_producto.nombre_producto, tipo_producto.descripcion_producto),
             )
 
             resultado = cursor.fetchone()
