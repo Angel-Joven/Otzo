@@ -304,13 +304,14 @@ function Inventario() {
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
-                <label htmlFor="edit_enable_input" className="block">
+                <label htmlFor="edit_enable_input" className="hidden">
                   Activo:
                 </label>
                 <input
                   type="checkbox"
                   id="edit_enable_input"
                   defaultChecked={!productoAEditar.descontinuado}
+                  className="hidden"
                 ></input>
                 <input
                   type="text"
