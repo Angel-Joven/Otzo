@@ -19,3 +19,7 @@ export const obtenerCategoriasTipoProductos = () => {
 export const descontinuarTipoProducto = (productoADescontinuar) => {
     return axios.patch("http://localhost:5000/api/inventario/descontinuar_tipo_producto", productoADescontinuar);
 }
+
+export const actualizarTipoProducto = (producto) => {
+    return axios.put("http://localhost:5000/api/inventario/actualizar_tipo_producto", producto);
+}

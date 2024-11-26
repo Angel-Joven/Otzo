@@ -3,6 +3,7 @@ import {
   crearTipoProducto,
   obtenerTodosLosProductosDescontinuados,
   obtenerCategoriasTipoProductos,
+  actualizarTipoProducto,
 } from "../api/inventario.api";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -20,6 +21,11 @@ function Inventario() {
   const [productosDescontinuados, setProductosDescontinuados] = useState();
 
   const [categorias, setCategorias] = useState([]);
+
+  const [isDialogEditTypeProductOpen, setisDialogEditTypeProductOpen] =
+    useState(false);
+
+  const [productoAEditar, setProductoAEditar] = useState({});
 
   useEffect(() => {
     obtenerTodosLosProductos()
@@ -81,14 +87,21 @@ function Inventario() {
     }
   };
 
+  const handleModalEditTypeProduct = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalEditProduct") {
+      setisDialogEditTypeProductOpen(false);
+    }
+  };
+
   const handleFormModalAddNewTipeProduct = async (e) => {
     e.preventDefault();
 
     const nuevoProducto = {
-      nombre_tipo_producto: e.target.add_product_title_input.value,
-      imagen_tipo_producto: e.target.add_product_image_input.value,
-      categoria_tipo_producto: e.target.add_product_category_input.value,
-      descripcion_tipo_producto: e.target.add_product_description_input.value,
+      nombre_tipo_producto: e.target.edit_product_title_input.value,
+      imagen_tipo_producto: e.target.edit_product_image_input.value,
+      categoria_tipo_producto: e.target.edit_product_category_input.value,
+      descripcion_tipo_producto: e.target.edit_product_description_input.value,
       precio_unitario: e.target.add_price_unit_input.value,
     };
 
@@ -99,6 +112,32 @@ function Inventario() {
       setRecargarProductos(!recargarProductos);
     } catch (error) {
       console.error("Error al agregar el producto:", error);
+    }
+  };
+
+  const handleFormModalEditTypeProduct = async (e) => {
+    e.preventDefault();
+
+    const productoEditado = {
+      nombre_tipo_producto: e.target.edit_product_title_input.value,
+      imagen_tipo_producto: e.target.edit_product_image_input.value,
+      categoria_tipo_producto: e.target.edit_product_category_input.value,
+      descripcion_tipo_producto: e.target.edit_product_description_input.value,
+      precio_unitario: e.target.edit_price_unit_input.value,
+      cantidad_tipo_producto: e.target.edit_amount_product_input.value,
+      descontinuado: !e.target.edit_enable_input.checked,
+      id_inventario: e.target.id_inventario.value,
+    };
+
+    console.log(productoEditado);
+
+    try {
+      actualizarTipoProducto(productoEditado);
+      console.log("Producto actualizado con éxito.");
+      setisDialogEditTypeProductOpen(false);
+      setRecargarProductos(!recargarProductos);
+    } catch (error) {
+      console.error("Error al actualizar el producto:", error);
     }
   };
 
@@ -183,6 +222,112 @@ function Inventario() {
           </dialog>
         )}
 
+        {isDialogEditTypeProductOpen && (
+          <dialog
+            id="modalEditProduct"
+            className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
+            onClick={handleModalEditTypeProduct}
+          >
+            <div
+              className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
+              onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
+            >
+              <p className="font-bold text-xl">Edita un producto:</p>
+              <form onSubmit={handleFormModalEditTypeProduct}>
+                <label htmlFor="edit_product_title_input" className="block">
+                  Titulo del producto:
+                </label>
+                <input
+                  defaultValue={productoAEditar.nombre_tipo_producto}
+                  id="edit_product_title_input"
+                  type="text"
+                  placeholder="Escribe aquí..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="edit_product_image_input" className="block">
+                  Imagen del producto:
+                </label>
+                <input
+                  defaultValue={productoAEditar.imagen_tipo_producto}
+                  id="edit_product_image_input"
+                  type="text"
+                  placeholder="Escribe aquí..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="edit_product_category_input" className="block">
+                  Categoria del producto:
+                </label>
+                <select
+                  defaultValue={productoAEditar.categoria_tipo_producto}
+                  name="edit_product_category_input"
+                  id="category"
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                >
+                  {categorias.map((categoria, index) => {
+                    return (
+                      <option value={categoria.categoria_producto} key={index}>
+                        {categoria.categoria_producto}
+                      </option>
+                    );
+                  })}
+                </select>
+                <label
+                  htmlFor="edit_product_description_input"
+                  className="block"
+                >
+                  Descripción del producto:
+                </label>
+                <textarea
+                  defaultValue={productoAEditar.descripcion_tipo_producto}
+                  id="edit_product_description_input"
+                  type="text"
+                  placeholder="Escribe aquí..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                ></textarea>
+                <label htmlFor="edit_price_unit_input" className="block">
+                  Precio del producto:
+                </label>
+                <input
+                  defaultValue={productoAEditar.precio_unitario}
+                  id="edit_price_unit_input"
+                  type="number"
+                  placeholder="Introduce tu precio..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="edit_amount_product_input" className="block">
+                  Cantidad del producto:
+                </label>
+                <input
+                  defaultValue={productoAEditar.cantidad_tipo_producto}
+                  id="edit_amount_product_input"
+                  type="number"
+                  placeholder="Introduce tu precio..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="edit_enable_input" className="block">
+                  Activo:
+                </label>
+                <input
+                  type="checkbox"
+                  id="edit_enable_input"
+                  defaultChecked={!productoAEditar.descontinuado}
+                ></input>
+                <input
+                  type="text"
+                  className="hidden"
+                  defaultValue={productoAEditar.id_inventario}
+                  id="id_inventario"
+                />
+                <input
+                  type="submit"
+                  value="Editar producto"
+                  className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
+                />
+              </form>
+            </div>
+          </dialog>
+        )}
+
         {/* Barra superior */}
         <div className="flex justify-between text-center bg-slate-800 text-white py-4 px-8">
           <h1 className="text-2xl font-bold">Inventario de productos</h1>
@@ -246,6 +391,9 @@ function Inventario() {
                       descontinuado={producto.descontinuado}
                       recargar={recargarProductos}
                       setRecargar={setRecargarProductos}
+                      abrirEditar={setisDialogEditTypeProductOpen}
+                      productoAEditar={productoAEditar}
+                      cambiarProductoAEditar={setProductoAEditar}
                     />
                   );
                 })
@@ -263,6 +411,9 @@ function Inventario() {
                       descontinuado={producto.descontinuado}
                       recargar={recargarProductos}
                       setRecargar={setRecargarProductos}
+                      abrirEditar={setisDialogEditTypeProductOpen}
+                      productoAEditar={productoAEditar}
+                      cambiarProductoAEditar={setProductoAEditar}
                     />
                   );
                 })}

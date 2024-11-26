@@ -13,6 +13,9 @@ export default function ProductCard({
   descontinuado,
   recargar,
   setRecargar,
+  abrirEditar,
+  productoAEditar,
+  cambiarProductoAEditar,
 }) {
   const descontinuarProducto = () => {
     descontinuarTipoProducto({
@@ -57,6 +60,20 @@ export default function ProductCard({
       });
   };
 
+  const activarModalEditar = () => {
+    cambiarProductoAEditar({
+      nombre_tipo_producto: titulo,
+      imagen_tipo_producto: imagen,
+      categoria_tipo_producto: categoria,
+      descripcion_tipo_producto: descripcion,
+      precio_unitario: precio,
+      cantidad_tipo_producto: cantidad,
+      descontinuado: false,
+      id_inventario: id,
+    });
+    abrirEditar(true);
+  };
+
   return (
     <motion.div
       initial={{ scale: 0, opacity: 0 }}
@@ -98,7 +115,10 @@ export default function ProductCard({
             <i className="align-middle fi fi-br-plus"></i>
           </button>
         )}
-        <button className="bg-blue-500 rounded-lg p-2">
+        <button
+          onClick={activarModalEditar}
+          className="bg-blue-500 rounded-lg p-2"
+        >
           <i className="align-middle fi fi-sr-pencil"></i>
         </button>
         <button
@@ -108,9 +128,9 @@ export default function ProductCard({
           } rounded-lg p-2`}
         >
           {descontinuado ? (
-            <i class="fi fi-sr-add"></i>
+            <i className="fi fi-sr-add"></i>
           ) : (
-            <i class="fi fi-sr-clear-alt"></i>
+            <i className="fi fi-sr-clear-alt"></i>
           )}
         </button>
       </div>

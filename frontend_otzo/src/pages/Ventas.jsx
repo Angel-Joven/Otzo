@@ -166,7 +166,7 @@ export function Ventas() {
   const [metodoPago, setMetodoPago] = useState("Tarjeta de crédito");
 
   // Nuevo estado para el efectivo dado
-  const [efectivoDado, setEfectivoDado] = useState(0);
+  const [efectivoDado, setEfectivoDado] = useState();
   const [cambio, setCambio] = useState(0);
 
   // Función para manejar el cambio cuando el efectivo dado cambia
