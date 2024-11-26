@@ -112,7 +112,7 @@ export function Ventas() {
             ? {
                 ...item,
                 cantidad_producto: Math.min(
-                  item.cantidad_producto + 1,
+                  item.cantidad + 1,
                   item.cantidad_producto
                 ),
               }
