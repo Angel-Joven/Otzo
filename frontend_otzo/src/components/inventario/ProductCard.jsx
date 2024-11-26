@@ -14,7 +14,6 @@ export default function ProductCard({
   recargar,
   setRecargar,
   abrirEditar,
-  productoAEditar,
   cambiarProductoAEditar,
 }) {
   const descontinuarProducto = () => {

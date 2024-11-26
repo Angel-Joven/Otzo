@@ -22,6 +22,7 @@ import { NavbarClientes } from "./components/NavbarClientes"; //Navbar para clie
 import { NavbarAdministradores } from "./components/NavbarAdministradores"; //Navbar para los administradores
 import { RutaProtegida } from "./components/RutasProtegidas"; //Proteger rutas para que solo puedan acceder usuarios logeados
 import Inventario from "./pages/Inventario";
+import "@flaticon/flaticon-uicons/css/all/all.css";
 
 function AppContent() {
   const location = useLocation();

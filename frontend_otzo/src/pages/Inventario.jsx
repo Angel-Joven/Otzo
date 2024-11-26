@@ -6,7 +6,6 @@ import {
   actualizarTipoProducto,
 } from "../api/inventario.api";
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import ProductCard from "../components/inventario/ProductCard";
 import { useLocation } from "react-router-dom";
 
