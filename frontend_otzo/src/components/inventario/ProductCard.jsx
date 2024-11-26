@@ -68,7 +68,7 @@ export default function ProductCard({
       descripcion_tipo_producto: descripcion,
       precio_unitario: precio,
       cantidad_tipo_producto: cantidad,
-      descontinuado: false,
+      descontinuado: descontinuado,
       id_inventario: id,
     });
     abrirEditar(true);
