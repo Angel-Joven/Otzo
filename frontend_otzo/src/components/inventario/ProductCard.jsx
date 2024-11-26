@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { descontinuarTipoProducto } from "../../api/inventario.api";
 
 export default function ProductCard({
   imagen,
@@ -8,7 +9,54 @@ export default function ProductCard({
   cantidad,
   descripcion,
   precio,
+  id,
+  descontinuado,
+  recargar,
+  setRecargar,
 }) {
+  const descontinuarProducto = () => {
+    descontinuarTipoProducto({
+      nombre_tipo_producto: titulo,
+      imagen_tipo_producto: imagen,
+      categoria_tipo_producto: categoria,
+      descripcion_tipo_producto: descripcion,
+      precio_unitario: precio,
+      cantidad_tipo_producto: cantidad,
+      descontinuado: true,
+      id_inventario: id,
+    })
+      .then((res) => {
+        console.log(res.data);
+        setRecargar(!recargar);
+      })
+      .catch((error) => {
+        console.error(
+          "No se pudo descontinuar el producto por un error: ",
+          error
+        );
+      });
+  };
+
+  const reactivarProducto = () => {
+    descontinuarTipoProducto({
+      nombre_tipo_producto: titulo,
+      imagen_tipo_producto: imagen,
+      categoria_tipo_producto: categoria,
+      descripcion_tipo_producto: descripcion,
+      precio_unitario: precio,
+      cantidad_tipo_producto: cantidad,
+      descontinuado: false,
+      id_inventario: id,
+    })
+      .then((res) => {
+        console.log(res.data);
+        setRecargar(!recargar);
+      })
+      .catch((error) => {
+        console.error("No se pudo reactivar el producto por un error: ", error);
+      });
+  };
+
   return (
     <motion.div
       initial={{ scale: 0, opacity: 0 }}
@@ -45,14 +93,25 @@ export default function ProductCard({
 
       {/* Botones */}
       <div className="flex justify-center gap-4 py-2">
-        <button className="bg-green-500 rounded-lg p-2">
-          <i className="align-middle fi fi-br-plus"></i>
-        </button>
+        {descontinuado ? null : (
+          <button className="bg-green-500 rounded-lg p-2">
+            <i className="align-middle fi fi-br-plus"></i>
+          </button>
+        )}
         <button className="bg-blue-500 rounded-lg p-2">
           <i className="align-middle fi fi-sr-pencil"></i>
         </button>
-        <button className="bg-red-500 rounded-lg p-2">
-          <i className="align-middle fi fi-br-minus"></i>
+        <button
+          onClick={descontinuado ? reactivarProducto : descontinuarProducto}
+          className={`${
+            descontinuado ? "bg-green-500" : "bg-red-500"
+          } rounded-lg p-2`}
+        >
+          {descontinuado ? (
+            <i class="fi fi-sr-add"></i>
+          ) : (
+            <i class="fi fi-sr-clear-alt"></i>
+          )}
         </button>
       </div>
     </motion.div>

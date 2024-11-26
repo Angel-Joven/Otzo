@@ -2,6 +2,7 @@ import {
   obtenerTodosLosProductos,
   crearTipoProducto,
   obtenerTodosLosProductosDescontinuados,
+  obtenerCategoriasTipoProductos,
 } from "../api/inventario.api";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -18,6 +19,8 @@ function Inventario() {
   const [descontinuados, setDescontinuados] = useState(false);
   const [productosDescontinuados, setProductosDescontinuados] = useState();
 
+  const [categorias, setCategorias] = useState([]);
+
   useEffect(() => {
     obtenerTodosLosProductos()
       .then((res) => {
@@ -28,6 +31,15 @@ function Inventario() {
       .catch((error) => {
         console.error("Error al obtener los productos:", error);
         setIsLoading(false);
+      });
+
+    obtenerTodosLosProductosDescontinuados()
+      .then((res) => {
+        console.log(res.data);
+        setProductosDescontinuados(res.data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los productos descontinuados:", error);
       });
   }, [recargarProductos]);
 
@@ -41,6 +53,17 @@ function Inventario() {
         console.error("Error al obtener los productos descontinuados:", error);
       });
   }, [descontinuados]);
+
+  useEffect(() => {
+    obtenerCategoriasTipoProductos()
+      .then((res) => {
+        console.log(res.data);
+        setCategorias(res.data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los productos descontinuados:", error);
+      });
+  }, [isDialogAddTypeProductOpen]);
 
   // Cierra el diálogo al cambiar de página
   useEffect(() => {
@@ -121,7 +144,13 @@ function Inventario() {
                   id="category"
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 >
-                  <option value="Bebidas">Bebidas</option>
+                  {categorias.map((categoria, index) => {
+                    return (
+                      <option value={categoria.categoria_producto} key={index}>
+                        {categoria.categoria_producto}
+                      </option>
+                    );
+                  })}
                 </select>
                 <label
                   htmlFor="add_product_description_input"
@@ -147,7 +176,7 @@ function Inventario() {
                 <input
                   type="submit"
                   value="Crear producto"
-                  className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2"
+                  className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
                 />
               </form>
             </div>
@@ -213,6 +242,10 @@ function Inventario() {
                       categoria={producto.categoria_producto}
                       descripcion={producto.descripcion_producto}
                       precio={producto.precio_unitario}
+                      id={producto.id_inventario}
+                      descontinuado={producto.descontinuado}
+                      recargar={recargarProductos}
+                      setRecargar={setRecargarProductos}
                     />
                   );
                 })
@@ -226,6 +259,10 @@ function Inventario() {
                       categoria={producto.categoria_producto}
                       descripcion={producto.descripcion_producto}
                       precio={producto.precio_unitario}
+                      id={producto.id_inventario}
+                      descontinuado={producto.descontinuado}
+                      recargar={recargarProductos}
+                      setRecargar={setRecargarProductos}
                     />
                   );
                 })}

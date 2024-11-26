@@ -27,6 +27,16 @@ class InventarioModelo(ABC):
         """Función para listar los tipos de productos descontinuados en el inventario"""
         pass
 
+    @abstractmethod
+    def listarCategoriasTiposProductos(self):
+        """Función para listar las categorías de tipos de productos en el inventario"""
+        pass
+
+    @abstractmethod
+    def obtenerTipoProducto(self):
+        """Función para obtener un tipo producto en el inventario"""
+        pass
+
 
 class DetalleInventarioModelo(ABC):
     @abstractmethod

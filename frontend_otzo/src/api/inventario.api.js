@@ -11,3 +11,11 @@ export const obtenerTodosLosProductosDescontinuados = () => {
 export const crearTipoProducto = (nuevoProducto) => {
     return axios.post("http://localhost:5000/api/inventario/agregar_tipo_producto", nuevoProducto);
 }
+
+export const obtenerCategoriasTipoProductos = () => {
+    return axios.get("http://localhost:5000/api/inventario/categorias");
+}
+
+export const descontinuarTipoProducto = (productoADescontinuar) => {
+    return axios.patch("http://localhost:5000/api/inventario/descontinuar_tipo_producto", productoADescontinuar);
+}

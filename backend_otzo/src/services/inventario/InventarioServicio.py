@@ -139,3 +139,39 @@ class InventarioServicio(InventarioModelo):
             return None
         finally:
             conexion.close()
+
+    def listarCategoriasTiposProductos(self) -> dict:
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            cursor.execute(
+                "SELECT DISTINCT categoria_producto FROM inventario where descontinuado = 0"
+            )
+
+            return cursor.fetchall()
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
+
+    def obtenerTipoProducto(self, id_tipo_producto: int):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            cursor.execute(
+                "SELECT * FROM inventario where id_inventario = %s", id_tipo_producto
+            )
+
+            return cursor.fetchone()
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
