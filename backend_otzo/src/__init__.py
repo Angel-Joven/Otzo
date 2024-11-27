@@ -5,6 +5,7 @@ from .routes import clientes
 from .routes import administracion
 from .routes import reportes
 from .routes import inventario
+from .routes import atencion
 
 app = Flask(__name__)
 
@@ -24,5 +25,6 @@ def init_app(config):
         administracion.administracion_bp, url_prefix="/api/administracion/"
     )
     app.register_blueprint(reportes.reportes_bp, url_prefix="/api/reportes/")
+    app.register_blueprint(atencion.atencion_bp, url_prefix="/api/atencion/")
 
     return app
