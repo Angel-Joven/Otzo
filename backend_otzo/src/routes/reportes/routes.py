@@ -27,21 +27,12 @@ def generar_reporte_puntos():
         if not fecha_reporte:
             return jsonify({"error": "La fecha es obligatoria"}), 400
         
-        # Validar formato de la fecha
-        try:
-            datetime.strptime(fecha_reporte, '%Y-%m-%d')
-        except ValueError:
-            return jsonify({"error": "El formato de la fecha debe ser YYYY-MM-DD"}), 400
-
         reporte = ReportesService.crear_reporte_puntos(fecha_reporte)
-        if not reporte:
-            return jsonify({"error": "No se generó el reporte, revise los datos"}), 404
-
         return jsonify(reporte), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": f"Error interno: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 # ---------------------------------------------------------------------------------------------------------------------------
 

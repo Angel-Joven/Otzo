@@ -159,4 +159,3 @@ class InventarioReporteDTO:
             "cantidad_producto": self.cantidad_producto,
             "categoria": self.categoria,  # Ajuste para incluir nuevos campos.
         }
-
