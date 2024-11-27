@@ -125,7 +125,6 @@ class ReportesService(ReportesModelo):
         finally:
             conexion.close()
 
-class ReportesService:
     @staticmethod
     def crear_reporte_inventario():
         """
@@ -162,6 +161,7 @@ class ReportesService:
             return {"error": f"Error al generar el reporte de inventario: {str(e)}"}
         finally:
             conexion.close()
+
 # prueba de funcionalidad fecha del reporte
 # print("Prueba con fecha específica")
 # fecha_prueba = "2024-11-21"  # Cambia esta fecha para tus pruebas
