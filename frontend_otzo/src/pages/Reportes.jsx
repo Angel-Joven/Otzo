@@ -11,8 +11,32 @@ export function Reportes() {
     const [reporteAdministracion, setReporteAdministracion] = useState(null);
     const [reporteQuejas, setReporteQuejas] = useState([]);
     const [reporteInventario, setReporteInventario] = useState([]);
-
     const [error, setError] = useState("");
+
+    const resetReportes = () => {
+        setReportePuntos(null);
+        setReporteVentas(null);
+        setReporteRangos(null);
+        setReporteAdministracion(null);
+        setReporteQuejas([]);
+        setReporteInventario(null);
+        setError("");
+    };
+
+    const manejarError = (tipo, error) => {
+        console.error(`Error al obtener el reporte de ${tipo}:`, error);
+        if (error.response) {
+            if (error.response.status === 400) {
+                setError(`Error de cliente: ${error.response.data.error}`);
+            } else if (error.response.status === 404) {
+                setError("No se encontraron datos para la fecha proporcionada.");
+            } else {
+                setError(`Error del servidor: ${error.response.data.error}`);
+            }
+        } else {
+            setError("Error de conexión: No se pudo conectar al servidor.");
+        }
+    };
 
     const obtenerReportePuntos = async () => {
         resetReportes();
@@ -20,11 +44,18 @@ export function Reportes() {
             setError("Por favor selecciona una fecha.");
             return;
         }
+
+        const fechaRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!fechaRegex.test(fecha)) {
+            setError("El formato de la fecha debe ser YYYY-MM-DD.");
+            return;
+        }
+
         try {
             const response = await axios.get(`http://127.0.0.1:5000/api/reportes/reporte-puntos?fecha=${fecha}`);
             setReportePuntos(response.data);
         } catch (error) {
-            manejarError("puntos");
+            manejarError("puntos", error);
         }
     };
 
@@ -38,7 +69,7 @@ export function Reportes() {
             const response = await axios.get(`http://127.0.0.1:5000/api/reportes/reporte-ventas?fecha=${fecha}`);
             setReporteVentas(response.data);
         } catch (error) {
-            manejarError("ventas");
+            manejarError("ventas", error);
         }
     };
 
@@ -48,7 +79,7 @@ export function Reportes() {
             const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-rangos");
             setReporteRangos(response.data);
         } catch (error) {
-            manejarError("rangos");
+            manejarError("rangos", error);
         }
     };
 
@@ -58,7 +89,7 @@ export function Reportes() {
             const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-administracion");
             setReporteAdministracion(response.data);
         } catch (error) {
-            manejarError("administración");
+            manejarError("administración", error);
         }
     };
 
@@ -69,7 +100,7 @@ export function Reportes() {
             const datos = Array.isArray(response.data) ? response.data : [];
             setReporteQuejas(datos);
         } catch (error) {
-            manejarError("quejas");
+            manejarError("quejas", error);
         }
     };
 
@@ -79,23 +110,8 @@ export function Reportes() {
             const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-inventario");
             setReporteInventario(response.data);
         } catch (error) {
-            manejarError("inventario");
+            manejarError("inventario", error);
         }
-    };
-
-    const resetReportes = () => {
-        setReportePuntos(null);
-        setReporteVentas(null);
-        setReporteRangos(null);
-        setReporteAdministracion(null);
-        setReporteQuejas([]);
-        setReporteInventario(null);
-        setError("");
-    };
-
-    const manejarError = (tipo) => {
-        console.error(`Error al obtener el reporte de ${tipo}:`, error);
-        setError(`Ocurrió un error al obtener el reporte de ${tipo}.`);
     };
 
     return (
@@ -350,41 +366,42 @@ export function Reportes() {
                         </div>
                     </div>
                 )}
-                    {reporteActivo === "inventario" && (
-                        <div>
-                            <h2 className="text-2xl font-bold mb-4">Reporte de Inventario</h2>
-                            <button
-                                onClick={obtenerReporteInventario}
-                                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
-                            >
-                                Generar Reporte
-                            </button>
-                            <div className="mt-6">
-                                {reporteInventario && reporteInventario.length > 0 ? (
-                                    <table className="table-auto w-full border-collapse border border-gray-400">
-                                        <thead>
-                                            <tr>
-                                                <th className="border px-4 py-2">ID Inventario</th>
-                                                <th className="border px-4 py-2">Nombre Producto</th>
-                                                <th className="border px-4 py-2">Cantidad</th>
+
+                {reporteActivo === "inventario" && (
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">Reporte de Inventario</h2>
+                        <button
+                            onClick={obtenerReporteInventario}
+                            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+                        >
+                            Generar Reporte
+                        </button>
+                        <div className="mt-6">
+                            {reporteInventario && reporteInventario.length > 0 ? (
+                                <table className="table-auto w-full border-collapse border border-gray-400">
+                                    <thead>
+                                        <tr>
+                                            <th className="border px-4 py-2">ID Inventario</th>
+                                            <th className="border px-4 py-2">Nombre Producto</th>
+                                            <th className="border px-4 py-2">Cantidad</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reporteInventario.map((item, index) => (
+                                            <tr key={index}>
+                                                <td className="border px-4 py-2">{item.id_inventario}</td>
+                                                <td className="border px-4 py-2">{item.nombre_producto}</td>
+                                                <td className="border px-4 py-2">{item.cantidad_producto}</td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {reporteInventario.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td className="border px-4 py-2">{item.id_inventario}</td>
-                                                    <td className="border px-4 py-2">{item.nombre_producto}</td>
-                                                    <td className="border px-4 py-2">{item.cantidad_producto}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                ) : (
-                                    <p className="text-gray-500">No hay datos disponibles. Genera un reporte para ver los datos.</p>
-                                )}
-                            </div>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p className="text-gray-500">No hay datos disponibles. Genera un reporte para ver los datos.</p>
+                            )}
                         </div>
-                    )}
+                    </div>
+                )}
             </div>
         </div>
     );
