@@ -364,7 +364,6 @@ export function Reportes() {
                                     <table className="table-auto w-full border-collapse border border-gray-400">
                                         <thead>
                                             <tr>
-                                                <th className="border px-4 py-2">ID Producto</th>
                                                 <th className="border px-4 py-2">ID Inventario</th>
                                                 <th className="border px-4 py-2">Nombre Producto</th>
                                                 <th className="border px-4 py-2">Cantidad</th>
@@ -373,7 +372,6 @@ export function Reportes() {
                                         <tbody>
                                             {reporteInventario.map((item, index) => (
                                                 <tr key={index}>
-                                                    <td className="border px-4 py-2">{item.id_producto}</td>
                                                     <td className="border px-4 py-2">{item.id_inventario}</td>
                                                     <td className="border px-4 py-2">{item.nombre_producto}</td>
                                                     <td className="border px-4 py-2">{item.cantidad_producto}</td>

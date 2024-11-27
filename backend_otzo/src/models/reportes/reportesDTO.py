@@ -147,15 +147,15 @@ class QuejasReporteDTO:
 
 @dataclass
 class InventarioReporteDTO:
-    id_producto: int
     id_inventario: int
     nombre_producto: str
     cantidad_producto: int
+    categoria: str  # Campo añadido para mostrar la categoría del producto.
 
     def to_dict(self):
         return {
-            "id_producto": self.id_producto,
             "id_inventario": self.id_inventario,
             "nombre_producto": self.nombre_producto,
-            "cantidad_producto": self.cantidad_producto
+            "cantidad_producto": self.cantidad_producto,
+            "categoria": self.categoria,  # Ajuste para incluir nuevos campos.
         }

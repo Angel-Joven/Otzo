@@ -125,21 +125,22 @@ class ReportesService(ReportesModelo):
         finally:
             conexion.close()
 
+class ReportesService:
     @staticmethod
     def crear_reporte_inventario():
         """
         Genera un reporte de inventario con los campos:
-        id_producto, id_inventario, nombre_producto y cantidad_producto.
+        id_producto, id_inventario, nombre_producto, cantidad_producto y categoría.
         """
         conexion = get_connection()
         try:
             with conexion.cursor(DictCursor) as cursor:
                 query = """
                     SELECT 
-                        i.id_producto,
                         i.id_inventario,
                         i.nombre_producto,
-                        i.cantidad_producto
+                        i.cantidad_producto,
+                        i.categoria_producto AS categoria
                     FROM inventario i
                 """
                 cursor.execute(query)
@@ -148,10 +149,10 @@ class ReportesService(ReportesModelo):
                 # Transformar resultados al formato DTO
                 reporte = [
                     InventarioReporteDTO(
-                        id_producto=row["id_producto"],
                         id_inventario=row["id_inventario"],
                         nombre_producto=row["nombre_producto"],
-                        cantidad_producto=row["cantidad_producto"]
+                        cantidad_producto=row["cantidad_producto"],
+                        categoria=row["categoria"]  # Ajuste para mapear la categoría.
                     ).to_dict()
                     for row in resultados
                 ]
