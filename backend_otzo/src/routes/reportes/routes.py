@@ -4,6 +4,7 @@ from src.services.reportes.reportesService import *
 from src.db import get_connection
 from src.utils.Logger import Logger
 from pymysql.cursors import DictCursor
+from datetime import datetime
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -62,7 +63,7 @@ def generar_reporte_rangos():
             query = """
                 SELECT r.nombre_rango, COUNT(p.idclientes_puntos) AS total_personas
                 FROM puntos p
-                JOIN rangos r ON p.idrango = r.idrango                              
+                JOIN rangos r WHERE p.idrango = r.idrango                              
                 GROUP BY r.nombre_rango
                 ORDER BY total_personas DESC
             """

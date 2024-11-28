@@ -62,7 +62,7 @@ def agregar():
             return (
                 jsonify(
                     {
-                        "error": f"Producto con código {producto["codigo_producto"]} no encontrado"
+                        "error": f"Producto con código {producto['codigo_producto']} no encontrado"
                     }
                 ),
                 404,

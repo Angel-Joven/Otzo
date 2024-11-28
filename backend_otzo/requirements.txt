@@ -9,4 +9,3 @@ MarkupSafe==3.0.2
 PyMySQL==1.1.1
 python-decouple==3.8
 Werkzeug==3.0.4
-decouple==0.0.7
