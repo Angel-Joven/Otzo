@@ -10,8 +10,9 @@ class InventarioDTO:
     _categoria_producto: str
     _descripcion_producto: str
     _precio_unitario: Decimal
-    _descontinuado: bool = False
     _cantidad_producto: int = 0
+    _descontinuado: bool = False
+    _cantidad_maxima_producto: int = 50
     _id_inventario: int = None
 
     @property
@@ -76,7 +77,15 @@ class InventarioDTO:
 
     @descontinuado.setter
     def descontinuado(self, descontinuado: bool):
-        self.descontinuado = descontinuado
+        self._descontinuado = descontinuado
+
+    @property
+    def cantidad_maxima_producto(self) -> int:
+        return self._cantidad_maxima_producto
+
+    @cantidad_maxima_producto.setter
+    def cantidad_maxima_producto(self, cantidad_maxima_producto: int):
+        self._cantidad_maxima_producto = cantidad_maxima_producto
 
 
 @dataclass
@@ -87,6 +96,7 @@ class DetalleInventarioDTO:
     _caducidad_producto: datetime
     _costo_unitario: Decimal
     _vendido: bool = False
+    _devuelto: bool = False
 
     @property
     def id_inventario(self) -> int:
@@ -135,3 +145,11 @@ class DetalleInventarioDTO:
     @vendido.setter
     def vendido(self, vendido: bool):
         self._vendido = vendido
+
+    @property
+    def devuelto(self) -> bool:
+        return self._devuelto
+
+    @devuelto.setter
+    def devuelto(self, devuelto: bool):
+        self._devuelto = devuelto

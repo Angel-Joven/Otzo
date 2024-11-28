@@ -23,3 +23,7 @@ export const descontinuarTipoProducto = (productoADescontinuar) => {
 export const actualizarTipoProducto = (producto) => {
     return axios.put("http://localhost:5000/api/inventario/actualizar_tipo_producto", producto);
 }
+
+export const reabastecerProducto = (solicitud) => {
+    return axios.post("http://localhost:5000/api/inventario/reabastecer", solicitud);
+}

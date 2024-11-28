@@ -15,6 +15,8 @@ export default function ProductCard({
   setRecargar,
   abrirEditar,
   cambiarProductoAEditar,
+  abrirReabastecer,
+  cambiarProductoAReabastecer,
 }) {
   const descontinuarProducto = () => {
     descontinuarTipoProducto({
@@ -73,6 +75,13 @@ export default function ProductCard({
     abrirEditar(true);
   };
 
+  const activarModalReabastecer = () => {
+    cambiarProductoAReabastecer({
+      id_inventario: id,
+    });
+    abrirReabastecer(true);
+  };
+
   return (
     <motion.div
       initial={{ scale: 0, opacity: 0 }}
@@ -110,7 +119,10 @@ export default function ProductCard({
       {/* Botones */}
       <div className="flex justify-center gap-4 py-2">
         {descontinuado ? null : (
-          <button className="bg-green-500 rounded-lg p-2">
+          <button
+            onClick={activarModalReabastecer}
+            className="bg-green-500 rounded-lg p-2"
+          >
             <i className="align-middle fi fi-br-plus"></i>
           </button>
         )}

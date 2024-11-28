@@ -4,6 +4,7 @@ import {
   obtenerTodosLosProductosDescontinuados,
   obtenerCategoriasTipoProductos,
   actualizarTipoProducto,
+  reabastecerProducto,
 } from "../api/inventario.api";
 import React, { useState, useEffect } from "react";
 import ProductCard from "../components/inventario/ProductCard";
@@ -25,6 +26,10 @@ function Inventario() {
     useState(false);
 
   const [productoAEditar, setProductoAEditar] = useState({});
+
+  const [isDialogReplenishOpen, setIsDialogReplenishOpen] = useState(false);
+
+  const [productoAReabastecer, setProductoAReabastecer] = useState({});
 
   useEffect(() => {
     obtenerTodosLosProductos()
@@ -79,17 +84,11 @@ function Inventario() {
     setDescontinuados(!descontinuados);
   };
 
+  //ADD PRODUCTS
   const handleModalAddNewTipeProductClick = (e) => {
     // Cierra el diálogo si se hace clic fuera del recuadro
     if (e.target.id === "modalAddProduct") {
       setIsDialogOpen(false);
-    }
-  };
-
-  const handleModalEditTypeProduct = (e) => {
-    // Cierra el diálogo si se hace clic fuera del recuadro
-    if (e.target.id === "modalEditProduct") {
-      setisDialogEditTypeProductOpen(false);
     }
   };
 
@@ -105,12 +104,22 @@ function Inventario() {
     };
 
     try {
-      crearTipoProducto(nuevoProducto);
-      console.log("Producto agregado con éxito.");
-      setIsDialogOpen(false);
-      setRecargarProductos(!recargarProductos);
+      crearTipoProducto(nuevoProducto).then((res) => {
+        console.log("Producto agregado con éxito.");
+        setIsDialogOpen(false);
+        setRecargarProductos(!recargarProductos);
+      });
     } catch (error) {
       console.error("Error al agregar el producto:", error);
+    }
+  };
+
+  //EDIT PRODUCTS
+
+  const handleModalEditTypeProduct = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalEditProduct") {
+      setisDialogEditTypeProductOpen(false);
     }
   };
 
@@ -131,12 +140,43 @@ function Inventario() {
     console.log(productoEditado);
 
     try {
-      actualizarTipoProducto(productoEditado);
-      console.log("Producto actualizado con éxito.");
-      setisDialogEditTypeProductOpen(false);
-      setRecargarProductos(!recargarProductos);
+      actualizarTipoProducto(productoEditado).then((res) => {
+        console.log("Producto actualizado con éxito.");
+        setisDialogEditTypeProductOpen(false);
+        setRecargarProductos(!recargarProductos);
+      });
     } catch (error) {
       console.error("Error al actualizar el producto:", error);
+    }
+  };
+
+  //REABASTECER
+
+  const handleModalReplenishProduct = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalReplenishProduct") {
+      setIsDialogReplenishOpen(false);
+    }
+  };
+
+  const handleFormModalReplenishProduct = async (e) => {
+    e.preventDefault();
+
+    const solicitud = {
+      id_inventario: e.target.replenish_product_id_input.value,
+      cantidad: e.target.replenish_product_quantity_input.value,
+    };
+
+    console.log(solicitud);
+
+    try {
+      reabastecerProducto(solicitud).then((res) => {
+        console.log("Producto reabastecido con éxito.");
+        setIsDialogReplenishOpen(false);
+        setRecargarProductos(!recargarProductos);
+      });
+    } catch (error) {
+      console.error("Error al reabastecer el producto:", error);
     }
   };
 
@@ -328,6 +368,46 @@ function Inventario() {
           </dialog>
         )}
 
+        {isDialogReplenishOpen && (
+          <dialog
+            id="modalReplenishProduct"
+            className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
+            onClick={handleModalReplenishProduct}
+          >
+            <div
+              className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
+              onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
+            >
+              <p className="font-bold text-xl">Edita un producto:</p>
+              <form onSubmit={handleFormModalReplenishProduct}>
+                <label
+                  htmlFor="replenish_product_quantity_input"
+                  className="block"
+                >
+                  Cantidad a reabastecer:
+                </label>
+                <input
+                  id="replenish_product_quantity_input"
+                  type="number"
+                  placeholder="Introduce la cantidad para agregar..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <input
+                  type="number"
+                  className="hidden"
+                  defaultValue={productoAReabastecer.id_inventario}
+                  id="replenish_product_id_input"
+                />
+                <input
+                  type="submit"
+                  value="Editar producto"
+                  className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
+                />
+              </form>
+            </div>
+          </dialog>
+        )}
+
         {/* Barra superior */}
         <div className="flex justify-between text-center bg-slate-800 text-white py-4 px-8">
           <h1 className="text-2xl font-bold">Inventario de productos</h1>
@@ -394,6 +474,8 @@ function Inventario() {
                       abrirEditar={setisDialogEditTypeProductOpen}
                       productoAEditar={productoAEditar}
                       cambiarProductoAEditar={setProductoAEditar}
+                      abrirReabastecer={setIsDialogReplenishOpen}
+                      cambiarProductoAReabastecer={setProductoAReabastecer}
                     />
                   );
                 })
@@ -414,6 +496,8 @@ function Inventario() {
                       abrirEditar={setisDialogEditTypeProductOpen}
                       productoAEditar={productoAEditar}
                       cambiarProductoAEditar={setProductoAEditar}
+                      abrirReabastecer={setIsDialogReplenishOpen}
+                      cambiarProductoAReabastecer={setProductoAReabastecer}
                     />
                   );
                 })}

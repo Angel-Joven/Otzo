@@ -53,3 +53,13 @@ class DetalleInventarioModelo(ABC):
     def devolverProducto(self):
         """Funcion para devolver un producto al detalle de inventario"""
         pass
+
+    @abstractmethod
+    def generarCodigoProducto(self):
+        """Función para generar un código de producto único"""
+        pass
+
+    @abstractmethod
+    def generarPrecioProducto(self):
+        """Función para generar el precio de un producto"""
+        pass

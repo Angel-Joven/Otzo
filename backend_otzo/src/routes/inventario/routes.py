@@ -8,7 +8,10 @@ from . import inventario_bp  # Importa el Blueprint de ventas
 import json
 from flask_cors import cross_origin
 
-from src.services.inventario.InventarioServicio import InventarioServicio
+from src.services.inventario.InventarioServicio import (
+    InventarioServicio,
+    DetalleInventarioServicio,
+)
 from src.models.inventario.InventarioDTOs import InventarioDTO
 
 
@@ -161,3 +164,24 @@ def descontinuar_tipo_producto():
         return jsonify({"mensaje": "Tipo de producto descontinuado correctamente"}), 200
     else:
         return jsonify({"error": "No se pudo descontinuar el tipo de producto"}), 500
+
+
+@inventario_bp.route("/reabastecer", methods=["POST"])
+@cross_origin()
+def reabastecer():
+
+    data = request.json
+
+    inventario_servicio = DetalleInventarioServicio()
+
+    resultado = inventario_servicio.agregarProducto(
+        data["id_inventario"], data["cantidad"]
+    )
+
+    if resultado:
+        return (
+            jsonify({"mensaje": "Cantidad de productos agregados correctamente"}),
+            200,
+        )
+    else:
+        return jsonify({"error": "No se pudo agregar la cantidad de productos"}), 500

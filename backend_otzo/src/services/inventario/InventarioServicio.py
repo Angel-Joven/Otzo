@@ -8,6 +8,9 @@ from dataclasses import dataclass
 from src.db import get_connection
 from decimal import Decimal
 from pymysql.cursors import DictCursor
+import string
+import random
+from datetime import datetime, timedelta
 
 
 @dataclass
@@ -97,6 +100,9 @@ class InventarioServicio(InventarioModelo):
                 (tipo_producto.descontinuado, tipo_producto.id_inventario),
             )
 
+            resultado = cursor.fetchone()
+            print(resultado)
+
             conexion.commit()
 
             return True
@@ -175,3 +181,79 @@ class InventarioServicio(InventarioModelo):
             return None
         finally:
             conexion.close()
+
+
+@dataclass
+class DetalleInventarioServicio(DetalleInventarioModelo):
+
+    def generarCodigoProducto(self):
+        letras_numeros = string.ascii_uppercase + string.digits
+        codigo_producto = "".join(random.choices(letras_numeros, k=8))
+        return codigo_producto
+
+    def generarPrecioProducto(self, precio_maximo: float):
+        precio_unitario = round(random.uniform(1, precio_maximo), 2)
+        return precio_unitario
+
+    def agregarProducto(self, id_tipo_producto: int, cantidad: int):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            conexion.begin()
+
+            cursor.execute(
+                "SELECT precio_unitario FROM inventario WHERE id_inventario = %s",
+                id_tipo_producto,
+            )
+
+            precio_producto = float(cursor.fetchone()["precio_unitario"])
+            fecha_actual = datetime.now()
+            fecha_caducidad = datetime.now() + timedelta(days=30)
+            costo_unitario = self.generarPrecioProducto(precio_producto)
+
+            for i in range(int(cantidad)):
+                cursor.execute(
+                    "INSERT INTO detalle_inventario (id_inventario, codigo_producto, fecha_producto, caducidad_producto, costo_unitario, vendido, devuelto) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        id_tipo_producto,
+                        self.generarCodigoProducto(),
+                        fecha_actual,
+                        fecha_caducidad,
+                        costo_unitario,
+                        False,
+                        False,
+                    ),
+                )
+
+            cursor.execute(
+                "SELECT cantidad_producto FROM inventario WHERE id_inventario = %s",
+                id_tipo_producto,
+            )
+
+            cantidad_actual = int(cursor.fetchone()["cantidad_producto"])
+
+            cursor.execute(
+                "UPDATE inventario SET cantidad_producto = %s WHERE id_inventario = %s",
+                (
+                    cantidad_actual + int(cantidad),
+                    id_tipo_producto,
+                ),
+            )
+
+            conexion.commit()
+
+            return True
+
+        except Exception as e:
+            print("No se pudo agregar una nueva cantidad de productos, error:", e)
+            conexion.rollback()
+            return False
+        finally:
+            conexion.close()
+
+    def actualizarProducto(self):
+        pass
+
+    def devolverProducto(self):
+        pass
