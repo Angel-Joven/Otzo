@@ -250,6 +250,7 @@ function Inventario() {
                 <input
                   id="add_price_unit_input"
                   type="number"
+                  step="0.01"
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
@@ -259,6 +260,7 @@ function Inventario() {
                 <input
                   id="add_max_quantity_input"
                   type="number"
+                  step="1"
                   placeholder="Introduce la cantidad máxima para reabastecer"
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
@@ -341,6 +343,7 @@ function Inventario() {
                   defaultValue={productoAEditar.precio_unitario}
                   id="edit_price_unit_input"
                   type="number"
+                  step="0.01"
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
@@ -351,6 +354,7 @@ function Inventario() {
                   defaultValue={productoAEditar.cantidad_tipo_producto}
                   id="edit_amount_product_input"
                   type="number"
+                  step="1"
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
@@ -361,6 +365,7 @@ function Inventario() {
                   defaultValue={productoAEditar.cantidad_maxima_producto}
                   id="edit_max_quantity_input"
                   type="number"
+                  step="1"
                   placeholder="Introduce la cantidad máxima del producto a reabastecer..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
@@ -410,11 +415,13 @@ function Inventario() {
                 <input
                   id="replenish_product_quantity_input"
                   type="number"
+                  step="1"
                   placeholder="Introduce la cantidad para agregar..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
                 <input
                   type="number"
+                  step="1"
                   className="hidden"
                   defaultValue={productoAReabastecer.id_inventario}
                   id="replenish_product_id_input"
