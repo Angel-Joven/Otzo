@@ -11,6 +11,7 @@ export default function ProductCard({
   precio,
   id,
   descontinuado,
+  cantidad_maxima_producto,
   recargar,
   setRecargar,
   abrirEditar,
@@ -26,6 +27,7 @@ export default function ProductCard({
       descripcion_tipo_producto: descripcion,
       precio_unitario: precio,
       cantidad_tipo_producto: cantidad,
+      cantidad_maxima_producto: cantidad_maxima_producto,
       descontinuado: true,
       id_inventario: id,
     })
@@ -49,6 +51,7 @@ export default function ProductCard({
       descripcion_tipo_producto: descripcion,
       precio_unitario: precio,
       cantidad_tipo_producto: cantidad,
+      cantidad_maxima_producto: cantidad_maxima_producto,
       descontinuado: false,
       id_inventario: id,
     })
@@ -70,6 +73,7 @@ export default function ProductCard({
       precio_unitario: precio,
       cantidad_tipo_producto: cantidad,
       descontinuado: descontinuado,
+      cantidad_maxima_producto: cantidad_maxima_producto,
       id_inventario: id,
     });
     abrirEditar(true);

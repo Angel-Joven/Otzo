@@ -1,7 +1,5 @@
 from . import inventario_bp  # Importa el Blueprint de ventas
 from flask import request, jsonify, Response
-from pymysql.cursors import DictCursor
-from src.db import get_connection
 from datetime import datetime
 from decimal import Decimal
 from . import inventario_bp  # Importa el Blueprint de ventas
@@ -102,6 +100,9 @@ def agregar_tipo_producto():
         data["categoria_tipo_producto"],
         data["descripcion_tipo_producto"],
         data["precio_unitario"],
+        0,
+        False,
+        data["cantidad_maxima_producto"],
     )
 
     resultado = inventario_servicio.agregarTipoProducto(nuevo_tipo_producto)
@@ -126,8 +127,9 @@ def actualizar_tipo_producto():
         data["categoria_tipo_producto"],
         data["descripcion_tipo_producto"],
         data["precio_unitario"],
-        data["descontinuado"],
         data["cantidad_tipo_producto"],
+        data["descontinuado"],
+        data["cantidad_maxima_producto"],
         data["id_inventario"],
     )
 
@@ -153,8 +155,9 @@ def descontinuar_tipo_producto():
         data["categoria_tipo_producto"],
         data["descripcion_tipo_producto"],
         data["precio_unitario"],
-        data["descontinuado"],
         data["cantidad_tipo_producto"],
+        data["descontinuado"],
+        data["cantidad_maxima_producto"],
         data["id_inventario"],
     )
 

@@ -6,7 +6,6 @@ from src.models.inventario.InventarioDTOs import InventarioDTO, DetalleInventari
 
 from dataclasses import dataclass
 from src.db import get_connection
-from decimal import Decimal
 from pymysql.cursors import DictCursor
 import string
 import random
@@ -33,7 +32,7 @@ class InventarioServicio(InventarioModelo):
                 raise Exception("No se puede agregar un producto que ya existe")
 
             cursor.execute(
-                "INSERT INTO inventario (nombre_producto, imagen_producto, categoria_producto, cantidad_producto, descripcion_producto, precio_unitario, descontinuado) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                "INSERT INTO inventario (nombre_producto, imagen_producto, categoria_producto, cantidad_producto, descripcion_producto, precio_unitario, descontinuado, cantidad_maxima_producto) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 (
                     tipo_producto.nombre_producto,
                     tipo_producto.imagen_producto,
@@ -42,6 +41,7 @@ class InventarioServicio(InventarioModelo):
                     tipo_producto.descripcion_producto,
                     tipo_producto.precio_unitario,
                     tipo_producto.descontinuado,
+                    tipo_producto.cantidad_maxima_producto,
                 ),
             )
 
@@ -64,7 +64,7 @@ class InventarioServicio(InventarioModelo):
             conexion.begin()
 
             cursor.execute(
-                "UPDATE inventario SET nombre_producto = %s, imagen_producto = %s, categoria_producto = %s, cantidad_producto = %s, descripcion_producto = %s, precio_unitario = %s, descontinuado = %s WHERE id_inventario = %s",
+                "UPDATE inventario SET nombre_producto = %s, imagen_producto = %s, categoria_producto = %s, cantidad_producto = %s, descripcion_producto = %s, precio_unitario = %s, descontinuado = %s, cantidad_maxima_producto = %s WHERE id_inventario = %s",
                 (
                     datos_producto.nombre_producto,
                     datos_producto.imagen_producto,
@@ -73,6 +73,7 @@ class InventarioServicio(InventarioModelo):
                     datos_producto.descripcion_producto,
                     datos_producto.precio_unitario,
                     datos_producto.descontinuado,
+                    datos_producto.cantidad_maxima_producto,  # La cantidad máxima del producto
                     datos_producto.id_inventario,  # El identificador del producto
                 ),
             )
@@ -212,19 +213,14 @@ class DetalleInventarioServicio(DetalleInventarioModelo):
             fecha_caducidad = datetime.now() + timedelta(days=30)
             costo_unitario = self.generarPrecioProducto(precio_producto)
 
-            for i in range(int(cantidad)):
-                cursor.execute(
-                    "INSERT INTO detalle_inventario (id_inventario, codigo_producto, fecha_producto, caducidad_producto, costo_unitario, vendido, devuelto) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                    (
-                        id_tipo_producto,
-                        self.generarCodigoProducto(),
-                        fecha_actual,
-                        fecha_caducidad,
-                        costo_unitario,
-                        False,
-                        False,
-                    ),
-                )
+            cursor.execute(
+                "SELECT cantidad_maxima_producto FROM inventario where id_inventario = %s",
+                id_tipo_producto,
+            )
+
+            cantidad_maxima_producto = int(
+                cursor.fetchone()["cantidad_maxima_producto"]
+            )
 
             cursor.execute(
                 "SELECT cantidad_producto FROM inventario WHERE id_inventario = %s",
@@ -233,14 +229,61 @@ class DetalleInventarioServicio(DetalleInventarioModelo):
 
             cantidad_actual = int(cursor.fetchone()["cantidad_producto"])
 
-            cursor.execute(
-                "UPDATE inventario SET cantidad_producto = %s WHERE id_inventario = %s",
-                (
-                    cantidad_actual + int(cantidad),
-                    id_tipo_producto,
-                ),
-            )
+            print(cantidad_maxima_producto, cantidad_actual, cantidad)
+            nueva_cantidad = cantidad_maxima_producto - cantidad_actual
 
+            if cantidad_actual == cantidad_maxima_producto:
+                raise Exception("Ya hay el stock maximo")
+
+            if int(cantidad) <= nueva_cantidad:
+                for i in range(int(cantidad)):
+                    cursor.execute(
+                        "INSERT INTO detalle_inventario (id_inventario, codigo_producto, fecha_producto, caducidad_producto, costo_unitario, vendido, devuelto) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                        (
+                            id_tipo_producto,
+                            self.generarCodigoProducto(),
+                            fecha_actual,
+                            fecha_caducidad,
+                            costo_unitario,
+                            False,
+                            False,
+                        ),
+                    )
+
+                cursor.execute(
+                    "SELECT cantidad_producto FROM inventario WHERE id_inventario = %s",
+                    id_tipo_producto,
+                )
+
+                cursor.execute(
+                    "UPDATE inventario SET cantidad_producto = %s WHERE id_inventario = %s",
+                    (
+                        cantidad_actual + int(cantidad),
+                        id_tipo_producto,
+                    ),
+                )
+            else:
+                for i in range(nueva_cantidad):
+                    cursor.execute(
+                        "INSERT INTO detalle_inventario (id_inventario, codigo_producto, fecha_producto, caducidad_producto, costo_unitario, vendido, devuelto) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                        (
+                            id_tipo_producto,
+                            self.generarCodigoProducto(),
+                            fecha_actual,
+                            fecha_caducidad,
+                            costo_unitario,
+                            False,
+                            False,
+                        ),
+                    )
+
+                cursor.execute(
+                    "UPDATE inventario SET cantidad_producto = %s WHERE id_inventario = %s",
+                    (
+                        cantidad_maxima_producto,
+                        id_tipo_producto,
+                    ),
+                )
             conexion.commit()
 
             return True

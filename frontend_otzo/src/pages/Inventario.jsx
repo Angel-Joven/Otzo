@@ -96,11 +96,12 @@ function Inventario() {
     e.preventDefault();
 
     const nuevoProducto = {
-      nombre_tipo_producto: e.target.edit_product_title_input.value,
-      imagen_tipo_producto: e.target.edit_product_image_input.value,
-      categoria_tipo_producto: e.target.edit_product_category_input.value,
-      descripcion_tipo_producto: e.target.edit_product_description_input.value,
+      nombre_tipo_producto: e.target.add_product_title_input.value,
+      imagen_tipo_producto: e.target.add_product_image_input.value,
+      categoria_tipo_producto: e.target.add_product_category_input.value,
+      descripcion_tipo_producto: e.target.add_product_description_input.value,
       precio_unitario: e.target.add_price_unit_input.value,
+      cantidad_maxima_producto: e.target.add_max_quantity_input.value,
     };
 
     try {
@@ -134,6 +135,7 @@ function Inventario() {
       precio_unitario: e.target.edit_price_unit_input.value,
       cantidad_tipo_producto: e.target.edit_amount_product_input.value,
       descontinuado: !e.target.edit_enable_input.checked,
+      cantidad_maxima_producto: e.target.edit_max_quantity_input.value,
       id_inventario: e.target.id_inventario.value,
     };
 
@@ -251,6 +253,15 @@ function Inventario() {
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
+                <label htmlFor="add_max_quantity_input" className="block">
+                  Cantidad máxima del producto:
+                </label>
+                <input
+                  id="add_max_quantity_input"
+                  type="number"
+                  placeholder="Introduce la cantidad máxima para reabastecer"
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
                 <input
                   type="submit"
                   value="Crear producto"
@@ -341,6 +352,16 @@ function Inventario() {
                   id="edit_amount_product_input"
                   type="number"
                   placeholder="Introduce tu precio..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="edit_max_quantity_input" className="block">
+                  Cantidad máxima del producto:
+                </label>
+                <input
+                  defaultValue={productoAEditar.cantidad_maxima_producto}
+                  id="edit_max_quantity_input"
+                  type="number"
+                  placeholder="Introduce la cantidad máxima del producto a reabastecer..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
                 <label htmlFor="edit_enable_input" className="hidden">
@@ -469,6 +490,9 @@ function Inventario() {
                       precio={producto.precio_unitario}
                       id={producto.id_inventario}
                       descontinuado={producto.descontinuado}
+                      cantidad_maxima_producto={
+                        producto.cantidad_maxima_producto
+                      }
                       recargar={recargarProductos}
                       setRecargar={setRecargarProductos}
                       abrirEditar={setisDialogEditTypeProductOpen}
@@ -491,6 +515,9 @@ function Inventario() {
                       precio={producto.precio_unitario}
                       id={producto.id_inventario}
                       descontinuado={producto.descontinuado}
+                      cantidad_maxima_producto={
+                        producto.cantidad_maxima_producto
+                      }
                       recargar={recargarProductos}
                       setRecargar={setRecargarProductos}
                       abrirEditar={setisDialogEditTypeProductOpen}
