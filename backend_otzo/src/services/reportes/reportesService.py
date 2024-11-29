@@ -47,83 +47,62 @@ class ReportesService(ReportesModelo):
 
 
     @staticmethod
-    def crear_reporte_ventas(fecha_reporte):
+    def generar_reporte_ventas():
         """
-        Genera un reporte de ventas filtrado por una fecha específica.
-
-        :param fecha_reporte: Fecha en formato 'YYYY-MM-DD' para filtrar las ventas.
+        Genera un reporte de todas las ventas registradas, incluyendo sus detalles.
         """
-        conexion = get_connection()
-        cursor = conexion.cursor(DictCursor)
         try:
-            # Consultar las ventas del día
+            # Conexión a la base de datos
+            conexion = get_connection()
+            cursor = conexion.cursor()
+
+            # Consultar todas las ventas con datos relacionados
             cursor.execute("""
                 SELECT v.id_venta, v.total_venta, v.fecha_venta, c.nombre AS cliente, e.nombre AS empleado
                 FROM ventas v
-                JOIN clientes c ON v.id_cliente = c.id_cliente
-                JOIN empleados e ON v.id_empleado = e.id_empleado
-                WHERE DATE(v.fecha_venta) = %s
-            """, (fecha_reporte,))
+                LEFT JOIN clientes c ON v.id_cliente = c.id_cliente
+                LEFT JOIN empleados e ON v.id_empleado = e.id_empleado
+            """)
             ventas = cursor.fetchall()
 
+            # Verificar si hay ventas registradas
             if not ventas:
-                return {"mensaje": f"No se encontraron ventas para la fecha {fecha_reporte}"}
+                return {"mensaje": "No se encontraron ventas registradas."}
 
-            # Procesar cada venta y obtener detalles
+            # Generar el reporte con los detalles de cada venta
             reporte = []
             for venta in ventas:
                 cursor.execute("""
                     SELECT nombre_producto, precio_unitario, cantidad
                     FROM detalle_ventas
                     WHERE id_venta = %s
-                """, (venta["id_venta"],))
+                """, (venta[0],))
                 detalles = cursor.fetchall()
 
-                venta_dto = VentaDTO(
-                    id_venta=venta["id_venta"],
-                    total_venta=venta["total_venta"],
-                    fecha_venta=venta["fecha_venta"],
-                    cliente=venta["cliente"],
-                    empleado=venta["empleado"],
-                    detalles=detalles,
-                )
-                reporte.append(venta_dto.to_dict())
+                reporte.append({
+                    "id_venta": venta[0],
+                    "total_venta": venta[1],
+                    "fecha_venta": venta[2],
+                    "cliente": venta[3] or "Sin asignar",
+                    "empleado": venta[4] or "Sin asignar",
+                    "detalles": [
+                        {
+                            "nombre_producto": detalle[0],
+                            "precio_unitario": detalle[1],
+                            "cantidad": detalle[2]
+                        }
+                        for detalle in detalles
+                    ]
+                })
 
-            return reporte
-        finally:
-            conexion.close()
-
-    @staticmethod
-    def crear_reporte_quejas():
-        """
-        Genera un reporte de quejas agrupadas por categoría.
-        """
-        conexion = get_connection()
-        try:
-            with conexion.cursor(DictCursor) as cursor:
-                query = """
-                    SELECT categoria, COUNT(id_queja) AS cantidad, GROUP_CONCAT(id_queja) AS ids_quejas
-                    FROM quejas
-                    GROUP BY categoria
-                    ORDER BY cantidad DESC
-                """
-                cursor.execute(query)
-                resultados = cursor.fetchall()
-
-            reporte = [
-                QuejasReporteDTO(
-                    categoria=resultado["categoria"],
-                    cantidad=resultado["cantidad"],
-                    ids_quejas=resultado["ids_quejas"].split(","),
-                ).to_dict()
-                for resultado in resultados
-            ]
-
+            # Retornar el reporte como lista de diccionarios
             return reporte
         except Exception as e:
-            return {"error": f"Error al generar el reporte de quejas: {str(e)}"}
+            raise Exception(f"Error al generar el reporte de ventas: {str(e)}")
         finally:
-            conexion.close()
+            # Asegurar que la conexión se cierre
+            if 'conexion' in locals():
+                conexion.close()
 
     @staticmethod
     def crear_reporte_inventario():

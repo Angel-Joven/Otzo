@@ -38,17 +38,51 @@ def generar_reporte_puntos():
 
 @reportes_bp.route("/reporte-ventas", methods=["GET"])
 def generar_reporte_ventas():
+    """
+    Genera un reporte de ventas sin necesidad de filtrar por fecha.
+    """
     try:
-        fecha_reporte = request.args.get("fecha")  # Obtener fecha desde los parámetros de consulta
-        if not fecha_reporte:
-            return jsonify({"error": "La fecha es obligatoria"}), 400
+        # Conexión a la base de datos
+        conexion = get_connection()
+        cursor = conexion.cursor(DictCursor)
 
-        reporte = ReportesService.crear_reporte_ventas(fecha_reporte)
+        # Consultar todas las ventas
+        cursor.execute("""
+            SELECT v.id_venta, v.total_venta, v.fecha_venta, c.nombre AS cliente, e.nombre AS empleado
+            FROM ventas v
+            JOIN clientes c ON v.id_cliente = c.id_cliente
+            JOIN empleados e ON v.id_empleado = e.id_empleado
+        """)
+        ventas = cursor.fetchall()
+
+        if not ventas:
+            return jsonify({"mensaje": "No se encontraron ventas registradas."}), 200
+
+        # Procesar cada venta y obtener detalles
+        reporte = []
+        for venta in ventas:
+            cursor.execute("""
+                SELECT nombre_producto, precio_unitario, cantidad
+                FROM detalle_ventas
+                WHERE id_venta = %s
+            """, (venta["id_venta"],))
+            detalles = cursor.fetchall()
+
+            reporte.append({
+                "id_venta": venta["id_venta"],
+                "total_venta": venta["total_venta"],
+                "fecha_venta": venta["fecha_venta"],
+                "cliente": venta["cliente"],
+                "empleado": venta["empleado"],
+                "detalles": detalles,
+            })
+
         return jsonify(reporte), 200
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Error al generar el reporte de ventas: {str(e)}"}), 500
+    finally:
+        if 'conexion' in locals():
+            conexion.close()
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
