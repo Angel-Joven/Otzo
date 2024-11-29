@@ -131,6 +131,24 @@ class InventarioServicio(InventarioModelo):
         finally:
             conexion.close()
 
+    def listarTipoProductosALaVenta(self) -> dict:
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            cursor.execute(
+                "SELECT * FROM inventario where descontinuado = 0 and cantidad_producto > 0"
+            )
+
+            return cursor.fetchall()
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
+
     def listarTipoProductosDescontinuados(self) -> dict:
         try:
             conexion = get_connection()

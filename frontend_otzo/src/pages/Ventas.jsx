@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import Spinner from "../components/ventas/Spinner";
 import { obtenerTodosLosProductos } from "../api/inventario.api";
+import RowCarrito from "../components/ventas/RowCarrito";
 
 export function Ventas() {
   const [productos, setProductos] = useState([]);
@@ -30,6 +31,37 @@ export function Ventas() {
     },
   };
 
+  const agregarAlCarrito = (producto) => {
+    setCarrito((prevCarrito) => {
+      // Verificar si el producto ya está en el carrito
+      const productoExistente = prevCarrito.find(
+        (item) => item.id_inventario === producto.id_inventario
+      );
+
+      if (productoExistente) {
+        // Incrementar la cantidad del producto, respetando el límite disponible
+        return prevCarrito.map((item) =>
+          item.id_inventario === producto.id_inventario
+            ? {
+                ...item,
+                cantidad: Math.min(
+                  item.cantidad + 1,
+                  producto.cantidad_producto
+                ), // No exceder cantidad disponible
+              }
+            : item
+        );
+      } else {
+        // Agregar el producto con cantidad inicial de 1
+        return [...prevCarrito, { ...producto, cantidad: 1 }];
+      }
+    });
+  };
+
+  useEffect(() => {
+    console.log(carrito);
+  }, [carrito]);
+
   //Cargar productos
   useEffect(() => {
     obtenerTodosLosProductos()
@@ -48,7 +80,9 @@ export function Ventas() {
       name: "Acciones",
       cell: (row) => (
         <button
-          onClick={() => setCarrito((prevCarrito) => [...prevCarrito, row])}
+          onClick={() => {
+            agregarAlCarrito(row);
+          }}
           className="bg-green-500 p-2 text-white font-bold"
         >
           <i className="fi fi-sr-shopping-cart-add"></i> Agregar
@@ -121,7 +155,18 @@ export function Ventas() {
             </div>
             <div>
               {carrito.map((producto, index) => {
-                return <h1 key={index}>{producto.nombre_producto}</h1>;
+                return (
+                  <RowCarrito
+                    id_producto={producto.id_inventario}
+                    nombre_producto={producto.nombre_producto}
+                    imagen_producto={producto.imagen_producto}
+                    cantidad_producto={producto.cantidad_producto}
+                    precio_producto={producto.precio_unitario}
+                    cantidad={producto.cantidad}
+                    setCarrito={setCarrito}
+                    key={index}
+                  />
+                );
               })}
             </div>
           </div>
