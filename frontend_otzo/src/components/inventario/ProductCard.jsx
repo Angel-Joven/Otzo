@@ -11,10 +11,13 @@ export default function ProductCard({
   precio,
   id,
   descontinuado,
+  cantidad_maxima_producto,
   recargar,
   setRecargar,
   abrirEditar,
   cambiarProductoAEditar,
+  abrirReabastecer,
+  cambiarProductoAReabastecer,
 }) {
   const descontinuarProducto = () => {
     descontinuarTipoProducto({
@@ -24,6 +27,7 @@ export default function ProductCard({
       descripcion_tipo_producto: descripcion,
       precio_unitario: precio,
       cantidad_tipo_producto: cantidad,
+      cantidad_maxima_producto: cantidad_maxima_producto,
       descontinuado: true,
       id_inventario: id,
     })
@@ -47,6 +51,7 @@ export default function ProductCard({
       descripcion_tipo_producto: descripcion,
       precio_unitario: precio,
       cantidad_tipo_producto: cantidad,
+      cantidad_maxima_producto: cantidad_maxima_producto,
       descontinuado: false,
       id_inventario: id,
     })
@@ -68,9 +73,17 @@ export default function ProductCard({
       precio_unitario: precio,
       cantidad_tipo_producto: cantidad,
       descontinuado: descontinuado,
+      cantidad_maxima_producto: cantidad_maxima_producto,
       id_inventario: id,
     });
     abrirEditar(true);
+  };
+
+  const activarModalReabastecer = () => {
+    cambiarProductoAReabastecer({
+      id_inventario: id,
+    });
+    abrirReabastecer(true);
   };
 
   return (
@@ -110,7 +123,10 @@ export default function ProductCard({
       {/* Botones */}
       <div className="flex justify-center gap-4 py-2">
         {descontinuado ? null : (
-          <button className="bg-green-500 rounded-lg p-2">
+          <button
+            onClick={activarModalReabastecer}
+            className="bg-green-500 rounded-lg p-2"
+          >
             <i className="align-middle fi fi-br-plus"></i>
           </button>
         )}

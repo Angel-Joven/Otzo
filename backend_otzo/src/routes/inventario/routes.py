@@ -1,14 +1,15 @@
 from . import inventario_bp  # Importa el Blueprint de ventas
 from flask import request, jsonify, Response
-from pymysql.cursors import DictCursor
-from src.db import get_connection
 from datetime import datetime
 from decimal import Decimal
 from . import inventario_bp  # Importa el Blueprint de ventas
 import json
 from flask_cors import cross_origin
 
-from src.services.inventario.InventarioServicio import InventarioServicio
+from src.services.inventario.InventarioServicio import (
+    InventarioServicio,
+    DetalleInventarioServicio,
+)
 from src.models.inventario.InventarioDTOs import InventarioDTO
 
 
@@ -99,6 +100,9 @@ def agregar_tipo_producto():
         data["categoria_tipo_producto"],
         data["descripcion_tipo_producto"],
         data["precio_unitario"],
+        0,
+        False,
+        data["cantidad_maxima_producto"],
     )
 
     resultado = inventario_servicio.agregarTipoProducto(nuevo_tipo_producto)
@@ -123,8 +127,9 @@ def actualizar_tipo_producto():
         data["categoria_tipo_producto"],
         data["descripcion_tipo_producto"],
         data["precio_unitario"],
-        data["descontinuado"],
         data["cantidad_tipo_producto"],
+        data["descontinuado"],
+        data["cantidad_maxima_producto"],
         data["id_inventario"],
     )
 
@@ -150,8 +155,9 @@ def descontinuar_tipo_producto():
         data["categoria_tipo_producto"],
         data["descripcion_tipo_producto"],
         data["precio_unitario"],
-        data["descontinuado"],
         data["cantidad_tipo_producto"],
+        data["descontinuado"],
+        data["cantidad_maxima_producto"],
         data["id_inventario"],
     )
 
@@ -161,3 +167,24 @@ def descontinuar_tipo_producto():
         return jsonify({"mensaje": "Tipo de producto descontinuado correctamente"}), 200
     else:
         return jsonify({"error": "No se pudo descontinuar el tipo de producto"}), 500
+
+
+@inventario_bp.route("/reabastecer", methods=["POST"])
+@cross_origin()
+def reabastecer():
+
+    data = request.json
+
+    inventario_servicio = DetalleInventarioServicio()
+
+    resultado = inventario_servicio.agregarProducto(
+        data["id_inventario"], data["cantidad"]
+    )
+
+    if resultado:
+        return (
+            jsonify({"mensaje": "Cantidad de productos agregados correctamente"}),
+            200,
+        )
+    else:
+        return jsonify({"error": "No se pudo agregar la cantidad de productos"}), 500

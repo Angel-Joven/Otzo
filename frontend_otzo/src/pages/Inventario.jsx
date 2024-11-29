@@ -4,6 +4,7 @@ import {
   obtenerTodosLosProductosDescontinuados,
   obtenerCategoriasTipoProductos,
   actualizarTipoProducto,
+  reabastecerProducto,
 } from "../api/inventario.api";
 import React, { useState, useEffect } from "react";
 import ProductCard from "../components/inventario/ProductCard";
@@ -25,6 +26,10 @@ function Inventario() {
     useState(false);
 
   const [productoAEditar, setProductoAEditar] = useState({});
+
+  const [isDialogReplenishOpen, setIsDialogReplenishOpen] = useState(false);
+
+  const [productoAReabastecer, setProductoAReabastecer] = useState({});
 
   useEffect(() => {
     obtenerTodosLosProductos()
@@ -79,6 +84,7 @@ function Inventario() {
     setDescontinuados(!descontinuados);
   };
 
+  //ADD PRODUCTS
   const handleModalAddNewTipeProductClick = (e) => {
     // Cierra el diálogo si se hace clic fuera del recuadro
     if (e.target.id === "modalAddProduct") {
@@ -86,31 +92,35 @@ function Inventario() {
     }
   };
 
-  const handleModalEditTypeProduct = (e) => {
-    // Cierra el diálogo si se hace clic fuera del recuadro
-    if (e.target.id === "modalEditProduct") {
-      setisDialogEditTypeProductOpen(false);
-    }
-  };
-
   const handleFormModalAddNewTipeProduct = async (e) => {
     e.preventDefault();
 
     const nuevoProducto = {
-      nombre_tipo_producto: e.target.edit_product_title_input.value,
-      imagen_tipo_producto: e.target.edit_product_image_input.value,
-      categoria_tipo_producto: e.target.edit_product_category_input.value,
-      descripcion_tipo_producto: e.target.edit_product_description_input.value,
+      nombre_tipo_producto: e.target.add_product_title_input.value,
+      imagen_tipo_producto: e.target.add_product_image_input.value,
+      categoria_tipo_producto: e.target.add_product_category_input.value,
+      descripcion_tipo_producto: e.target.add_product_description_input.value,
       precio_unitario: e.target.add_price_unit_input.value,
+      cantidad_maxima_producto: e.target.add_max_quantity_input.value,
     };
 
     try {
-      crearTipoProducto(nuevoProducto);
-      console.log("Producto agregado con éxito.");
-      setIsDialogOpen(false);
-      setRecargarProductos(!recargarProductos);
+      crearTipoProducto(nuevoProducto).then((res) => {
+        console.log("Producto agregado con éxito.");
+        setIsDialogOpen(false);
+        setRecargarProductos(!recargarProductos);
+      });
     } catch (error) {
       console.error("Error al agregar el producto:", error);
+    }
+  };
+
+  //EDIT PRODUCTS
+
+  const handleModalEditTypeProduct = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalEditProduct") {
+      setisDialogEditTypeProductOpen(false);
     }
   };
 
@@ -125,18 +135,50 @@ function Inventario() {
       precio_unitario: e.target.edit_price_unit_input.value,
       cantidad_tipo_producto: e.target.edit_amount_product_input.value,
       descontinuado: !e.target.edit_enable_input.checked,
+      cantidad_maxima_producto: e.target.edit_max_quantity_input.value,
       id_inventario: e.target.id_inventario.value,
     };
 
     console.log(productoEditado);
 
     try {
-      actualizarTipoProducto(productoEditado);
-      console.log("Producto actualizado con éxito.");
-      setisDialogEditTypeProductOpen(false);
-      setRecargarProductos(!recargarProductos);
+      actualizarTipoProducto(productoEditado).then((res) => {
+        console.log("Producto actualizado con éxito.");
+        setisDialogEditTypeProductOpen(false);
+        setRecargarProductos(!recargarProductos);
+      });
     } catch (error) {
       console.error("Error al actualizar el producto:", error);
+    }
+  };
+
+  //REABASTECER
+
+  const handleModalReplenishProduct = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalReplenishProduct") {
+      setIsDialogReplenishOpen(false);
+    }
+  };
+
+  const handleFormModalReplenishProduct = async (e) => {
+    e.preventDefault();
+
+    const solicitud = {
+      id_inventario: e.target.replenish_product_id_input.value,
+      cantidad: e.target.replenish_product_quantity_input.value,
+    };
+
+    console.log(solicitud);
+
+    try {
+      reabastecerProducto(solicitud).then((res) => {
+        console.log("Producto reabastecido con éxito.");
+        setIsDialogReplenishOpen(false);
+        setRecargarProductos(!recargarProductos);
+      });
+    } catch (error) {
+      console.error("Error al reabastecer el producto:", error);
     }
   };
 
@@ -208,7 +250,18 @@ function Inventario() {
                 <input
                   id="add_price_unit_input"
                   type="number"
+                  step="0.01"
                   placeholder="Introduce tu precio..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="add_max_quantity_input" className="block">
+                  Cantidad máxima del producto:
+                </label>
+                <input
+                  id="add_max_quantity_input"
+                  type="number"
+                  step="1"
+                  placeholder="Introduce la cantidad máxima para reabastecer"
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
                 <input
@@ -290,6 +343,7 @@ function Inventario() {
                   defaultValue={productoAEditar.precio_unitario}
                   id="edit_price_unit_input"
                   type="number"
+                  step="0.01"
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
@@ -300,7 +354,19 @@ function Inventario() {
                   defaultValue={productoAEditar.cantidad_tipo_producto}
                   id="edit_amount_product_input"
                   type="number"
+                  step="1"
                   placeholder="Introduce tu precio..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <label htmlFor="edit_max_quantity_input" className="block">
+                  Cantidad máxima del producto:
+                </label>
+                <input
+                  defaultValue={productoAEditar.cantidad_maxima_producto}
+                  id="edit_max_quantity_input"
+                  type="number"
+                  step="1"
+                  placeholder="Introduce la cantidad máxima del producto a reabastecer..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 />
                 <label htmlFor="edit_enable_input" className="hidden">
@@ -321,6 +387,48 @@ function Inventario() {
                 <input
                   type="submit"
                   value="Editar producto"
+                  className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
+                />
+              </form>
+            </div>
+          </dialog>
+        )}
+
+        {isDialogReplenishOpen && (
+          <dialog
+            id="modalReplenishProduct"
+            className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
+            onClick={handleModalReplenishProduct}
+          >
+            <div
+              className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
+              onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
+            >
+              <p className="font-bold text-xl">Reabastece un producto:</p>
+              <form onSubmit={handleFormModalReplenishProduct}>
+                <label
+                  htmlFor="replenish_product_quantity_input"
+                  className="block"
+                >
+                  Cantidad a reabastecer:
+                </label>
+                <input
+                  id="replenish_product_quantity_input"
+                  type="number"
+                  step="1"
+                  placeholder="Introduce la cantidad para agregar..."
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                />
+                <input
+                  type="number"
+                  step="1"
+                  className="hidden"
+                  defaultValue={productoAReabastecer.id_inventario}
+                  id="replenish_product_id_input"
+                />
+                <input
+                  type="submit"
+                  value="Reabastecer producto"
                   className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
                 />
               </form>
@@ -389,11 +497,16 @@ function Inventario() {
                       precio={producto.precio_unitario}
                       id={producto.id_inventario}
                       descontinuado={producto.descontinuado}
+                      cantidad_maxima_producto={
+                        producto.cantidad_maxima_producto
+                      }
                       recargar={recargarProductos}
                       setRecargar={setRecargarProductos}
                       abrirEditar={setisDialogEditTypeProductOpen}
                       productoAEditar={productoAEditar}
                       cambiarProductoAEditar={setProductoAEditar}
+                      abrirReabastecer={setIsDialogReplenishOpen}
+                      cambiarProductoAReabastecer={setProductoAReabastecer}
                     />
                   );
                 })
@@ -409,11 +522,16 @@ function Inventario() {
                       precio={producto.precio_unitario}
                       id={producto.id_inventario}
                       descontinuado={producto.descontinuado}
+                      cantidad_maxima_producto={
+                        producto.cantidad_maxima_producto
+                      }
                       recargar={recargarProductos}
                       setRecargar={setRecargarProductos}
                       abrirEditar={setisDialogEditTypeProductOpen}
                       productoAEditar={productoAEditar}
                       cambiarProductoAEditar={setProductoAEditar}
+                      abrirReabastecer={setIsDialogReplenishOpen}
+                      cambiarProductoAReabastecer={setProductoAReabastecer}
                     />
                   );
                 })}
