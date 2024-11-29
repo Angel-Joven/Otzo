@@ -36,29 +36,34 @@ def login():
         return jsonify({"error": "Faltan datos de inicio de sesion"}), 400
 
     try:
-        connection = get_connection()
-        with connection.cursor(DictCursor) as cursor:
+        conexion = get_connection()
+        with conexion.cursor(DictCursor) as cursor:
             cursor.execute(
                 "SELECT idCliente, nombre, contraseña FROM clientes WHERE nombre = %s",
                 (nombre,)
             )
             cliente = cursor.fetchone()
 
-        if not cliente:
-            return jsonify({"error": "La cuenta no existe"}), 404
+            if not cliente:
+                return jsonify({"error": "La cuenta no existe"}), 404
 
-        if cliente['contraseña'] != contraseña:
-            return jsonify({"error": "La contraseña es incorrecta"}), 401
+            if cliente['contraseña'] != contraseña:
+                return jsonify({"error": "La contraseña es incorrecta"}), 401
 
-        return jsonify({
-            "mensaje": "Inicio de sesión exitoso",
-            "idCliente": cliente['idCliente']
-        }), 200
+            cursor.execute(
+                "UPDATE clientes SET ultimo_acceso = NOW() WHERE idCliente = %s",
+                (cliente['idCliente'],)
+            )
+            conexion.commit()
 
+            return jsonify({
+                "mensaje": "Inicio de sesión exitoso",
+                "idCliente": cliente['idCliente']
+            }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        connection.close()
+        conexion.close()
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -112,23 +117,25 @@ def verificar_cliente():
         if not correo or not nombre or not apellido_paterno or not apellido_materno:
             return jsonify({"error": "Faltan datos para la verificacion"}), 400
 
-        connection = get_connection()
-        with connection.cursor(DictCursor) as cursor:
+        conexion = get_connection()
+        with conexion.cursor(DictCursor) as cursor:
             cursor.execute(
-                "SELECT COUNT(*) as cuenta FROM clientes WHERE contacto_correo = %s AND nombre = %s AND apellido_paterno = %s AND apellido_materno = %s",
-                (correo, nombre, apellido_paterno, apellido_materno)
+                #"SELECT COUNT(*) as cuenta FROM clientes WHERE contacto_correo = %s AND nombre = %s AND apellido_paterno = %s AND apellido_materno = %s",
+                #(correo, nombre, apellido_paterno, apellido_materno)
+                "SELECT COUNT(*) as cuenta FROM clientes WHERE contacto_correo = %s and nombre = %s",
+                (correo, nombre)
             )
             resultado = cursor.fetchone()
 
         if resultado['cuenta'] > 0:
-            return jsonify({"existe": True, "mensaje": "El cliente ya existe"}), 200
+            return jsonify({"existe": True, "mensaje": "El cliente/correo ya existe. Favor de iniciar sesion."}), 200
         else:
             return jsonify({"existe": False}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        connection.close()
+        conexion.close()
 
 # ---------------------------------------------------------------------------------------------------------------------------
 
@@ -145,8 +152,8 @@ def resetear_contraseña():
         if not nombre or not apellido_paterno or not apellido_materno or not nueva_contraseña:
             return jsonify({"error": "Faltan datos para resetear la contraseña"}), 400
 
-        connection = get_connection()
-        with connection.cursor(DictCursor) as cursor:
+        conexion = get_connection()
+        with conexion.cursor(DictCursor) as cursor:
             cursor.execute(
                 "SELECT idCliente FROM clientes WHERE nombre = %s AND apellido_paterno = %s AND apellido_materno = %s",
                 (nombre, apellido_paterno, apellido_materno)
@@ -156,19 +163,19 @@ def resetear_contraseña():
         if not cliente:
             return jsonify({"error": "Cliente no encontrado"}), 404
 
-        with connection.cursor() as cursor:
+        with conexion.cursor() as cursor:
             cursor.execute(
                 "UPDATE clientes SET contraseña = %s WHERE idCliente = %s",
                 (nueva_contraseña, cliente['idCliente'])
             )
-            connection.commit()
+            conexion.commit()
 
         return jsonify({"mensaje": "Contraseña actualizada con exito"}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        connection.close()
+        conexion.close()
 
 # ---------------------------------------------------------------------------------------------------------------------------
 

@@ -268,7 +268,7 @@ export function ClientesAdministracion() {
 
       <div className="flex flex-col gap-4 p-4 md:p-8">
         {/* Recuadro - Cliente actual */}
-        <div className="w-full flex justify-center">
+        {/*<div className="w-full flex justify-center">
           <motion.div
             initial={{ x: 0, opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { delay: 0.8 } }}
@@ -306,7 +306,7 @@ export function ClientesAdministracion() {
                       <td className="py-2 px-4 border-b text-center">{clienteActual.apellido_materno}</td>
                       <td className="py-2 px-4 border-b text-center">{clienteActual.contacto_correo}</td>
                       <td className="py-2 px-4 border-b text-center">{clienteActual.contacto_telefono}</td>
-                      {/* Para poder mostrar el total de puntos y el rango del cliente actual */}
+                        Para poder mostrar el total de puntos y el rango del cliente actual
                       <td className="py-2 px-4 border-b text-center">
                         {(() => {
                           const puntosCliente = puntos.find(p => p.idclientes_puntos === clienteActual.idCliente);
@@ -337,7 +337,7 @@ export function ClientesAdministracion() {
               </table>
             </div>
           </motion.div>
-        </div>
+        </div>*/}
         <div className="grid grid-cols-1 gap-4">
           {/* Recuadro - Lista de clientes */}
           <motion.div
@@ -368,6 +368,8 @@ export function ClientesAdministracion() {
                     <th className="py-2 px-4 border-b text-center">Total de Puntos</th>
                     <th className="py-2 px-4 border-b text-center">Rango Actual</th>
                     <th className="py-2 px-4 border-b text-center">Estado de la Cuenta</th>
+                    <th className="py-2 px-4 border-b text-center">Fecha de Alta</th>
+                    <th className="py-2 px-4 border-b text-center">Fecha de Ultimo Acceso</th>
                     <th className="py-2 px-4 border-b text-center">Accion</th>
                   </tr>
                 </thead>
@@ -399,6 +401,8 @@ export function ClientesAdministracion() {
                           })()}
                         </td>
                         <td className="py-2 px-4 border-b text-center">{cliente.estado_cuenta}</td>
+                        <td className="py-2 px-4 border-b text-center">{cliente.fechaDe_Alta}</td>
+                        <td className="py-2 px-4 border-b text-center">{cliente.ultimo_acceso}</td>
                         <td className="py-2 px-4 border-b text-center">
                           <button onClick={() => manejarClickModificar(cliente)} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Modificar</button>
                           <button onClick={() => manejarDarDeAlta(cliente.idCliente)} className="bg-green-500 text-white px-2 py-1 rounded mr-2">Dar de Alta</button>

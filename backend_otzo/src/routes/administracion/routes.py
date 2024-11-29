@@ -43,16 +43,24 @@ def login():
                 "SELECT id_empleado, nombre, contraseña FROM administracion WHERE nombre = %s",
                 (nombre,)
             )
-            cliente = cursor.fetchone()
+            administrador = cursor.fetchone()
 
-        if not cliente:
-            return jsonify({"error": "La cuenta no existe"}), 404
-        if cliente['contraseña'] != contraseña:
-            return jsonify({"error": "La contraseña es incorrecta"}), 401
-        return jsonify({
-            "mensaje": "Inicio de sesion exitoso",
-            "id_empleado": cliente['id_empleado']
-        }), 200
+            if not administrador:
+                return jsonify({"error": "La cuenta no existe"}), 404
+
+            if administrador['contraseña'] != contraseña:
+                return jsonify({"error": "La contraseña es incorrecta"}), 401
+
+            cursor.execute(
+                "UPDATE administracion SET ultimo_acceso = NOW() WHERE id_empleado = %s",
+                (administrador['id_empleado'],)
+            )
+            conexion.commit()
+
+            return jsonify({
+                "mensaje": "Inicio de sesion exitoso",
+                "id_empleado": administrador['id_empleado']
+            }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:

@@ -81,54 +81,67 @@ export function Administracion() {
     } = administrador;
 
     if (!nombre || !apellido_paterno || !apellido_materno) {
+      //alert("Por favor, complete los campos: Nombre, Apellido Paterno y Apellido Materno.");
       return "Por favor, complete los campos: Nombre, Apellido Paterno y Apellido Materno.";
     }
 
-    if (fecha_nacimiento && !/^\d{4}-\d{2}-\d{2}$/.test(fecha_nacimiento)) {
-      return "La fecha de nacimiento debe tener el formato AAAA-MM-DD.";
-    }
-
     if (!fecha_nacimiento) {
+      //alert("Ingrese una fecha de nacimiento.");
       return "Ingrese una fecha de nacimiento.";
     }
 
+    if (fecha_nacimiento && !/^\d{4}-\d{2}-\d{2}$/.test(fecha_nacimiento)) {
+      //alert("La fecha de nacimiento debe tener el formato AAAA-MM-DD.");
+      return "La fecha de nacimiento debe tener el formato AAAA-MM-DD.";
+    }
+
     if (genero !== "Masculino" && genero !== "Femenino") {
-      return "El genero debe ser 'Masculino' o 'Femenino'.";
+      //alert("Seleccione un genero. ('Masculino' o 'Femenino')");
+      return "Seleccione un genero. ('Masculino' o 'Femenino')";
     }
 
     if (!direccion_calle || !direccion_colonia || !direccion_codigopostal || !direccion_estado || !direccion_municipio) {
+      //alert("Por favor, complete los campos: Calle, Colonia, Codigo Postal, Estado y Municipio.");
       return "Por favor, complete los campos: Calle, Colonia, Codigo Postal, Estado y Municipio.";
     }
 
     if (direccion_codigopostal && (!/^\d{5,8}$/.test(direccion_codigopostal) || direccion_codigopostal.length > 10)) {
+      //alert("El codigo postal debe tener entre 5 y 8 digitos.");
       return "El codigo postal debe tener entre 5 y 8 digitos.";
     }
 
     if (!contacto_correo) {
+      //alert("Ingrese un correo electronico");
       return "Ingrese un correo electronico";
     }
 
     if (contacto_correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacto_correo)) {
+      //alert("Ingrese un correo electronico valido.");
       return "Ingrese un correo electronico valido.";
     }
 
     if (!contraseña) {
+      //alert("Ingrese una contraseña");
       return "Ingrese una contraseña";
     }
 
     if (contraseña && (contraseña.length > 255 || contraseña.length < 6)) {
+      //alert("La contraseña debe tener entre 6 y 255 caracteres.");
       return "La contraseña debe tener entre 6 y 255 caracteres.";
     }
 
     if (!contacto_telefono) {
+      //alert("Ingrese un numero telefonico");
       return "Ingrese un numero telefonico";
     }
 
     if (contacto_telefono && !/^\d{8,15}$/.test(contacto_telefono)) {
+      //alert("El telefono debe ser un numero valido de entre 8 y 15 digitos.");
       return "El telefono debe ser un numero valido de entre 8 y 15 digitos.";
     }
 
     if (!area_Trabajo) {
+      //alert("Seleccione un area de trabajo para el administrador.");
       return "Seleccione un area de trabajo para el administrador.";
     }
 
@@ -369,6 +382,8 @@ export function Administracion() {
                     <th className="py-2 px-4 border-b text-center">Telefono</th>
                     <th className="py-2 px-4 border-b text-center">Area de Trabajo</th>
                     <th className="py-2 px-4 border-b text-center">Estado de Cuenta</th>
+                    <th className="py-2 px-4 border-b text-center">Fecha de Alta</th>
+                    <th className="py-2 px-4 border-b text-center">Fecha de Ultimo Acceso</th>
                     <th className="py-2 px-4 border-b text-center">Accion</th>
                   </tr>
                 </thead>
@@ -384,6 +399,8 @@ export function Administracion() {
                         <td className="py-2 px-4 border-b text-center">{administrador.contacto_telefono}</td>
                         <td className="py-2 px-4 border-b text-center">{administrador.area_Trabajo}</td>
                         <td className="py-2 px-4 border-b text-center">{administrador.estado_cuenta}</td>
+                        <td className="py-2 px-4 border-b text-center">{administrador.fechaDe_Alta}</td>
+                        <td className="py-2 px-4 border-b text-center">{administrador.ultimo_acceso}</td>
                         <td className="py-2 px-4 border-b text-center">
                           <button onClick={() => manejarClickModificar(administrador)} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Modificar</button>
                           <button onClick={() => manejarDarDeAlta(administrador.id_empleado)} className="bg-green-500 text-white px-2 py-1 rounded mr-2">Dar de Alta</button>

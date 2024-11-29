@@ -77,9 +77,39 @@ export function LoginClientes() {
   const manejarCrearCuenta = async () => {
     const { nombre, apellido_paterno, apellido_materno, contacto_correo, contraseña } = nuevaCuenta;
 
-    if (!nombre || !apellido_paterno || !contacto_correo || !contraseña) {
-      alert("Por favor, completa todos los campos obligatorios.");
+    if (!nombre) {
+      alert("Por favor ingresa tu nombre");
       return;
+    }
+
+    if (!apellido_paterno) {
+      alert("Por favor ingresa tu apellido paterno");
+      return;
+    }
+
+    if (!apellido_materno) {
+      alert("Por favor ingresa tu apellido materno");
+      return;
+    }
+
+    if (!contacto_correo) {
+      alert("Ingrese un correo electronico");
+      return "Ingrese un correo electronico";
+    }
+
+    if (contacto_correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacto_correo)) {
+      alert("Ingrese un correo electronico valido.");
+      return "Ingrese un correo electronico valido.";
+    }
+
+    if (!contraseña) {
+      alert("Ingrese una contraseña");
+      return "Ingrese una contraseña";
+    }
+
+    if (contraseña && (contraseña.length > 255 || contraseña.length < 6)) {
+      alert("La contraseña debe tener entre 6 y 255 caracteres.");
+      return "La contraseña debe tener entre 6 y 255 caracteres.";
     }
 
     try {
@@ -91,6 +121,13 @@ export function LoginClientes() {
 
       await axios.post('http://localhost:5000/api/clientes/crearclientelogin', nuevaCuenta);
       alert('Cuenta creada con éxito. Por favor, inicie sesion.');
+      setNuevaCuenta({
+        nombre: '',
+        apellido_paterno: '',
+        apellido_materno: '',
+        contacto_correo: '',
+        contraseña: '',
+      });
       setMostrarModal(false);
     } catch (error) {
       console.error('Error al crear la cuenta:', error);
@@ -101,14 +138,40 @@ export function LoginClientes() {
   const manejarResetearContraseña = async () => {
     const { nombre, apellido_paterno, apellido_materno, nueva_contraseña } = resetData;
 
-    if (!nombre || !apellido_paterno || !apellido_materno || !nueva_contraseña) {
-      alert('Por favor, complete todos los campos obligatorios.');
+    if (!nombre) {
+      alert("Por favor ingresa tu nombre");
       return;
+    }
+
+    if (!apellido_paterno) {
+      alert("Por favor ingresa tu apellido paterno");
+      return;
+    }
+
+    if (!apellido_materno) {
+      alert("Por favor ingresa tu apellido materno");
+      return;
+    }
+
+    if (!nueva_contraseña) {
+      alert("Ingrese una nueva contraseña");
+      return "Ingrese una nueva contraseña";
+    }
+
+    if (nueva_contraseña && (nueva_contraseña.length > 255 || nueva_contraseña.length < 6)) {
+      alert("La nueva contraseña debe tener entre 6 y 255 caracteres.");
+      return "La nueva contraseña debe tener entre 6 y 255 caracteres.";
     }
 
     try {
       const response = await axios.post('http://localhost:5000/api/clientes/resetearcontraseña', resetData);
       alert(response.data.mensaje || 'Contraseña actualizada con wxito. Por favor, inicie sesion.');
+      setResetData({
+        nombre: '',
+        apellido_paterno: '',
+        apellido_materno: '',
+        nueva_contraseña: '',
+      });
       setMostrarReset(false);
     } catch (error) {
       console.error('Error al resetear la contraseña:', error);
