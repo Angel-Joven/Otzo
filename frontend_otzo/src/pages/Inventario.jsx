@@ -404,7 +404,7 @@ function Inventario() {
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
               onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
             >
-              <p className="font-bold text-xl">Edita un producto:</p>
+              <p className="font-bold text-xl">Reabastece un producto:</p>
               <form onSubmit={handleFormModalReplenishProduct}>
                 <label
                   htmlFor="replenish_product_quantity_input"
@@ -428,7 +428,7 @@ function Inventario() {
                 />
                 <input
                   type="submit"
-                  value="Editar producto"
+                  value="Reabastecer producto"
                   className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
                 />
               </form>
