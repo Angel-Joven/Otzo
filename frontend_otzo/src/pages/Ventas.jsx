@@ -12,6 +12,8 @@ export function Ventas() {
 
   const [total, setTotal] = useState(0);
 
+  const [cambio, setCambio] = useState(0);
+
   const [metodoPago, setMetodoPago] = useState("efectivo");
 
   const cambioMetodoPago = (e) => {
@@ -19,6 +21,13 @@ export function Ventas() {
   };
 
   const [abrirModalCompra, setAbrirModalCompra] = useState(false);
+
+  const manejarAbrirModalCompra = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalCompra") {
+      setAbrirModalCompra(false);
+    }
+  };
 
   //  Internally, customStyles will deep merges your customStyles with the default styling.
   const customStyles = {
@@ -66,6 +75,17 @@ export function Ventas() {
     );
     setTotal(nuevoTotal); // Actualiza el total con el nuevo cálculo
   }, [carrito]);
+
+  const comprobarCambio = (e) => {
+    console.log(total - e.target.value);
+    setCambio(total - e.target.value);
+  };
+
+  useEffect(() => {
+    if (metodoPago != "efectivo") {
+      setCambio(0);
+    }
+  }, [metodoPago]);
 
   //Cargar productos
   useEffect(() => {
@@ -124,30 +144,47 @@ export function Ventas() {
     <>
       <div className="bg-gradient-to-b from-green-500 to-green-900 w-full h-full min-h-[calc(100vh-5rem)] z-0 relative">
         {abrirModalCompra && (
-          <dialog className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"></dialog>
+          <dialog
+            id="modalCompra"
+            className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
+            onClick={manejarAbrirModalCompra}
+          >
+            <div
+              className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
+              onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
+            >
+              <p className="font-bold">RESUMEN DE COMPRA:</p>
+              <p>Total: {total} MXN</p>
+              <p>Metodo de pago:</p>
+              <select
+                name="metodo_pago"
+                id="metodo_pago"
+                onChange={cambioMetodoPago}
+              >
+                <option value="efectivo">Efectivo</option>
+                <option value="tarjeta">Tarjeta</option>
+              </select>
+              <label htmlFor="input_metodo_pago">
+                Monto dado por el cliente:{" "}
+              </label>
+              {metodoPago == "efectivo" && (
+                <>
+                  <input
+                    type="text"
+                    className="block"
+                    id="input_metodo_pago"
+                    onChange={comprobarCambio}
+                  />
+                  <p>Cambio: {cambio}</p>
+                </>
+              )}
+              <button className="bg-yellow-300 font-bold p-2">Comprar</button>
+            </div>
+          </dialog>
         )}
 
         <div className="flex justify-between text-center bg-green-800 text-white py-4 px-8">
           <h1 className="text-2xl font-bold">Ventas</h1>
-        </div>
-
-        <div className="flex justify-around bg-white">
-          <div>
-            <p>Total: {total} MXN</p>
-            <p>Metodo de pago:</p>
-            <select
-              name="metodo_pago"
-              id="metodo_pago"
-              onChange={cambioMetodoPago}
-            >
-              <option value="efectivo">Efectivo</option>
-              <option value="tarjeta">Tarjeta</option>
-            </select>
-            {metodoPago == "efectivo" ? (
-              <input type="text" className="block" />
-            ) : null}
-          </div>
-          <button className="bg-yellow-300 font-bold p-2">Comprar</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 grid-rows-1 gap-4 p-2">
@@ -175,7 +212,14 @@ export function Ventas() {
           <div className="bg-white">
             <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
               <p className="font-bold">Carrito</p>
-              <button className="bg-green-500 font-bold p-1">COMPRAR</button>
+              <button
+                className="bg-green-500 font-bold p-1"
+                onClick={() => {
+                  setAbrirModalCompra(true);
+                }}
+              >
+                COMPRAR
+              </button>
             </div>
             <div>
               {carrito.map((producto, index) => {
