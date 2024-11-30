@@ -75,7 +75,7 @@ function Inventario() {
       .catch((error) => {
         console.error("Error al obtener los productos descontinuados:", error);
       });
-  }, [isDialogAddTypeProductOpen]);
+  }, [isDialogEditTypeProductOpen]);
 
   // Cierra el diálogo al cambiar de página
   useEffect(() => {
@@ -258,13 +258,32 @@ function Inventario() {
                   id="category"
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                 >
-                  {categorias.map((categoria, index) => {
-                    return (
-                      <option value={categoria.categoria_producto} key={index}>
-                        {categoria.categoria_producto}
-                      </option>
-                    );
-                  })}
+                  <option value="Alimentos">Alimentos</option>
+                  <option value="Bebidas">Bebidas</option>
+                  <option value="Botanas">Botanas</option>
+                  <option value="Electrónicos">Electrónicos</option>
+                  <option value="Ropa">Ropa</option>
+                  <option value="Calzado">Calzado</option>
+                  <option value="Hogar">Hogar</option>
+                  <option value="Jardinería">Jardinería</option>
+                  <option value="Deportes">Deportes</option>
+                  <option value="Automotriz">Automotriz</option>
+                  <option value="Juguetes">Juguetes</option>
+                  <option value="Libros">Libros</option>
+                  <option value="Papelería">Papelería</option>
+                  <option value="Belleza">Belleza</option>
+                  <option value="Cuidado Personal">Cuidado Personal</option>
+                  <option value="Farmacia">Farmacia</option>
+                  <option value="Mascotas">Mascotas</option>
+                  <option value="Herramientas">Herramientas</option>
+                  <option value="Construcción">Construcción</option>
+                  <option value="Muebles">Muebles</option>
+                  <option value="Tecnología">Tecnología</option>
+                  <option value="Videojuegos">Videojuegos</option>
+                  <option value="Electrodomésticos">Electrodomésticos</option>
+                  <option value="Viajes">Viajes</option>
+                  <option value="Salud">Salud</option>
+                  <option value="Oficina">Oficina</option>
                 </select>
                 <label
                   htmlFor="add_product_description_input"
