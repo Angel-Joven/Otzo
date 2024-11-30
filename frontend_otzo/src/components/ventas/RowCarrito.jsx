@@ -9,6 +9,7 @@ export default function RowCarrito({
   cantidad,
   setCarrito,
   carrito,
+  eliminarDelCarrito,
 }) {
   const cambiarCantidad = (e) => {
     const nuevaCantidad = parseInt(e.target.value, 10) || 1;
@@ -28,7 +29,7 @@ export default function RowCarrito({
         <img src={imagen_producto} alt={nombre_producto} width={50} />
         <p>{nombre_producto}</p>
       </div>
-      <div className="flex">
+      <div className="flex items-center">
         <input
           type="number"
           name={`input_cantidad_${nombre_producto}`}
@@ -45,6 +46,14 @@ export default function RowCarrito({
             {precio_producto} MXN
           </span>
         </p>
+        <div className="px-2">
+          <button
+            className="bg-red-500 text-white p-2"
+            onClick={() => eliminarDelCarrito(id_producto)}
+          >
+            borrar
+          </button>
+        </div>
       </div>
     </div>
   );

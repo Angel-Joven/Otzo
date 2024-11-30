@@ -77,6 +77,12 @@ export function Ventas() {
     setTotal(nuevoTotal); // Actualiza el total con el nuevo cálculo
   }, [carrito]);
 
+  const eliminarDelCarrito = (id_producto) => {
+    setCarrito((prevCarrito) =>
+      prevCarrito.filter((producto) => producto.id_inventario !== id_producto)
+    );
+  };
+
   const comprobarCambio = (e) => {
     setCambio(e.target.value - total);
   };
@@ -233,6 +239,7 @@ export function Ventas() {
                     cantidad={producto.cantidad}
                     setCarrito={setCarrito}
                     carrito={carrito}
+                    eliminarDelCarrito={eliminarDelCarrito}
                     key={index}
                   />
                 );
