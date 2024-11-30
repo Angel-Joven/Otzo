@@ -39,18 +39,7 @@ export function Ventas() {
       );
 
       if (productoExistente) {
-        // Incrementar la cantidad del producto, respetando el límite disponible
-        return prevCarrito.map((item) =>
-          item.id_inventario === producto.id_inventario
-            ? {
-                ...item,
-                cantidad: Math.min(
-                  item.cantidad + 1,
-                  producto.cantidad_producto
-                ), // No exceder cantidad disponible
-              }
-            : item
-        );
+        return [...prevCarrito];
       } else {
         // Agregar el producto con cantidad inicial de 1
         return [...prevCarrito, { ...producto, cantidad: 1 }];
@@ -164,6 +153,7 @@ export function Ventas() {
                     precio_producto={producto.precio_unitario}
                     cantidad={producto.cantidad}
                     setCarrito={setCarrito}
+                    carrito={carrito}
                     key={index}
                   />
                 );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function RowCarrito({
   id_producto,
@@ -8,14 +8,15 @@ export default function RowCarrito({
   precio_producto,
   cantidad,
   setCarrito,
+  carrito,
 }) {
-  const handleAmount = (e) => {
-    const nuevaCantidad = parseInt(e.target.value, 10); // Obtenemos la nueva cantidad ingresada
+  const cambiarCantidad = (e) => {
+    const nuevaCantidad = parseInt(e.target.value, 10) || 1;
 
     setCarrito((prevCarrito) =>
       prevCarrito.map((producto) =>
-        producto.id_producto === id_producto
-          ? { ...producto, cantidad: nuevaCantidad } // Actualizamos la cantidad del producto
+        producto.id_inventario === id_producto
+          ? { ...producto, cantidad: nuevaCantidad }
           : producto
       )
     );
@@ -33,8 +34,8 @@ export default function RowCarrito({
           name={`input_cantidad_${nombre_producto}`}
           id={`input_cantidad_${nombre_producto}`}
           step={"1"}
-          value={cantidad} //CAMBIAR DEFAULT VALUE 1
-          onChange={handleAmount} //CAMBIAR SETCARRITO
+          defaultValue={1}
+          onChange={cambiarCantidad}
           max={cantidad_producto}
           min={1}
         />
