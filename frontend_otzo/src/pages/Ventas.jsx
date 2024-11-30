@@ -10,6 +10,8 @@ export function Ventas() {
 
   const [carrito, setCarrito] = useState([]);
 
+  const [total, setTotal] = useState(0);
+
   //  Internally, customStyles will deep merges your customStyles with the default styling.
   const customStyles = {
     rows: {
@@ -48,7 +50,13 @@ export function Ventas() {
   };
 
   useEffect(() => {
-    console.log(carrito);
+    // Calcula el nuevo total sumando los precios en base a la cantidad
+    const nuevoTotal = carrito.reduce(
+      (acumulador, producto) =>
+        acumulador + producto.cantidad * producto.precio_unitario,
+      0 // Valor inicial del acumulador
+    );
+    setTotal(nuevoTotal); // Actualiza el total con el nuevo cálculo
   }, [carrito]);
 
   //Cargar productos
@@ -111,7 +119,7 @@ export function Ventas() {
           <h1 className="text-2xl font-bold">Ventas</h1>
         </div>
         <div className="flex justify-around">
-          <p>Total: 122 MXN</p>
+          <p>Total: {total} MXN</p>
           <p>Metodo de pago: Efectivo</p>
           <button className="bg-yellow-300 font-bold p-2">Comprar</button>
         </div>
