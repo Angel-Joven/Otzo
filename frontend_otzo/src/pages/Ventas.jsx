@@ -12,6 +12,14 @@ export function Ventas() {
 
   const [total, setTotal] = useState(0);
 
+  const [metodoPago, setMetodoPago] = useState("efectivo");
+
+  const cambioMetodoPago = (e) => {
+    setMetodoPago(e.target.value);
+  };
+
+  const [abrirModalCompra, setAbrirModalCompra] = useState(false);
+
   //  Internally, customStyles will deep merges your customStyles with the default styling.
   const customStyles = {
     rows: {
@@ -115,12 +123,30 @@ export function Ventas() {
   return (
     <>
       <div className="bg-gradient-to-b from-green-500 to-green-900 w-full h-full min-h-[calc(100vh-5rem)] z-0 relative">
+        {abrirModalCompra && (
+          <dialog className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"></dialog>
+        )}
+
         <div className="flex justify-between text-center bg-green-800 text-white py-4 px-8">
           <h1 className="text-2xl font-bold">Ventas</h1>
         </div>
-        <div className="flex justify-around">
-          <p>Total: {total} MXN</p>
-          <p>Metodo de pago: Efectivo</p>
+
+        <div className="flex justify-around bg-white">
+          <div>
+            <p>Total: {total} MXN</p>
+            <p>Metodo de pago:</p>
+            <select
+              name="metodo_pago"
+              id="metodo_pago"
+              onChange={cambioMetodoPago}
+            >
+              <option value="efectivo">Efectivo</option>
+              <option value="tarjeta">Tarjeta</option>
+            </select>
+            {metodoPago == "efectivo" ? (
+              <input type="text" className="block" />
+            ) : null}
+          </div>
           <button className="bg-yellow-300 font-bold p-2">Comprar</button>
         </div>
 
@@ -147,8 +173,9 @@ export function Ventas() {
             </div>
           </div>
           <div className="bg-white">
-            <div className="bg-gray-900 text-white p-4">
+            <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
               <p className="font-bold">Carrito</p>
+              <button className="bg-green-500 font-bold p-1">COMPRAR</button>
             </div>
             <div>
               {carrito.map((producto, index) => {
