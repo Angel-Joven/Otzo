@@ -99,7 +99,7 @@ export default function ProductCard({
         </div>
         <p
           className={`absolute top-0 right-0 p-2 font-bold ${
-            cantidad > 10 ? "text-green-500" : "text-red-500"
+            cantidad >= 10 ? "text-green-500" : "text-red-500"
           }`}
         >
           {cantidad}

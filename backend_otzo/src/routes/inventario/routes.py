@@ -204,3 +204,11 @@ def reabastecer():
         )
     else:
         return jsonify({"error": "No se pudo agregar la cantidad de productos"}), 500
+
+
+@inventario_bp.route("/historial_reabastecimiento", methods=["GET"])
+@cross_origin()
+def verHistorialReabastecimiento():
+    detalleInventarioServicio = DetalleInventarioServicio()
+
+    return detalleInventarioServicio.listarReabastecimientosPorDia()

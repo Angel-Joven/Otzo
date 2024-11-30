@@ -5,10 +5,12 @@ import {
   obtenerCategoriasTipoProductos,
   actualizarTipoProducto,
   reabastecerProducto,
+  obtenerHistorialDeReabastecimientoPorDia,
 } from "../api/inventario.api";
 import React, { useState, useEffect } from "react";
 import ProductCard from "../components/inventario/ProductCard";
 import { useLocation } from "react-router-dom";
+import DataTable from "react-data-table-component";
 
 function Inventario() {
   const [data, setData] = useState();
@@ -181,6 +183,38 @@ function Inventario() {
       console.error("Error al reabastecer el producto:", error);
     }
   };
+
+  const [isViewReplenishOpen, setIsViewReplenishOpen] = useState(false);
+  const [replenishHistory, setReplenishHistory] = useState([]);
+
+  const handleModalViewReplenish = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalViewReplenish") {
+      setIsViewReplenishOpen(false);
+    }
+  };
+
+  const viewReplenish = () => {
+    obtenerHistorialDeReabastecimientoPorDia().then((res) => {
+      setReplenishHistory(res.data);
+    });
+    setIsViewReplenishOpen(true);
+  };
+
+  const columns = [
+    {
+      name: "ID Inventario",
+      selector: (row) => row.id_inventario,
+    },
+    {
+      name: "Fecha reabastecimiento",
+      selector: (row) => row.dia_reabastecimiento,
+    },
+    {
+      name: "Cantidad de productos",
+      selector: (row) => row.cantidad_productos,
+    },
+  ];
 
   return (
     <>
@@ -436,6 +470,34 @@ function Inventario() {
           </dialog>
         )}
 
+        {isViewReplenishOpen && (
+          <dialog
+            id="modalViewReplenish"
+            className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
+            onClick={handleModalViewReplenish}
+          >
+            <div
+              className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
+              onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
+            >
+              <p className="font-bold">
+                Historial de reabastecimientos por día:
+              </p>
+              <DataTable
+                columns={columns}
+                data={replenishHistory}
+                fixedHeader
+                theme="default"
+                striped={true}
+                dense={true}
+                pagination={true}
+                paginationPerPage={5}
+                paginationRowsPerPageOptions={[5, 10]}
+              />
+            </div>
+          </dialog>
+        )}
+
         {/* Barra superior */}
         <div className="flex justify-between text-center bg-slate-800 text-white py-4 px-8">
           <h1 className="text-2xl font-bold">Inventario de productos</h1>
@@ -448,7 +510,7 @@ function Inventario() {
         </div>
 
         <div className="bg-slate-700 text-white p-4">
-          <div className="flex">
+          <div className="flex gap-4">
             <button
               onClick={changeProductsToDiscontinued}
               className={`${
@@ -458,6 +520,12 @@ function Inventario() {
               {descontinuados
                 ? "Ver productos disponibles"
                 : "Ver productos descontinuados"}
+            </button>
+            <button
+              className="bg-blue-500 p-2 rounded-xl"
+              onClick={viewReplenish}
+            >
+              Ver historial de reabastecimientos
             </button>
           </div>
         </div>

@@ -63,3 +63,8 @@ class DetalleInventarioModelo(ABC):
     def generarPrecioProducto(self):
         """Función para generar el precio de un producto"""
         pass
+
+    @abstractmethod
+    def listarReabastecimientosPorDia(self):
+        """Función para listar los reabastecimientos realizados por día"""
+        pass

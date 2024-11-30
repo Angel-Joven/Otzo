@@ -31,3 +31,7 @@ export const actualizarTipoProducto = (producto) => {
 export const reabastecerProducto = (solicitud) => {
     return axios.post("http://localhost:5000/api/inventario/reabastecer", solicitud);
 }
+
+export const obtenerHistorialDeReabastecimientoPorDia = () => {
+    return axios.get("http://localhost:5000/api/inventario/historial_reabastecimiento");
+}

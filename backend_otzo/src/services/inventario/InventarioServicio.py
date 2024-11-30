@@ -318,3 +318,23 @@ class DetalleInventarioServicio(DetalleInventarioModelo):
 
     def devolverProducto(self):
         pass
+
+    def listarReabastecimientosPorDia(self):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            cursor.execute(
+                "SELECT fecha_producto AS dia_reabastecimiento, id_inventario, COUNT(*) AS cantidad_productos FROM detalle_inventario GROUP BY  dia_reabastecimiento, id_inventario ORDER BY dia_reabastecimiento, id_inventario;"
+            )
+
+            resultado = cursor.fetchall()
+
+            return resultado
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
