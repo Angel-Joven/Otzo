@@ -26,6 +26,7 @@ export function Ventas() {
     // Cierra el diálogo si se hace clic fuera del recuadro
     if (e.target.id === "modalCompra") {
       setAbrirModalCompra(false);
+      setCambio(0);
     }
   };
 
@@ -77,8 +78,7 @@ export function Ventas() {
   }, [carrito]);
 
   const comprobarCambio = (e) => {
-    console.log(total - e.target.value);
-    setCambio(total - e.target.value);
+    setCambio(e.target.value - total);
   };
 
   useEffect(() => {
