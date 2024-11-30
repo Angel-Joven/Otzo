@@ -1,7 +1,11 @@
 import axios from "axios";
 
-export const obtenerTodosLosProductos = () => {
+export const obtenerTodosLosProductosAVender = () => {
     return axios.get("http://localhost:5000/api/inventario/vender");
+};
+
+export const obtenerTodosLosProductos = () => {
+    return axios.get("http://localhost:5000/api/inventario");
 };
 
 export const obtenerTodosLosProductosDescontinuados = () => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import Spinner from "../components/ventas/Spinner";
-import { obtenerTodosLosProductos } from "../api/inventario.api";
+import { obtenerTodosLosProductosAVender } from "../api/inventario.api";
 import RowCarrito from "../components/ventas/RowCarrito";
 
 export function Ventas() {
@@ -69,7 +69,7 @@ export function Ventas() {
 
   //Cargar productos
   useEffect(() => {
-    obtenerTodosLosProductos()
+    obtenerTodosLosProductosAVender()
       .then((res) => {
         console.log(res.data);
         setProductos(res.data);
