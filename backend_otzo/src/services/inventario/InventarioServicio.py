@@ -183,71 +183,6 @@ class InventarioServicio(InventarioModelo):
         finally:
             conexion.close()
 
-    def obtenerTipoProducto(self, id_tipo_producto: int):
-        try:
-            conexion = get_connection()
-            cursor = conexion.cursor(DictCursor)
-
-            cursor.execute(
-                "SELECT * FROM inventario where id_inventario = %s", id_tipo_producto
-            )
-
-            return cursor.fetchone()
-
-        except Exception as e:
-            print("No se pudo conectar a la base de datos, error:", e)
-            conexion.rollback()
-            return None
-        finally:
-            conexion.close()
-
-    def comprobarStock(self, id_tipo_producto: int, cantidad: int) -> bool:
-        try:
-            conexion = get_connection()
-            cursor = conexion.cursor(DictCursor)
-
-            conexion.begin()
-
-            cursor.execute(
-                "SELECT cantidad_producto FROM inventario where id_inventario = %s and descontinuado = 0",
-                id_tipo_producto,
-            )
-
-            resultado = int(cursor.fetchone())
-
-            if resultado >= cantidad:
-                return True
-            else:
-                return False
-
-        except Exception as e:
-            print("No se pudo conectar a la base de datos, error:", e)
-            conexion.rollback()
-            return None
-        finally:
-            conexion.close()
-
-    def retornar_tipo_producto(self, id_tipo_producto: int):
-        try:
-            conexion = get_connection()
-            cursor = conexion.cursor(DictCursor)
-
-            conexion.begin()
-
-            cursor.execute(
-                "SELECT * FROM inventario where id_inventario = %s",
-                id_tipo_producto,
-            )
-
-            return cursor.fetchone()
-
-        except Exception as e:
-            print("No se pudo conectar a la base de datos, error:", e)
-            conexion.rollback()
-            return None
-        finally:
-            conexion.close()
-
 
 @dataclass
 class DetalleInventarioServicio(DetalleInventarioModelo):
@@ -378,34 +313,6 @@ class DetalleInventarioServicio(DetalleInventarioModelo):
             resultado = cursor.fetchall()
 
             return resultado
-
-        except Exception as e:
-            print("No se pudo conectar a la base de datos, error:", e)
-            conexion.rollback()
-            return None
-        finally:
-            conexion.close()
-
-    def obtenerProductos(self, id_inventario: int, codigos: list) -> dict:
-        try:
-            conexion = get_connection()
-            cursor = conexion.cursor(DictCursor)
-
-            conexion.begin()
-
-            codigo_valido = False
-
-            while not codigo_valido:
-
-                cursor.execute(
-                    "SELECT codigo_producto FROM detalle_inventario WHERE id_inventario = %s and vendido = 0",
-                    id_inventario,
-                )
-
-                resultado = cursor.fetchone()
-
-                if resultado["codigo_producto"] not in codigos:
-                    return resultado
 
         except Exception as e:
             print("No se pudo conectar a la base de datos, error:", e)

@@ -94,8 +94,8 @@ class VentaDTO:
     _metodo_pago: str
     _id_cliente: int
     _id_empleado: int
-    _detalles_venta: list[DetalleVentaDTO]
-    _total_venta: float = 0
+    _total_venta: float
+    _detalles_venta: list[DetalleVentaDTO] = None
     _id_venta: int = None
 
     @property

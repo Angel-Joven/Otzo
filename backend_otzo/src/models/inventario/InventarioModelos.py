@@ -32,21 +32,6 @@ class InventarioModelo(ABC):
         """Función para listar las categorías de tipos de productos en el inventario"""
         pass
 
-    @abstractmethod
-    def obtenerTipoProducto(self):
-        """Función para obtener un tipo producto en el inventario"""
-        pass
-
-    @abstractmethod
-    def comprobarStock(self):
-        """Función para comprobar el stock de un producto"""
-        pass
-
-    @abstractmethod
-    def retornar_tipo_producto(self):
-        """Función para obtener el tipo de producto de un producto del detalle de inventario"""
-        pass
-
 
 class DetalleInventarioModelo(ABC):
     @abstractmethod
@@ -77,9 +62,4 @@ class DetalleInventarioModelo(ABC):
     @abstractmethod
     def listarReabastecimientosPorDia(self):
         """Función para listar los reabastecimientos realizados por día"""
-        pass
-
-    @abstractmethod
-    def obtenerProductos(self):
-        """Función para obtener un producto del detalle de inventario"""
         pass

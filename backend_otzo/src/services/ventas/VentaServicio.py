@@ -7,7 +7,43 @@ from src.db import get_connection
 
 @dataclass
 class VentaServicio(VentaModelo):
-    def agregarVenta(self, venta: VentaDTO):
+    def calcularTotalVenta(self, productos: list[dict]) -> float:
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            precio_total = 0
+
+            conexion.begin()
+
+            for producto in productos:
+
+                print("PRODUCTO: ", producto)
+
+                cursor.execute(
+                    "SELECT precio_unitario from inventario where id_inventario = %s",
+                    producto["id_inventario"],
+                )
+
+                precio_producto = int(producto["cantidad"]) * float(
+                    cursor.fetchone()["precio_unitario"]
+                )
+
+                print("PRECIO PRODUCTO: ", precio_producto)
+
+                precio_total += precio_producto
+
+                print("PRECIO TOTAL:", precio_total)
+
+            return precio_total
+
+        except Exception as e:
+            print("No se pudo calcular el precio total, error:", e)
+            return None
+        finally:
+            conexion.close()
+
+    def agregarVentaEfectivo(self, venta: VentaDTO):
         try:
             conexion = get_connection()
             cursor = conexion.cursor(DictCursor)
@@ -50,5 +86,75 @@ class VentaServicio(VentaModelo):
             print("No se pudo agregar la venta, error:", e)
             conexion.rollback()
             return False
+        finally:
+            conexion.close()
+
+
+@dataclass
+class DetalleVentaServicio(DetalleVentaModelo):
+    def devolverProducto(self):
+        pass
+
+    def llenarDatos(self, productos: list[dict]) -> list[DetalleVentaDTO]:
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            detalles_venta = []
+
+            conexion.begin()
+
+            for producto in productos:
+
+                id_inventario = int(producto["id_inventario"])
+                cantidad = int(producto["cantidad"])
+
+                cursor.execute(
+                    "SELECT nombre_producto from inventario where id_inventario = %s",
+                    id_inventario,
+                )
+
+                nombre_producto = str(cursor.fetchone()["nombre_producto"])
+
+                cursor.execute(
+                    "SELECT precio_unitario from inventario where id_inventario = %s",
+                    id_inventario,
+                )
+
+                precio_unitario = float(cursor.fetchone()["precio_unitario"])
+
+                cursor.execute(
+                    "SELECT categoria_producto from inventario where id_inventario = %s",
+                    id_inventario,
+                )
+
+                categoria_producto = str(cursor.fetchone()["categoria_producto"])
+
+                cursor.execute(
+                    "select codigo_producto from detalle_inventario where id_inventario = %s",
+                    id_inventario,
+                )
+
+                codigos_productos = [
+                    row["codigo_producto"] for row in cursor.fetchall()[:cantidad]
+                ]
+
+                for i in range(cantidad):
+                    detalle_venta = DetalleVentaDTO(
+                        nombre_producto,
+                        codigos_productos[i],
+                        categoria_producto,
+                        id_inventario,
+                        precio_unitario,
+                        False,
+                    )
+
+                    detalles_venta.append(detalle_venta)
+
+            return detalles_venta
+
+        except Exception as e:
+            print("No se pudieron llenar los datos de detalles venta, error:", e)
+            return None
         finally:
             conexion.close()
