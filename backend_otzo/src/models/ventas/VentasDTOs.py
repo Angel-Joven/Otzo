@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 @dataclass
 class DetalleVentaDTO:
     _nombre_producto: str
@@ -8,9 +9,17 @@ class DetalleVentaDTO:
     _categoria_producto: str = None
     _id_producto: int = None
     _precio_unitario: float = 0
-    _id_detalle_venta: int = None
-    _id_venta: int = None
     _devuelto: bool = False
+    _id_venta: int = None
+    _id_detalle_venta: int = None
+
+    @property
+    def id_producto(self) -> int:
+        return self._id_producto
+
+    @id_producto.setter
+    def id_producto(self, value: int):
+        self._id_producto = value
 
     @property
     def id_detalle_venta(self) -> int:
@@ -85,7 +94,7 @@ class VentaDTO:
     _metodo_pago: str
     _id_cliente: int
     _id_empleado: int
-    _detalles_venta: list
+    _detalles_venta: list[DetalleVentaDTO]
     _total_venta: float = 0
     _id_venta: int = None
 
