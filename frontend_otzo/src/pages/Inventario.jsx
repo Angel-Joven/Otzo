@@ -240,6 +240,7 @@ function Inventario() {
                   type="text"
                   placeholder="Escribe aquí..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <label htmlFor="add_product_image_input" className="block">
                   Imagen del producto:
@@ -249,6 +250,7 @@ function Inventario() {
                   type="text"
                   placeholder="Escribe aquí..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <label htmlFor="add_product_category_input" className="block">
                   Categoria del producto:
@@ -306,6 +308,7 @@ function Inventario() {
                   step="0.01"
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <label htmlFor="add_max_quantity_input" className="block">
                   Cantidad máxima del producto:
@@ -316,6 +319,7 @@ function Inventario() {
                   step="1"
                   placeholder="Introduce la cantidad máxima para reabastecer"
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <input
                   type="submit"
@@ -348,6 +352,7 @@ function Inventario() {
                   type="text"
                   placeholder="Escribe aquí..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <label htmlFor="edit_product_image_input" className="block">
                   Imagen del producto:
@@ -358,6 +363,7 @@ function Inventario() {
                   type="text"
                   placeholder="Escribe aquí..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <label htmlFor="edit_product_category_input" className="block">
                   Categoria del producto:
@@ -399,6 +405,7 @@ function Inventario() {
                   step="0.01"
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <label htmlFor="edit_amount_product_input" className="block">
                   Cantidad del producto:
@@ -410,6 +417,7 @@ function Inventario() {
                   step="1"
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <label htmlFor="edit_max_quantity_input" className="block">
                   Cantidad máxima del producto:
@@ -421,6 +429,7 @@ function Inventario() {
                   step="1"
                   placeholder="Introduce la cantidad máxima del producto a reabastecer..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <label htmlFor="edit_enable_input" className="hidden">
                   Activo:
@@ -436,6 +445,7 @@ function Inventario() {
                   className="hidden"
                   defaultValue={productoAEditar.id_inventario}
                   id="id_inventario"
+                  required
                 />
                 <input
                   type="submit"
@@ -471,6 +481,7 @@ function Inventario() {
                   step="1"
                   placeholder="Introduce la cantidad para agregar..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 />
                 <input
                   type="number"
@@ -478,6 +489,7 @@ function Inventario() {
                   className="hidden"
                   defaultValue={productoAReabastecer.id_inventario}
                   id="replenish_product_id_input"
+                  required
                 />
                 <input
                   type="submit"
