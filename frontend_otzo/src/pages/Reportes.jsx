@@ -92,7 +92,7 @@ export function Reportes() {
 
     const manejarError = (tipo) => {
         console.error(`Error al obtener el reporte de ${tipo}:`, error);
-        setError(`Ocurrió un error al obtener el reporte de ${tipo}.`);
+        setError(`No se han añadido datos de ${tipo} el dia de hoy.`);
     };
 
     return (
