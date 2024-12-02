@@ -22,12 +22,11 @@ def index():
 
 @reportes_bp.route("/reporte-puntos", methods=["GET"])
 def generar_reporte_puntos():
+    """
+    Genera un reporte de puntos para todos los clientes.
+    """
     try:
-        fecha_reporte = request.args.get("fecha")  # Obtener fecha desde los parámetros de consulta
-        if not fecha_reporte:
-            return jsonify({"error": "La fecha es obligatoria"}), 400
-        
-        reporte = ReportesService.crear_reporte_puntos(fecha_reporte)
+        reporte = ReportesService.crear_reporte_puntos()
         return jsonify(reporte), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -97,7 +96,10 @@ def generar_reporte_rangos():
             query = """
                 SELECT r.nombre_rango, COUNT(p.idclientes_puntos) AS total_personas
                 FROM puntos p
-                JOIN rangos r WHERE p.idrango = r.idrango                              
+                JOIN rangos r WHERE   
+                 
+                  
+                    p.idrango = r.idrango                              
                 GROUP BY r.nombre_rango
                 ORDER BY total_personas DESC
             """
