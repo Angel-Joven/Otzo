@@ -111,6 +111,45 @@ class PuntosService(PuntosModelo):
         finally:
             conexion.close()
 
+    def comprobar_puntos(self, id_cliente, precio_compra_total):
+        conexion = get_connection()
+        try:
+            with conexion.cursor() as cursor:
+                #Comenzamos la transaccion
+                conexion.begin()
+
+                #Validamos si el cliente existe en la tabla de puntos y que tenga habilitado el poder obtener puntos o algun rango
+                cursor.execute("SELECT COUNT(*) FROM puntos WHERE idclientes_puntos = %s AND habilitado = 1", (id_cliente,))
+                cliente_existe = cursor.fetchone()[0] > 0
+                #print(cliente_existe)
+
+                if not cliente_existe:
+                    raise ValueError("La cuenta del cliente no existe o esta Inactiva/Suspendida, por lo tanto no se pudo comprobar sus puntos totales.")
+
+                #Obtenemos los puntos totales del cliente
+                cursor.execute("SELECT total_puntos FROM puntos WHERE idclientes_puntos = %s", (id_cliente,))
+                resultado = cursor.fetchone()
+                #print(resultado)
+
+                if not resultado:
+                    raise ValueError("La cuenta del cliente no fue encontrada para realizar la comprobacion de puntos.")
+
+                puntos_totales = resultado[0]
+                if puntos_totales >= precio_compra_total:
+                    print("Puntos Suficientes")
+                    return True
+                else:
+                    print("Puntos Insuficientes")
+                    return False
+
+        except DatabaseError as e:
+            #Deshacemos la transaccion en caso de error
+            conexion.rollback()
+            raise e
+        finally:
+            conexion.close()
+
+
 # ---------------------------------------------------------------------------------------------------------------------------
 
 class RangosService(RangosModelo):
@@ -431,6 +470,14 @@ class PagarPuntosCompraActualizarRangoService(PagarPuntosActualizarRangoModelo):
 
 # PagarPuntosCompraActualizarRangoService().obtener_y_asignar_nuevo_Rango(id_cliente)
 # PagarPuntosCompraActualizarRangoService().pagar_con_puntos_compra(id_cliente, precio_compra_total)
+
+# ----------------------
+
+# EJEMPLO DE USO 4 - COMPROBAR LOS PUNTOS DE UN CLIENTE AL MOMENTO DE REALIZAR UNA COMPRA CON PUNTOS
+# ES NECESARIO INGRESAR O TENER ALMACENADO LA INFORMACION
+# DEL 'id_cliente' Y DE 'precio_compra_total' PARA PASARLO A ESTE SERVICIO.
+
+# PuntosService().comprobar_puntos(id_cliente, precio_compra_total)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------------------------------------

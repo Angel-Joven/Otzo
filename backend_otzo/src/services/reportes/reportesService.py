@@ -13,38 +13,25 @@ from src.models.reportes.reportesDTO import InventarioReporteDTO
 
 class ReportesService(ReportesModelo):
     @staticmethod
-    def crear_reporte_puntos(fecha_reporte):
+    def crear_reporte_puntos():
         """
-        Genera un reporte de puntos filtrado por una fecha específica.
-
-        :param fecha_reporte: Fecha en formato 'YYYY-MM-DD' para filtrar los puntos.
+        Genera un reporte de puntos para todos los clientes.
         """
         datos_puntos = ObtenerInfoClientesPuntosService().obtener_info_clientes_puntos()
 
         if isinstance(datos_puntos, list):
-            # Filtrar los datos por la fecha proporcionada
-            datos_filtrados = [
+            reporte = [
                 {
                     "idcliente_puntos": dato["idcliente_puntos"],
                     "total_puntos": dato["total_puntos"],
-                    "ultima_actualizacionPuntos": dato[
-                        "ultima_actualizacionPuntos"
-                    ].split("T")[0],
+                    "ultima_actualizacionPuntos": dato["ultima_actualizacionPuntos"].split("T")[0],
                 }
                 for dato in datos_puntos
-                if dato["ultima_actualizacionPuntos"].split("T")[0] == fecha_reporte
             ]
 
-            # Si no hay datos para la fecha proporcionada
-            if not datos_filtrados:
-                return {
-                    "mensaje": f"No se encontraron puntos para la fecha {fecha_reporte}"
-                }
-
-            return datos_filtrados
+            return reporte
         else:
             return {"error": datos_puntos}
-
 
     @staticmethod
     def generar_reporte_ventas():

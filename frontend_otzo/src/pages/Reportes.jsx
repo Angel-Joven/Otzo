@@ -16,12 +16,8 @@ export function Reportes() {
 
     const obtenerReportePuntos = async () => {
         resetReportes();
-        if (!fecha) {
-            setError("Por favor selecciona una fecha.");
-            return;
-        }
         try {
-            const response = await axios.get(`http://127.0.0.1:5000/api/reportes/reporte-puntos?fecha=${fecha}`);
+            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-puntos");
             setReportePuntos(response.data);
         } catch (error) {
             manejarError("puntos");
@@ -149,16 +145,6 @@ export function Reportes() {
                 {reporteActivo === "puntos" && (
                     <div>
                         <h2 className="text-2xl font-bold mb-4">Reporte de Puntos</h2>
-                        <div className="mb-4">
-                            <label htmlFor="fecha" className="block text-gray-700 mb-2">Selecciona una fecha:</label>
-                            <input
-                                id="fecha"
-                                type="date"
-                                value={fecha}
-                                onChange={(e) => setFecha(e.target.value)}
-                                className="p-2 border border-gray-300 rounded w-full"
-                            />
-                        </div>
                         <button
                             onClick={obtenerReportePuntos}
                             className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
