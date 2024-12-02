@@ -9,7 +9,11 @@ from flask_cors import cross_origin
 
 from src.models.ventas.VentasDTOs import VentaDTO, DetalleVentaDTO
 
-from src.services.ventas.VentaServicio import VentaServicio
+from src.services.ventas.VentaServicio import VentaServicio, DetalleVentaServicio
+from src.services.inventario.InventarioServicio import (
+    InventarioServicio,
+    DetalleInventarioServicio,
+)
 
 
 # Conversor para serializar Decimals y datetimes
@@ -44,87 +48,32 @@ def index():
 def agregar():
     data = request.json
 
-    # Crear los objetos DetalleVentasDTO
-    detalles_venta = []
-
-    conexion = get_connection()
-    cursor = conexion.cursor(DictCursor)
-
-    for producto in data["detalles_venta"]:
-        cursor.execute(
-            "select * from inventario where codigo_producto = (%s)",
-            producto["codigo_producto"],
-        )
-
-        producto_db = cursor.fetchone()
-
-        if not producto_db:
-            return (
-                jsonify(
-                    {
-                        "error": f"Producto con código {producto['codigo_producto']} no encontrado"
-                    }
-                ),
-                404,
-            )
-
-        detalle = DetalleVentaDTO(
-            producto_db["id_inventario"],
-            producto["codigo_producto"],
-            producto_db["nombre_producto"],
-            producto_db["categoria"],
-            float(producto_db["precio_unitario"]),
-        )
-
-        detalles_venta.append(detalle)
-
-    conexion.close()
-
-    # Crear el objeto VentaDTO
-    venta = VentaDTO(
-        data["monto_recibido"],
-        datetime.now(),
-        data["metodo_pago"],
-        data["id_cliente"],
-        data["id_empleado"],
-        detalles_venta,
-    )
-
+    inventario_servicio = InventarioServicio()
+    detalle_inventario_servicio = DetalleInventarioServicio()
     venta_servicio = VentaServicio()
-    venta.total_venta = venta_servicio.calcularTotalVenta(venta)
+    detalle_venta_servicio = DetalleVentaServicio()
 
-    if venta.monto_recibido >= venta.total_venta:
-        venta_servicio.agregarVenta(venta)
+    productos = data["productos"]
+    # Validar el total de la venta
+    total_venta = venta_servicio.calcularTotalVenta(productos)
+    metodo_pago = str(data["metodo_pago"])
+    monto_recibido = float(data["monto_recibido"])
 
-    # Calcular el total de la venta
-    # venta.total_venta = VentaService().calcularTotalVenta(venta)
+    detalles_venta = detalle_venta_servicio.llenarDatos(productos)
 
-    # Agregar la venta a la base de datos
-    # VentaService().agregarVenta(venta)
+    print("DETALLES VENTA: ", detalles_venta)
 
-    return jsonify({"Mensaje": "Venta agregada correctamente"}), 201
+    if data["metodo_pago"] == "efectivo":
+        print("METODO PAGO EFECTIVO")
 
+        # FUNCIONALIDAD A PROBAR
 
-@ventas_bp.route("/test", methods=["POST", "OPTIONS"])
-@cross_origin()
-def test():
-    data = request.json
+        # venta = VentaDTO(monto_recibido, datetime.now(), metodo_pago, 1, 7, total_venta, detalles_venta)
+        # venta_servicio.agregarVentaEfectivo(venta)
 
-    detalles_venta = []
-
-    for producto in data["detalles_venta"]:
-
-        # TODO: FUNCION QUE AL PASAR UN NOMBRE DE PRODUCTO Y LA CANTIDAD, RETORNE
-        # UNA LISTA DE DICCIONARIOS CON TODOS LOS CAMPOS POR CADA PRODUCTO Y SI NO HAY SUFICIENTE CANTIDAD
-        # QUE RETORNE NONE -----FUNCIONALIDAD DE INVENTARIO-----
-
-        print(producto)
-        # detalle = DetalleVentaDTO()
-
-    # INSTANCIAR VENTA
-
-    # AGREGAR VENTA A BASE DE DATOS
-
-    # ACTUALIZAR PUNTOS
+    elif data["metodo_pago"] == "tarjeta":
+        print("METODO PAGO TARJETA")
+    elif data["metodo_pago"] == "puntos":
+        print("METODO PAGO PUNTOS")
 
     return jsonify({"Mensaje": "Venta agregada correctamente"}), 200

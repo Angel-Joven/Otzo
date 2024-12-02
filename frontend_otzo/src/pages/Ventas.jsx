@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import Spinner from "../components/ventas/Spinner";
 import { obtenerTodosLosProductosAVender } from "../api/inventario.api";
+import { agregarCompra } from "../api/ventas.api";
 import RowCarrito from "../components/ventas/RowCarrito";
 
 export function Ventas() {
@@ -13,6 +14,8 @@ export function Ventas() {
   const [total, setTotal] = useState(0);
 
   const [cambio, setCambio] = useState(0);
+
+  const [montoRecibido, setMontoRecibido] = useState(0);
 
   const [metodoPago, setMetodoPago] = useState("efectivo");
 
@@ -85,6 +88,7 @@ export function Ventas() {
 
   const comprobarCambio = (e) => {
     setCambio(e.target.value - total);
+    setMontoRecibido(e.target.value);
   };
 
   useEffect(() => {
@@ -105,6 +109,67 @@ export function Ventas() {
         console.error("Error al obtener los productos:", error);
       });
   }, []);
+
+  const procesarCompra = () => {
+    // Validar que el carrito no esté vacío
+    if (carrito.length === 0) {
+      alert("El carrito está vacío. Agrega productos antes de comprar.");
+      return;
+    }
+
+    // Validar si el método de pago es efectivo y el monto es suficiente
+    if (metodoPago === "efectivo" && cambio < 0) {
+      alert("El monto proporcionado no es suficiente para cubrir el total.");
+      return;
+    }
+
+    // Preparar los datos para enviar al backend
+    const datosCompra = {
+      productos: carrito.map(
+        ({
+          cantidad_maxima_producto,
+          cantidad_producto,
+          categoria_producto,
+          descontinuado,
+          descripcion_producto,
+          id_inventario,
+          imagen_producto,
+          nombre_producto,
+          precio_unitario,
+          cantidad,
+        }) => ({
+          cantidad_maxima_producto,
+          cantidad_producto,
+          categoria_producto,
+          descontinuado,
+          descripcion_producto,
+          id_inventario,
+          imagen_producto,
+          nombre_producto,
+          precio_unitario,
+          cantidad,
+        })
+      ),
+      total,
+      metodo_pago: metodoPago,
+      monto_recibido: montoRecibido,
+    };
+
+    // Enviar los datos de compra al backend
+    agregarCompra(datosCompra)
+      .then((res) => {
+        alert("Compra procesada con éxito.");
+        // Resetear estados
+        setCarrito([]);
+        setTotal(0);
+        setCambio(0);
+        setAbrirModalCompra(false);
+      })
+      .catch((error) => {
+        console.error("Error al procesar la compra:", error);
+        alert("Hubo un problema al procesar la compra. Intenta de nuevo.");
+      });
+  };
 
   const columns = [
     {
@@ -169,6 +234,7 @@ export function Ventas() {
               >
                 <option value="efectivo">Efectivo</option>
                 <option value="tarjeta">Tarjeta</option>
+                <option value="puntos">Puntos</option>
               </select>
               <label htmlFor="input_metodo_pago">
                 Monto dado por el cliente:{" "}
@@ -184,7 +250,12 @@ export function Ventas() {
                   <p>Cambio: {cambio}</p>
                 </>
               )}
-              <button className="bg-yellow-300 font-bold p-2">Comprar</button>
+              <button
+                className="bg-yellow-300 font-bold p-2"
+                onClick={procesarCompra}
+              >
+                Comprar
+              </button>
             </div>
           </dialog>
         )}
