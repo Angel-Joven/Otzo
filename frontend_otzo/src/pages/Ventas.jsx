@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import Spinner from "../components/ventas/Spinner";
 import { obtenerTodosLosProductosAVender } from "../api/inventario.api";
+import { obtenerAdministradores } from "../api/administracion.api";
 import { agregarCompra } from "../api/ventas.api";
 import RowCarrito from "../components/ventas/RowCarrito";
 import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function Ventas() {
-  const { clienteActual, idCliente, administradorActual, idEmpleado } =
-    ObtenerTipoUsuario();
+  const { clienteActual, idCliente } = ObtenerTipoUsuario();
+
+  const [administrador, setAdministrador] = useState();
 
   const [productos, setProductos] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -57,6 +59,18 @@ export function Ventas() {
       },
     },
   };
+
+  useEffect(() => {
+    // Obtiene los administradores
+    obtenerAdministradores().then((res) => {
+      const administradores = res.data;
+      const indiceAleatorio = Math.floor(
+        Math.random() * administradores.length
+      );
+      const administrador = administradores[indiceAleatorio];
+      setAdministrador(administrador.id_empleado);
+    });
+  }, []);
 
   const agregarAlCarrito = (producto) => {
     setCarrito((prevCarrito) => {
@@ -157,7 +171,11 @@ export function Ventas() {
       total,
       metodo_pago: metodoPago,
       monto_recibido: montoRecibido,
+      id_cliente: idCliente,
+      id_empleado: administrador,
     };
+
+    console.log(datosCompra);
 
     // Enviar los datos de compra al backend
     agregarCompra(datosCompra)

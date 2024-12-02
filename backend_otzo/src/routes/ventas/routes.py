@@ -7,7 +7,7 @@ from . import ventas_bp  # Importa el Blueprint de ventas
 import json
 from flask_cors import cross_origin
 
-from src.models.ventas.VentasDTOs import VentaDTO, DetalleVentaDTO
+from src.models.ventas.VentasDTOs import VentaDTO
 
 from src.services.ventas.VentaServicio import VentaServicio, DetalleVentaServicio
 from src.services.inventario.InventarioServicio import (
@@ -156,11 +156,22 @@ def agregar():
             detalles_venta,
         )
 
-        puntos_service.compro
+        puntos_suficientes = puntos_service.comprobar_puntos(id_cliente, total_venta)
+
+        if not puntos_suficientes:
+            return (
+                jsonify({"Error": "No hay suficientes puntos para realizar la compra"}),
+                400,
+            )
 
         venta_hecha = venta_servicio.agregarVenta(venta)
 
         if not venta_hecha:
             return jsonify({"Error": "No se pudo agregar la venta"}), 400
+
+        pagar_puntos_compra_rango_service.obtener_y_asignar_nuevo_Rango(id_cliente)
+        pagar_puntos_compra_rango_service.pagar_con_puntos_compra(
+            id_cliente, total_venta
+        )
 
     return jsonify({"Mensaje": "Venta agregada correctamente"}), 200

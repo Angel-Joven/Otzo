@@ -83,6 +83,20 @@ class VentaServicio(VentaModelo):
                     detalle_venta.codigo_producto,
                 )
 
+                # ACTUALIZAR STOCK
+
+                cursor.execute(
+                    "SELECT id_inventario FROM detalle_inventario WHERE codigo_producto = %s",
+                    detalle_venta.codigo_producto,
+                )
+
+                id_inventario = cursor.fetchone()["id_inventario"]
+
+                cursor.execute(
+                    "UPDATE inventario SET cantidad_producto = cantidad_producto - 1 WHERE id_inventario = %s",
+                    id_inventario,
+                )
+
             conexion.commit()
 
             return True
