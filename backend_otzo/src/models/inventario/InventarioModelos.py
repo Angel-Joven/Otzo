@@ -32,6 +32,11 @@ class InventarioModelo(ABC):
         """Función para listar las categorías de tipos de productos en el inventario"""
         pass
 
+    @abstractmethod
+    def validarInventario(self):
+        """Función para validar el inventario"""
+        pass
+
 
 class DetalleInventarioModelo(ABC):
     @abstractmethod

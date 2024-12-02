@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class VentaModelo(ABC):
     @abstractmethod
-    def agregarVentaEfectivo(self):
+    def agregarVenta(self):
         """Funcion para agregar una venta en efectivo"""
         pass
 

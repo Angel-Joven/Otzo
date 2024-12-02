@@ -15,6 +15,15 @@ from src.services.inventario.InventarioServicio import (
     DetalleInventarioServicio,
 )
 
+# Servicios de fidelizacion:
+from src.services.fidelizacion.fidelizacionService import (
+    CalcularAgregarPuntosCompraActualizarRangoService,
+    CalcularAgregarPuntosDevolucionActualizarRangoService,
+    PagarPuntosCompraActualizarRangoService,
+)
+
+from src.services.fidelizacion.fidelizacionService import PuntosService
+
 
 # Conversor para serializar Decimals y datetimes
 def custom_json_serializer(obj):
@@ -53,11 +62,32 @@ def agregar():
     venta_servicio = VentaServicio()
     detalle_venta_servicio = DetalleVentaServicio()
 
+    # Servicios de fidelizacion:
+    calcular_agregar_puntos_compra_rango_service = (
+        CalcularAgregarPuntosCompraActualizarRangoService()
+    )
+    calcular_agregar_puntos_devolucion_rango_service = (
+        CalcularAgregarPuntosDevolucionActualizarRangoService()
+    )
+    pagar_puntos_compra_rango_service = PagarPuntosCompraActualizarRangoService()
+
+    puntos_service = PuntosService()
+
     productos = data["productos"]
+
+    # Validar que el inventario tenga los productos necesarios
+
+    stock = inventario_servicio.validarInventario(productos)
+
+    if not stock:
+        return jsonify({"Error": "No hay stock suficiente para realizar la venta"}), 400
+
     # Validar el total de la venta
     total_venta = venta_servicio.calcularTotalVenta(productos)
     metodo_pago = str(data["metodo_pago"])
     monto_recibido = float(data["monto_recibido"])
+    id_cliente = int(data["id_cliente"])
+    id_empleado = int(data["id_empleado"])
 
     detalles_venta = detalle_venta_servicio.llenarDatos(productos)
 
@@ -66,14 +96,71 @@ def agregar():
     if data["metodo_pago"] == "efectivo":
         print("METODO PAGO EFECTIVO")
 
-        # FUNCIONALIDAD A PROBAR
+        venta = VentaDTO(
+            monto_recibido,
+            datetime.now(),
+            metodo_pago,
+            id_cliente,
+            id_empleado,
+            total_venta,
+            detalles_venta,
+        )
 
-        # venta = VentaDTO(monto_recibido, datetime.now(), metodo_pago, 1, 7, total_venta, detalles_venta)
-        # venta_servicio.agregarVentaEfectivo(venta)
+        venta_hecha = venta_servicio.agregarVenta(venta)
+
+        if not venta_hecha:
+            return jsonify({"Error": "No se pudo agregar la venta"}), 400
+
+        calcular_agregar_puntos_compra_rango_service.obtener_y_asignar_nuevo_Rango(
+            id_cliente
+        )
+        calcular_agregar_puntos_compra_rango_service.calcular_y_agregar_puntos_compra(
+            id_cliente, total_venta
+        )
 
     elif data["metodo_pago"] == "tarjeta":
         print("METODO PAGO TARJETA")
+
+        venta = VentaDTO(
+            total_venta,
+            datetime.now(),
+            metodo_pago,
+            id_cliente,
+            id_empleado,
+            total_venta,
+            detalles_venta,
+        )
+
+        venta_hecha = venta_servicio.agregarVenta(venta)
+
+        if not venta_hecha:
+            return jsonify({"Error": "No se pudo agregar la venta"}), 400
+
+        calcular_agregar_puntos_compra_rango_service.obtener_y_asignar_nuevo_Rango(
+            id_cliente
+        )
+        calcular_agregar_puntos_compra_rango_service.calcular_y_agregar_puntos_compra(
+            id_cliente, total_venta
+        )
+
     elif data["metodo_pago"] == "puntos":
         print("METODO PAGO PUNTOS")
+
+        venta = VentaDTO(
+            total_venta,
+            datetime.now(),
+            metodo_pago,
+            id_cliente,
+            id_empleado,
+            total_venta,
+            detalles_venta,
+        )
+
+        puntos_service.compro
+
+        venta_hecha = venta_servicio.agregarVenta(venta)
+
+        if not venta_hecha:
+            return jsonify({"Error": "No se pudo agregar la venta"}), 400
 
     return jsonify({"Mensaje": "Venta agregada correctamente"}), 200

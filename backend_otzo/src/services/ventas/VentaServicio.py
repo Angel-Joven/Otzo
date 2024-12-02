@@ -43,7 +43,7 @@ class VentaServicio(VentaModelo):
         finally:
             conexion.close()
 
-    def agregarVentaEfectivo(self, venta: VentaDTO):
+    def agregarVenta(self, venta: VentaDTO):
         try:
             conexion = get_connection()
             cursor = conexion.cursor(DictCursor)
@@ -76,6 +76,11 @@ class VentaServicio(VentaModelo):
                         detalle_venta.categoria_producto,
                         detalle_venta.devuelto,
                     ),
+                )
+
+                cursor.execute(
+                    "UPDATE detalle_inventario SET vendido = 1 WHERE codigo_producto = %s",
+                    detalle_venta.codigo_producto,
                 )
 
             conexion.commit()
@@ -131,7 +136,7 @@ class DetalleVentaServicio(DetalleVentaModelo):
                 categoria_producto = str(cursor.fetchone()["categoria_producto"])
 
                 cursor.execute(
-                    "select codigo_producto from detalle_inventario where id_inventario = %s",
+                    "select codigo_producto from detalle_inventario where id_inventario = %s and vendido = 0",
                     id_inventario,
                 )
 

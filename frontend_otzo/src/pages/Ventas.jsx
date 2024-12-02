@@ -4,8 +4,12 @@ import Spinner from "../components/ventas/Spinner";
 import { obtenerTodosLosProductosAVender } from "../api/inventario.api";
 import { agregarCompra } from "../api/ventas.api";
 import RowCarrito from "../components/ventas/RowCarrito";
+import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function Ventas() {
+  const { clienteActual, idCliente, administradorActual, idEmpleado } =
+    ObtenerTipoUsuario();
+
   const [productos, setProductos] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
 
