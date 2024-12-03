@@ -98,19 +98,6 @@ export function NavbarAdministradores() {
             </li>
             <li>
               <Link
-                to={"/ventas"}
-                className={`block py-2 px-3 mb-2 ${
-                  location.pathname === "/ventas"
-                    ? "text-black font-bold md:text-blue-500 underline"
-                    : "text-white"
-                } bg-green-600 rounded md:bg-transparent md:p-0`}
-                aria-current="page"
-              >
-                Ventas
-              </Link>
-            </li>
-            <li>
-              <Link
                 to={"/clientesadmin"}
                 className={`block py-2 px-3 mb-2 ${
                   location.pathname === "/clientesadmin"

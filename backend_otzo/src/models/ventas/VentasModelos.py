@@ -12,6 +12,11 @@ class VentaModelo(ABC):
         """Funcion para calcular el precio total de una venta"""
         pass
 
+    @abstractmethod
+    def listarVentasDeUsuario(self):
+        """Funcion para listar las ventas de un usuario"""
+        pass
+
 
 class DetalleVentaModelo(ABC):
     @abstractmethod
@@ -22,4 +27,14 @@ class DetalleVentaModelo(ABC):
     @abstractmethod
     def llenarDatos(self):
         """Funcion para llenar los datos de los detalles de venta"""
+        pass
+
+    @abstractmethod
+    def listarDetallesDeVenta(self):
+        """Funcion para listar los detalles de una venta"""
+        pass
+
+    @abstractmethod
+    def listarVariosDetallesDeVentas(self):
+        """Funcion para listar varios detalles de varias ventas"""
         pass

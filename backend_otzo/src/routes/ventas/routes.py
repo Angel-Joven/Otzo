@@ -175,3 +175,81 @@ def agregar():
         )
 
     return jsonify({"Mensaje": "Venta agregada correctamente"}), 200
+
+
+@ventas_bp.route("/ver_historial", methods=["POST"])
+def ver_historial():
+    data = request.json
+
+    id_cliente = int(data["id_cliente"])
+
+    venta_servicio = VentaServicio()
+
+    historial = venta_servicio.listarVentasDeUsuario(id_cliente)
+
+    if not historial:
+        return jsonify({"Error": "No hay historial de ventas para este cliente"}), 404
+
+    # Convierte el resultado a JSON usando el conversor personalizado
+    json_data = json.dumps(
+        historial, ensure_ascii=False, default=custom_json_serializer
+    )
+    return Response(json_data, content_type="application/json; charset=utf-8")
+
+
+@ventas_bp.route("/ver_historial/detalles_ventas", methods=["POST"])
+def ver_historial_detalles_ventas():
+    data = request.json
+
+    ids_ventas = data["ids_ventas"]
+
+    detalle_venta_servicio = DetalleVentaServicio()
+
+    historial = detalle_venta_servicio.listarVariosDetallesDeVentas(ids_ventas)
+
+    if not historial:
+        return (
+            jsonify(
+                {
+                    "Error": "No hay historial de detalles ventas para este cliente o fallo 1"
+                }
+            ),
+            404,
+        )
+
+    # Convierte el resultado a JSON usando el conversor personalizado
+    json_data = json.dumps(
+        historial, ensure_ascii=False, default=custom_json_serializer
+    )
+    return Response(json_data, content_type="application/json; charset=utf-8")
+
+
+@ventas_bp.route("/devolver", methods=["POST"])
+def devolver():
+    data = request.json
+
+    detalle_venta_servicio = DetalleVentaServicio()
+
+    id_inventario = int(data["id_inventario"])
+    id_detalle = int(data["id_detalle"])
+    codigo_producado = str(data["codigo_producto"])
+    id_cliente = int(data["id_cliente"])
+    precio_producto = float(data["precio_producto"])
+
+    devuelto = detalle_venta_servicio.devolverProducto(
+        id_inventario, id_detalle, codigo_producado
+    )
+
+    if not devuelto:
+        return jsonify({"Error": "No se pudo devolver el producto"}), 400
+
+    calcular_agregar_puntos_devolucion_service = (
+        CalcularAgregarPuntosDevolucionActualizarRangoService()
+    )
+
+    calcular_agregar_puntos_devolucion_service.obtener_y_asignar_nuevo_Rango(id_cliente)
+    calcular_agregar_puntos_devolucion_service.calcular_y_agregar_puntos_devolucion(
+        id_cliente, precio_producto
+    )
+
+    return jsonify({"Mensaje": "Producto devuelto correctamente"}), 200

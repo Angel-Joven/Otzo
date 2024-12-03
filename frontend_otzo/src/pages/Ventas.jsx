@@ -3,12 +3,17 @@ import DataTable from "react-data-table-component";
 import Spinner from "../components/ventas/Spinner";
 import { obtenerTodosLosProductosAVender } from "../api/inventario.api";
 import { obtenerAdministradores } from "../api/administracion.api";
-import { agregarCompra } from "../api/ventas.api";
+import {
+  agregarCompra,
+  devolverProducto,
+  obtenerHistorialCompraUsuario,
+  obtenerHistorialDetallesVenta,
+} from "../api/ventas.api";
 import RowCarrito from "../components/ventas/RowCarrito";
 import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function Ventas() {
-  const { clienteActual, idCliente } = ObtenerTipoUsuario();
+  const { idCliente } = ObtenerTipoUsuario();
 
   const [administrador, setAdministrador] = useState();
 
@@ -233,6 +238,169 @@ export function Ventas() {
     },
   ];
 
+  const columnasHistorial = [
+    {
+      name: "ID venta",
+      selector: (row) => row.id_venta,
+    },
+    {
+      name: "Fecha",
+      selector: (row) => row.fecha_venta,
+    },
+    {
+      name: "Monto recibido",
+      selector: (row) => "$" + row.monto_recibido + " MXN",
+    },
+    {
+      name: "Total venta",
+      selector: (row) => "$" + row.total_venta + " MXN",
+    },
+
+    {
+      name: "Método de pago",
+      selector: (row) => row.metodo_pago,
+    },
+  ];
+
+  const [isViewPurchaseHistory, setIsViewPurchaseHistory] = useState(false);
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
+
+  const handleModalViewPurchaseHistory = (e) => {
+    // Cierra el diálogo si se hace clic fuera del recuadro
+    if (e.target.id === "modalViewPurchaseHistory") {
+      setIsViewPurchaseHistory(false);
+    }
+  };
+
+  const viewPurchaseHistory = () => {
+    obtenerHistorialCompraUsuario({ id_cliente: idCliente })
+      .then((res) => {
+        const ventas = res.data;
+
+        // Obtener los IDs de las ventas
+        const idsVentas = ventas.map((venta) => venta.id_venta);
+
+        console.log(idsVentas);
+
+        // Llamar al backend para obtener los detalles de las ventas
+        return obtenerHistorialDetallesVenta({ ids_ventas: idsVentas }).then(
+          (detalles) => {
+            // Combinar los detalles con las ventas
+            const ventasConDetalles = ventas.map((venta) => {
+              const detallesVenta = detalles.data.find(
+                (detalle) => detalle.id_venta === venta.id_venta
+              );
+              return {
+                ...venta,
+                detalles_venta: detallesVenta?.detalles_venta || [],
+              };
+            });
+
+            return ventasConDetalles;
+          }
+        );
+      })
+      .then((ventasConDetalles) => {
+        setPurchaseHistory(ventasConDetalles);
+        setIsViewPurchaseHistory(true);
+      })
+      .catch((error) => {
+        console.error("Error al obtener historial de compras:", error);
+      });
+  };
+
+  const manejarDevolucion = (detalle) => {
+    devolverProducto({
+      id_inventario: detalle.id_producto,
+      id_detalle: detalle.id_detalle_venta,
+      codigo_producto: detalle.codigo_producto,
+      id_cliente: idCliente,
+      precio_producto: detalle.precio_unitario.toFixed(2),
+    }).then((res) => {
+      console.log("Producto devuelto correctamente");
+    });
+  };
+
+  const expandedComponent = ({ data }) => {
+    const detalles = data?.detalles_venta || [];
+
+    return (
+      <div style={{ padding: "1rem", fontFamily: "Arial, sans-serif" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={thStyle}>ID Detalle</th>
+              <th style={thStyle}>Nombre Producto</th>
+              <th style={thStyle}>Código Producto</th>
+              <th style={thStyle}>Precio Unitario</th>
+              <th style={thStyle}>Categoría</th>
+              <th style={thStyle}>Devuelto</th>
+              <th style={thStyle}>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {detalles.map((detalle, index) => (
+              <tr
+                key={index}
+                style={index % 2 === 0 ? rowStyleEven : rowStyleOdd}
+              >
+                <td style={tdStyle}>{detalle.id_detalle_venta}</td>
+                <td style={tdStyle}>{detalle.nombre_producto}</td>
+                <td style={tdStyle}>{detalle.codigo_producto}</td>
+                <td style={tdStyle}>{detalle.precio_unitario.toFixed(2)}</td>
+                <td style={tdStyle}>{detalle.categoria_producto}</td>
+                <td style={tdStyle}>{detalle.devuelto ? "Sí" : "No"}</td>
+                <td style={tdStyle}>
+                  {detalle.devuelto === 0 ? (
+                    <button
+                      onClick={() => manejarDevolucion(detalle)}
+                      style={buttonStyle}
+                    >
+                      Devolver
+                    </button>
+                  ) : null}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  // Estilos para la tabla y botones
+  const thStyle = {
+    backgroundColor: "#4CAF50",
+    color: "white",
+    padding: "10px",
+    textAlign: "left",
+    borderBottom: "2px solid #ddd",
+  };
+
+  const tdStyle = {
+    padding: "8px",
+    textAlign: "left",
+    borderBottom: "1px solid #ddd",
+  };
+
+  const rowStyleEven = {
+    backgroundColor: "#f9f9f9",
+  };
+
+  const rowStyleOdd = {
+    backgroundColor: "#fff",
+  };
+
+  const buttonStyle = {
+    backgroundColor: "#FF5733",
+    color: "white",
+    padding: "5px 10px",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontSize: "14px",
+  };
+
   return (
     <>
       <div className="bg-gradient-to-b from-green-500 to-green-900 w-full h-full min-h-[calc(100vh-5rem)] z-0 relative">
@@ -240,7 +408,7 @@ export function Ventas() {
           <dialog
             id="modalCompra"
             className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
-            onClick={manejarAbrirModalCompra}
+            onMouseDown={manejarAbrirModalCompra}
           >
             <div
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
@@ -282,8 +450,47 @@ export function Ventas() {
           </dialog>
         )}
 
+        {isViewPurchaseHistory && (
+          <dialog
+            id="modalViewPurchaseHistory"
+            className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
+            onMouseDown={handleModalViewPurchaseHistory}
+          >
+            <div
+              className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
+              onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
+            >
+              <p className="font-bold">Historial compras:</p>
+              <DataTable
+                columns={columnasHistorial}
+                data={purchaseHistory}
+                fixedHeader
+                theme="default"
+                striped={true}
+                dense={true}
+                pagination={true}
+                paginationPerPage={5}
+                paginationRowsPerPageOptions={[5, 10]}
+                expandableRows
+                expandableRowsComponent={expandedComponent}
+              />
+            </div>
+          </dialog>
+        )}
+
         <div className="flex justify-between text-center bg-green-800 text-white py-4 px-8">
           <h1 className="text-2xl font-bold">Ventas</h1>
+        </div>
+
+        <div className="bg-green-700 text-white p-4">
+          <div className="flex gap-4">
+            <button
+              className="bg-purple-700 p-2 rounded-xl"
+              onClick={viewPurchaseHistory}
+            >
+              Ver mi historial de compras
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 grid-rows-1 gap-4 p-2">

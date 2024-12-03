@@ -108,11 +108,58 @@ class VentaServicio(VentaModelo):
         finally:
             conexion.close()
 
+    def listarVentasDeUsuario(self, id_cliente: int):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            cursor.execute("SELECT * FROM ventas where id_cliente = %s", id_cliente)
+
+            return cursor.fetchall()
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
+
 
 @dataclass
 class DetalleVentaServicio(DetalleVentaModelo):
-    def devolverProducto(self):
-        pass
+    def devolverProducto(
+        self, id_inventario: int, id_detalle: int, codigo_producto: str
+    ):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            conexion.begin()
+
+            cursor.execute(
+                "UPDATE detalle_inventario SET vendido = 0 WHERE codigo_producto = %s",
+                codigo_producto,
+            )
+
+            cursor.execute(
+                "UPDATE inventario SET cantidad_producto = cantidad_producto + 1 WHERE id_inventario = %s",
+                id_inventario,
+            )
+
+            cursor.execute(
+                "UPDATE detalle_ventas SET devuelto = 1 where id_detalle_venta = %s",
+                id_detalle,
+            )
+
+            conexion.commit()
+
+            return True
+
+        except Exception as e:
+            print("No se pudieron llenar los datos de detalles venta, error:", e)
+            return False
+        finally:
+            conexion.close()
 
     def llenarDatos(self, productos: list[dict]) -> list[DetalleVentaDTO]:
         try:
@@ -177,3 +224,39 @@ class DetalleVentaServicio(DetalleVentaModelo):
             return None
         finally:
             conexion.close()
+
+    def listarDetallesDeVenta(self, id_venta: int) -> dict:
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            cursor.execute(
+                "SELECT * FROM detalle_ventas where id_venta = %s",
+                id_venta,
+            )
+
+            return cursor.fetchall()
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
+
+    def listarVariosDetallesDeVentas(self, ids_ventas: list[int]):
+
+        # lista_detalles_ventas = [{"id_venta": 1, "detalles_venta": [{}]}]
+        lista_detalles_ventas = []
+
+        for id_venta in ids_ventas:
+            detalles_de_la_venta = self.listarDetallesDeVenta(id_venta)
+
+            if not detalles_de_la_venta:
+                return None
+
+            lista_detalles_ventas.append(
+                {"id_venta": id_venta, "detalles_venta": detalles_de_la_venta}
+            )
+
+        return lista_detalles_ventas

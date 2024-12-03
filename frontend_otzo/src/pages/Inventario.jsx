@@ -13,14 +13,14 @@ import { useLocation } from "react-router-dom";
 import DataTable from "react-data-table-component";
 
 function Inventario() {
-  const [data, setData] = useState();
+  const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogAddTypeProductOpen, setIsDialogOpen] = useState(false); // Controla el diálogo
   const location = useLocation(); // Detecta cambios en la ruta
   const [recargarProductos, setRecargarProductos] = useState(false);
 
   const [descontinuados, setDescontinuados] = useState(false);
-  const [productosDescontinuados, setProductosDescontinuados] = useState();
+  const [productosDescontinuados, setProductosDescontinuados] = useState([]);
 
   const [categorias, setCategorias] = useState([]);
 
@@ -224,7 +224,7 @@ function Inventario() {
           <dialog
             id="modalAddProduct"
             className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
-            onClick={handleModalAddNewTipeProductClick}
+            onMouseDown={handleModalAddNewTipeProductClick}
           >
             <div
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
@@ -335,7 +335,7 @@ function Inventario() {
           <dialog
             id="modalEditProduct"
             className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
-            onClick={handleModalEditTypeProduct}
+            onMouseDown={handleModalEditTypeProduct}
           >
             <div
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
@@ -505,7 +505,7 @@ function Inventario() {
           <dialog
             id="modalViewReplenish"
             className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
-            onClick={handleModalViewReplenish}
+            onMouseDown={handleModalViewReplenish}
           >
             <div
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
@@ -582,7 +582,7 @@ function Inventario() {
             </svg>
           </div>
         ) : (
-          <div className="flex p-4 gap-4 flex-wrap">
+          <div className="flex p-4 gap-4 flex-wrap justify-center lg:justify-evenly">
             {descontinuados
               ? productosDescontinuados.map((producto, index) => {
                   return (
