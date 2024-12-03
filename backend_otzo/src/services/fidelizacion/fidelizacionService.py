@@ -477,6 +477,8 @@ class PagarPuntosCompraActualizarRangoService(PagarPuntosActualizarRangoModelo):
 # ES NECESARIO INGRESAR O TENER ALMACENADO LA INFORMACION
 # DEL 'id_cliente' Y DE 'precio_compra_total' PARA PASARLO A ESTE SERVICIO.
 
+# LA ESTRUCTURA ES LA SIGUIENTE:
+
 # PuntosService().comprobar_puntos(id_cliente, precio_compra_total)
 
 # ---------------------------------------------------------------------------------------------------------------------------

@@ -178,54 +178,40 @@ export function Reportes() {
                     </div>
                 )}
 
-    {reporteActivo === "ventas" && (
-        <div>
-            <h2 className="text-2xl font-bold mb-4">Reporte de Ventas</h2>
-            {/* Botón para generar el reporte */}
-            <button
-                onClick={obtenerReporteVentas}
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
-            >
-                Generar Reporte
-            </button>
-            <div className="mt-6">
-                {/* Renderizar los datos obtenidos */}
-                {reporteVentas ? (
-                    <table className="table-auto w-full border-collapse border border-gray-400">
-                        <thead>
-                            <tr>
-                                <th className="border px-4 py-2">ID Venta</th>
-                                <th className="border px-4 py-2">Total</th>
-                                <th className="border px-4 py-2">Fecha</th>
-                                <th className="border px-4 py-2">Cliente</th>
-                                <th className="border px-4 py-2">Empleado</th>
-                                <th className="border px-4 py-2">Detalles</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {reporteVentas.map((venta, index) => (
-                                <tr key={index}>
-                                    <td className="border px-4 py-2">{venta.id_venta}</td>
-                                    <td className="border px-4 py-2">${venta.total_venta}</td>
-                                    <td className="border px-4 py-2">{venta.fecha_venta}</td>
-                                    <td className="border px-4 py-2">{venta.cliente}</td>
-                                    <td className="border px-4 py-2">{venta.empleado}</td>
-                                    <td className="border px-4 py-2">
-                                        <ul>
-                                            {venta.detalles.map((detalle, i) => (
-                                                <li key={i}>
-                                                    {detalle.nombre_producto} - ${detalle.precio_unitario} x {detalle.cantidad}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                ) : (
-                    <p className="text-gray-500">Genera un reporte para ver los datos.</p>
-                )}
+                {reporteActivo === "ventas" && (
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">Reporte de Ventas</h2>
+                        <button
+                            onClick={obtenerReporteVentas}
+                            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+                        >
+                            Generar Reporte
+                        </button>
+                        <div className="mt-6">
+                            {reporteVentas ? (
+                                <table className="table-auto w-full border-collapse border border-gray-400">
+                                    <thead>
+                                        <tr>
+                                            <th className="border px-4 py-2">Nombre Producto</th>
+                                            <th className="border px-4 py-2">ID Venta</th>
+                                            <th className="border px-4 py-2">Fecha Venta</th>
+                                            <th className="border px-4 py-2">Total Venta</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {reporteVentas.map((venta, index) => (
+                                            <tr key={index}>
+                                                <td className="border px-4 py-2">{venta.nombre_producto}</td>
+                                                <td className="border px-4 py-2">{venta.id_venta}</td>
+                                                <td className="border px-4 py-2">{venta.fecha_venta}</td>
+                                                <td className="border px-4 py-2">${venta.total_venta}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p className="text-gray-500">Genera un reporte para ver los datos.</p>
+                            )}
                         </div>
                     </div>
                 )}
