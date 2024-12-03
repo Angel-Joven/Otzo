@@ -108,6 +108,22 @@ class VentaServicio(VentaModelo):
         finally:
             conexion.close()
 
+    def listarVentasDeUsuario(self, id_cliente: int):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            cursor.execute("SELECT * FROM ventas where id_cliente = %s", id_cliente)
+
+            return cursor.fetchall()
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
+
 
 @dataclass
 class DetalleVentaServicio(DetalleVentaModelo):
@@ -177,3 +193,45 @@ class DetalleVentaServicio(DetalleVentaModelo):
             return None
         finally:
             conexion.close()
+
+    def listarDetallesDeVenta(self, id_venta: int) -> dict:
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            cursor.execute(
+                "SELECT * FROM detalle_ventas where id_venta = %s",
+                id_venta,
+            )
+
+            return cursor.fetchall()
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            conexion.rollback()
+            return None
+        finally:
+            conexion.close()
+
+    def listarVariosDetallesDeVentas(self, ids_ventas: list[int]):
+
+        # lista_detalles_ventas = [{"id_venta": 1, "detalles_venta": [{}]}]
+        lista_detalles_ventas = []
+
+        print(ids_ventas)
+
+        for id_venta in ids_ventas:
+            detalles_de_la_venta = self.listarDetallesDeVenta(id_venta)
+
+            print(detalles_de_la_venta)
+
+            if not detalles_de_la_venta:
+                return None
+
+            lista_detalles_ventas.append(
+                {"id_venta": id_venta, "detalles_venta": detalles_de_la_venta}
+            )
+
+        print(lista_detalles_ventas)
+
+        return lista_detalles_ventas

@@ -74,7 +74,7 @@ function AppContent() {
         <Route
           path="/ventas"
           element={
-            <RutaProtegida allowedUserTypes={["cliente", "administrador"]}>
+            <RutaProtegida allowedUserTypes={["cliente"]}>
               {" "}
               <Ventas />{" "}
             </RutaProtegida>
