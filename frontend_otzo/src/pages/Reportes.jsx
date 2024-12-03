@@ -252,7 +252,7 @@ export function Reportes() {
                                         {reporteRangos.map((rango, index) => (
                                             <tr key={index}>
                                                 <td className="border px-4 py-2">{rango.nombre_rango}</td>
-                                                <td className="border px-4 py-2">{rango.total_personas}</td>
+                                                <td className="border px-4 py-2">{rango.total_personas || 0}</td>
                                             </tr>
                                         ))}
                                     </tbody>
