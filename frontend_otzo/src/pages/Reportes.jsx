@@ -300,17 +300,19 @@ export function Reportes() {
                                 <table className="table-auto w-full border-collapse border border-gray-400">
                                     <thead>
                                         <tr>
+                                            <th className="border px-4 py-2">ID Queja</th>
                                             <th className="border px-4 py-2">Categoría</th>
-                                            <th className="border px-4 py-2">Cantidad</th>
-                                            <th className="border px-4 py-2">IDs de Quejas</th>
+                                            <th className="border px-4 py-2">Estado</th>
+                                            <th className="border px-4 py-2">Fecha y Hora</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {reporteQuejas.map((queja, index) => (
                                             <tr key={index}>
+                                                <td className="border px-4 py-2">{queja.idQueja}</td>
                                                 <td className="border px-4 py-2">{queja.categoria}</td>
-                                                <td className="border px-4 py-2">{queja.cantidad}</td>
-                                                <td className="border px-4 py-2">{queja.ids_quejas.join(", ")}</td>
+                                                <td className="border px-4 py-2">{queja.estado}</td>
+                                                <td className="border px-4 py-2">{queja.fechaHora}</td>
                                             </tr>
                                         ))}
                                     </tbody>
