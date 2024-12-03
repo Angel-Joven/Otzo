@@ -13,14 +13,14 @@ import { useLocation } from "react-router-dom";
 import DataTable from "react-data-table-component";
 
 function Inventario() {
-  const [data, setData] = useState();
+  const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogAddTypeProductOpen, setIsDialogOpen] = useState(false); // Controla el diálogo
   const location = useLocation(); // Detecta cambios en la ruta
   const [recargarProductos, setRecargarProductos] = useState(false);
 
   const [descontinuados, setDescontinuados] = useState(false);
-  const [productosDescontinuados, setProductosDescontinuados] = useState();
+  const [productosDescontinuados, setProductosDescontinuados] = useState([]);
 
   const [categorias, setCategorias] = useState([]);
 
@@ -582,7 +582,7 @@ function Inventario() {
             </svg>
           </div>
         ) : (
-          <div className="flex p-4 gap-4 flex-wrap">
+          <div className="flex p-4 gap-4 flex-wrap justify-center lg:justify-evenly">
             {descontinuados
               ? productosDescontinuados.map((producto, index) => {
                   return (

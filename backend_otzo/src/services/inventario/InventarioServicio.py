@@ -183,6 +183,30 @@ class InventarioServicio(InventarioModelo):
         finally:
             conexion.close()
 
+    def validarInventario(self, productos: list[dict]) -> bool:
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            for producto in productos:
+                cursor.execute(
+                    "SELECT cantidad_producto FROM inventario where id_inventario = %s",
+                    producto["id_inventario"],
+                )
+
+                cantidad_actual = cursor.fetchone()["cantidad_producto"]
+
+                if not cantidad_actual:
+                    return False
+
+            return True
+
+        except Exception as e:
+            print("No se pudo conectar a la base de datos, error:", e)
+            return False
+        finally:
+            conexion.close()
+
 
 @dataclass
 class DetalleInventarioServicio(DetalleInventarioModelo):
