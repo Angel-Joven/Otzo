@@ -128,6 +128,42 @@ class ReportesService(ReportesModelo):
         finally:
             conexion.close()
 
+    @staticmethod
+    def crear_reporte_quejas():
+        """
+        Genera un reporte de quejas con los campos: categoría, estado, fechaHora, idQueja.
+        """
+        conexion = get_connection()
+        try:
+            with conexion.cursor(DictCursor) as cursor:
+                query = """
+                    SELECT 
+                        idQueja AS id_queja,
+                        categoria,
+                        estado,
+                        fechaHora
+                    FROM quejas
+                """
+                cursor.execute(query)
+                resultados = cursor.fetchall()
+
+                # Formatear el reporte
+                reporte = [
+                    {
+                        "idQueja": row["id_queja"],
+                        "categoria": row["categoria"],
+                        "estado": row["estado"],
+                        "fechaHora": row["fechaHora"].isoformat()  # Convertir a formato ISO
+                    }
+                    for row in resultados
+                ]
+
+                return reporte
+        except Exception as e:
+            return {"error": f"Error al generar el reporte de quejas: {str(e)}"}
+        finally:
+            conexion.close()
+
 # prueba de funcionalidad fecha del reporte
 # print("Prueba con fecha específica")
 # fecha_prueba = "2024-11-21"  # Cambia esta fecha para tus pruebas
