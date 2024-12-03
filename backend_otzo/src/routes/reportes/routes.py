@@ -95,8 +95,8 @@ def generar_reporte_rangos():
         with conexion.cursor(DictCursor) as cursor:
             query = """
                 SELECT r.nombre_rango, COUNT(p.idclientes_puntos) AS total_personas
-                FROM puntos p
-                JOIN rangos r where p.idrango = r.idrango                              
+                FROM rangos r
+                LEFT JOIN puntos p ON p.idrango = r.idrango
                 GROUP BY r.nombre_rango
                 ORDER BY total_personas DESC
             """
@@ -107,6 +107,7 @@ def generar_reporte_rangos():
         return jsonify({"error": f"Error al generar el reporte: {str(e)}"}), 500
     finally:
         conexion.close()
+
 # linea 65 where > on 
 # ---------------------------------------------------------------------------------------------------------------------------
 
