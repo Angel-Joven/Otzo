@@ -11,11 +11,14 @@ import {
 } from "../api/ventas.api";
 import RowCarrito from "../components/ventas/RowCarrito";
 import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
+import { Toaster, toast } from "react-hot-toast";
 
 export function Ventas() {
   const { idCliente } = ObtenerTipoUsuario();
 
   const [administrador, setAdministrador] = useState();
+
+  const [recargarProductos, setRecargarProductos] = useState(false);
 
   const [productos, setProductos] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -24,7 +27,7 @@ export function Ventas() {
 
   const [total, setTotal] = useState(0);
 
-  const [cambio, setCambio] = useState(0);
+  const [cambio, setCambio] = useState();
 
   const [montoRecibido, setMontoRecibido] = useState(0);
 
@@ -131,18 +134,19 @@ export function Ventas() {
       .catch((error) => {
         console.error("Error al obtener los productos:", error);
       });
-  }, []);
+  }, [recargarProductos]);
 
   const procesarCompra = () => {
-    // Validar que el carrito no esté vacío
-    if (carrito.length === 0) {
-      alert("El carrito está vacío. Agrega productos antes de comprar.");
+    if (metodoPago === "efectivo" && cambio == undefined) {
+      toast.error("Debe ingresar el monto recibido.");
       return;
     }
 
     // Validar si el método de pago es efectivo y el monto es suficiente
     if (metodoPago === "efectivo" && cambio < 0) {
-      alert("El monto proporcionado no es suficiente para cubrir el total.");
+      toast.error(
+        "El monto proporcionado no es suficiente para cubrir el total."
+      );
       return;
     }
 
@@ -174,28 +178,30 @@ export function Ventas() {
         })
       ),
       total,
-      metodo_pago: metodoPago,
-      monto_recibido: montoRecibido,
-      id_cliente: idCliente,
-      id_empleado: administrador,
+      metodo_pago: String(metodoPago),
+      monto_recibido: parseFloat(montoRecibido),
+      id_cliente: parseInt(idCliente),
+      id_empleado: parseInt(administrador),
     };
 
     console.log(datosCompra);
 
     // Enviar los datos de compra al backend
-    agregarCompra(datosCompra)
-      .then((res) => {
-        alert("Compra procesada con éxito.");
+    toast.promise(
+      agregarCompra(datosCompra).then((res) => {
         // Resetear estados
         setCarrito([]);
         setTotal(0);
-        setCambio(0);
+        setCambio(undefined);
         setAbrirModalCompra(false);
-      })
-      .catch((error) => {
-        console.error("Error al procesar la compra:", error);
-        alert("Hubo un problema al procesar la compra. Intenta de nuevo.");
-      });
+        setRecargarProductos(!recargarProductos);
+      }),
+      {
+        loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+        success: "¡Compra procesada con éxito!", // Mensaje cuando la promesa se resuelve con éxito
+        error: "Error al realizar la compra.", // Mensaje cuando la promesa es rechazada
+      }
+    );
   };
 
   const columns = [
@@ -273,18 +279,20 @@ export function Ventas() {
   };
 
   const viewPurchaseHistory = () => {
-    obtenerHistorialCompraUsuario({ id_cliente: idCliente })
-      .then((res) => {
-        const ventas = res.data;
+    toast.promise(
+      obtenerHistorialCompraUsuario({ id_cliente: idCliente })
+        .then((res) => {
+          const ventas = res.data;
 
-        // Obtener los IDs de las ventas
-        const idsVentas = ventas.map((venta) => venta.id_venta);
+          // Obtener los IDs de las ventas
+          const idsVentas = ventas.map((venta) => venta.id_venta);
 
-        console.log(idsVentas);
+          console.log(idsVentas);
 
-        // Llamar al backend para obtener los detalles de las ventas
-        return obtenerHistorialDetallesVenta({ ids_ventas: idsVentas }).then(
-          (detalles) => {
+          // Llamar al backend para obtener los detalles de las ventas
+          return obtenerHistorialDetallesVenta({
+            ids_ventas: idsVentas,
+          }).then((detalles) => {
             // Combinar los detalles con las ventas
             const ventasConDetalles = ventas.map((venta) => {
               const detallesVenta = detalles.data.find(
@@ -297,28 +305,38 @@ export function Ventas() {
             });
 
             return ventasConDetalles;
-          }
-        );
-      })
-      .then((ventasConDetalles) => {
-        setPurchaseHistory(ventasConDetalles);
-        setIsViewPurchaseHistory(true);
-      })
-      .catch((error) => {
-        console.error("Error al obtener historial de compras:", error);
-      });
+          });
+        })
+        .then((ventasConDetalles) => {
+          setPurchaseHistory(ventasConDetalles);
+          setIsViewPurchaseHistory(true);
+        }),
+      {
+        loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+        success: "¡Historial de compra consultado correctamente!", // Mensaje cuando la promesa se resuelve con éxito
+        error: "Error al intentar consultar el historial de compras", // Mensaje cuando la promesa es rechazada
+      }
+    );
   };
 
   const manejarDevolucion = (detalle) => {
-    devolverProducto({
-      id_inventario: detalle.id_producto,
-      id_detalle: detalle.id_detalle_venta,
-      codigo_producto: detalle.codigo_producto,
-      id_cliente: idCliente,
-      precio_producto: detalle.precio_unitario.toFixed(2),
-    }).then((res) => {
-      console.log("Producto devuelto correctamente");
-    });
+    toast.promise(
+      devolverProducto({
+        id_inventario: parseInt(detalle.id_producto),
+        id_detalle: parseInt(detalle.id_detalle_venta),
+        codigo_producto: String(detalle.codigo_producto),
+        id_cliente: parseInt(idCliente),
+        precio_producto: parseFloat(detalle.precio_unitario.toFixed(2)),
+      }).then(() => {
+        setIsViewPurchaseHistory(false);
+        setRecargarProductos(!recargarProductos);
+      }),
+      {
+        loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+        success: "¡Producto devuelto correctamente!", // Mensaje cuando la promesa se resuelve con éxito
+        error: "Error al intentar devolver el producto", // Mensaje cuando la promesa es rechazada
+      }
+    );
   };
 
   const expandedComponent = ({ data }) => {
@@ -403,6 +421,7 @@ export function Ventas() {
 
   return (
     <>
+      <Toaster position="top-center" />
       <div className="bg-gradient-to-b from-green-500 to-green-900 w-full h-full min-h-[calc(100vh-5rem)] z-0 relative">
         {abrirModalCompra && (
           <dialog
@@ -426,16 +445,17 @@ export function Ventas() {
                 <option value="tarjeta">Tarjeta</option>
                 <option value="puntos">Puntos</option>
               </select>
-              <label htmlFor="input_metodo_pago">
-                Monto dado por el cliente:{" "}
-              </label>
               {metodoPago == "efectivo" && (
                 <>
+                  <label htmlFor="input_metodo_pago">
+                    Monto dado por el cliente:{" "}
+                  </label>
                   <input
                     type="text"
                     className="block"
                     id="input_metodo_pago"
                     onChange={comprobarCambio}
+                    required
                   />
                   <p>Cambio: {cambio}</p>
                 </>
@@ -521,7 +541,11 @@ export function Ventas() {
               <button
                 className="bg-green-500 font-bold p-1"
                 onClick={() => {
-                  setAbrirModalCompra(true);
+                  if (carrito.length > 0) {
+                    setAbrirModalCompra(true);
+                  } else {
+                    toast.error("No hay productos en el carrito.");
+                  }
                 }}
               >
                 COMPRAR

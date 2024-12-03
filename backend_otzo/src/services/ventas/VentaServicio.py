@@ -22,7 +22,7 @@ class VentaServicio(VentaModelo):
 
                 cursor.execute(
                     "SELECT precio_unitario from inventario where id_inventario = %s",
-                    producto["id_inventario"],
+                    int(producto["id_inventario"]),
                 )
 
                 precio_producto = int(producto["cantidad"]) * float(

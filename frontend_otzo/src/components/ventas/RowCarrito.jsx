@@ -12,6 +12,12 @@ export default function RowCarrito({
   eliminarDelCarrito,
 }) {
   const cambiarCantidad = (e) => {
+    if (e.target.value <= 0) {
+      e.target.value = 1;
+    } else if (e.target.value > cantidad_producto) {
+      e.target.value = cantidad_producto;
+    }
+
     const nuevaCantidad = parseInt(e.target.value, 10) || 1;
 
     setCarrito((prevCarrito) =>

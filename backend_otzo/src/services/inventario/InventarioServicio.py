@@ -191,10 +191,10 @@ class InventarioServicio(InventarioModelo):
             for producto in productos:
                 cursor.execute(
                     "SELECT cantidad_producto FROM inventario where id_inventario = %s",
-                    producto["id_inventario"],
+                    int(producto["id_inventario"]),
                 )
 
-                cantidad_actual = cursor.fetchone()["cantidad_producto"]
+                cantidad_actual = int(cursor.fetchone()["cantidad_producto"])
 
                 if not cantidad_actual:
                     return False
@@ -255,6 +255,9 @@ class DetalleInventarioServicio(DetalleInventarioModelo):
 
             print(cantidad_maxima_producto, cantidad_actual, cantidad)
             nueva_cantidad = cantidad_maxima_producto - cantidad_actual
+
+            if cantidad_actual > cantidad_maxima_producto:
+                raise Exception("Ya se supero el stock maximo")
 
             if cantidad_actual == cantidad_maxima_producto:
                 raise Exception("Ya hay el stock maximo")
