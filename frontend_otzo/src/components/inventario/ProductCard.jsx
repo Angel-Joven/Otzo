@@ -21,15 +21,15 @@ export default function ProductCard({
 }) {
   const descontinuarProducto = () => {
     descontinuarTipoProducto({
-      nombre_tipo_producto: titulo,
-      imagen_tipo_producto: imagen,
-      categoria_tipo_producto: categoria,
-      descripcion_tipo_producto: descripcion,
-      precio_unitario: precio,
-      cantidad_tipo_producto: cantidad,
-      cantidad_maxima_producto: cantidad_maxima_producto,
+      nombre_tipo_producto: String(titulo),
+      imagen_tipo_producto: String(imagen),
+      categoria_tipo_producto: String(categoria),
+      descripcion_tipo_producto: String(descripcion),
+      precio_unitario: parseFloat(precio),
+      cantidad_tipo_producto: parseInt(cantidad),
+      cantidad_maxima_producto: parseInt(cantidad_maxima_producto),
       descontinuado: true,
-      id_inventario: id,
+      id_inventario: parseInt(id),
     })
       .then((res) => {
         console.log(res.data);
