@@ -127,8 +127,39 @@ class VentaServicio(VentaModelo):
 
 @dataclass
 class DetalleVentaServicio(DetalleVentaModelo):
-    def devolverProducto(self):
-        pass
+    def devolverProducto(
+        self, id_inventario: int, id_detalle: int, codigo_producto: str
+    ):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            conexion.begin()
+
+            cursor.execute(
+                "UPDATE detalle_inventario SET vendido = 0 WHERE codigo_producto = %s",
+                codigo_producto,
+            )
+
+            cursor.execute(
+                "UPDATE inventario SET cantidad_producto = cantidad_producto + 1 WHERE id_inventario = %s",
+                id_inventario,
+            )
+
+            cursor.execute(
+                "UPDATE detalle_ventas SET devuelto = 1 where id_detalle_venta = %s",
+                id_detalle,
+            )
+
+            conexion.commit()
+
+            return True
+
+        except Exception as e:
+            print("No se pudieron llenar los datos de detalles venta, error:", e)
+            return False
+        finally:
+            conexion.close()
 
     def llenarDatos(self, productos: list[dict]) -> list[DetalleVentaDTO]:
         try:

@@ -5,6 +5,7 @@ import { obtenerTodosLosProductosAVender } from "../api/inventario.api";
 import { obtenerAdministradores } from "../api/administracion.api";
 import {
   agregarCompra,
+  devolverProducto,
   obtenerHistorialCompraUsuario,
   obtenerHistorialDetallesVenta,
 } from "../api/ventas.api";
@@ -242,6 +243,23 @@ export function Ventas() {
       name: "ID venta",
       selector: (row) => row.id_venta,
     },
+    {
+      name: "Fecha",
+      selector: (row) => row.fecha_venta,
+    },
+    {
+      name: "Monto recibido",
+      selector: (row) => "$" + row.monto_recibido + " MXN",
+    },
+    {
+      name: "Total venta",
+      selector: (row) => "$" + row.total_venta + " MXN",
+    },
+
+    {
+      name: "Método de pago",
+      selector: (row) => row.metodo_pago,
+    },
   ];
 
   const [isViewPurchaseHistory, setIsViewPurchaseHistory] = useState(false);
@@ -293,21 +311,18 @@ export function Ventas() {
       });
   };
 
+  const manejarDevolucion = (detalle) => {
+    devolverProducto({
+      id_inventario: detalle.id_producto,
+      id_detalle: detalle.id_detalle_venta,
+      codigo_producto: detalle.codigo_producto,
+    }).then((res) => {
+      console.log("Producto devuelto correctamente");
+    });
+  };
+
   const expandedComponent = ({ data }) => {
     const detalles = data?.detalles_venta || [];
-
-    const devolverProducto = async (idDetalle) => {
-      try {
-        // Aquí llamarías a tu promesa devolverProducto
-        console.log(`Devolviendo producto con ID: ${idDetalle}`);
-        // Simulación de llamada a la API
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log(`Producto con ID ${idDetalle} devuelto correctamente`);
-        // Aquí puedes implementar la lógica para actualizar la UI o estado global
-      } catch (error) {
-        console.error(`Error al devolver producto con ID ${idDetalle}:`, error);
-      }
-    };
 
     return (
       <div style={{ padding: "1rem", fontFamily: "Arial, sans-serif" }}>
@@ -342,7 +357,7 @@ export function Ventas() {
                 <td style={tdStyle}>
                   {detalle.devuelto === 0 ? (
                     <button
-                      onClick={() => devolverProducto(detalle.id_detalle_venta)}
+                      onClick={() => manejarDevolucion(detalle)}
                       style={buttonStyle}
                     >
                       Devolver
@@ -449,9 +464,7 @@ export function Ventas() {
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
               onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
             >
-              <p className="font-bold">
-                Historial de reabastecimientos por día:
-              </p>
+              <p className="font-bold">Historial compras:</p>
               <DataTable
                 columns={columnasHistorial}
                 data={purchaseHistory}

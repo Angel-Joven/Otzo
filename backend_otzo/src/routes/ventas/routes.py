@@ -222,3 +222,23 @@ def ver_historial_detalles_ventas():
         historial, ensure_ascii=False, default=custom_json_serializer
     )
     return Response(json_data, content_type="application/json; charset=utf-8")
+
+
+@ventas_bp.route("/devolver", methods=["POST"])
+def devolver():
+    data = request.json
+
+    detalle_venta_servicio = DetalleVentaServicio()
+
+    id_inventario = int(data["id_inventario"])
+    id_detalle = int(data["id_detalle"])
+    codigo_producado = str(data["codigo_producto"])
+
+    devuelto = detalle_venta_servicio.devolverProducto(
+        id_inventario, id_detalle, codigo_producado
+    )
+
+    if not devuelto:
+        return jsonify({"Error": "No se pudo devolver el producto"}), 400
+
+    return jsonify({"Mensaje": "Producto devuelto correctamente"}), 200

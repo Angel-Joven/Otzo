@@ -15,3 +15,8 @@ export const obtenerHistorialCompraUsuario = (id_cliente) => {
 export const obtenerHistorialDetallesVenta = (ids_ventas) => {
     return axios.post("http://localhost:5000/api/ventas/ver_historial/detalles_ventas", ids_ventas);
 }
+
+export const devolverProducto = (productoADevolver) => {
+    console.log(productoADevolver);
+    return axios.post("http://localhost:5000/api/ventas/devolver", productoADevolver);
+}
