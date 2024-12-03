@@ -38,45 +38,23 @@ def generar_reporte_puntos():
 @reportes_bp.route("/reporte-ventas", methods=["GET"])
 def generar_reporte_ventas():
     """
-    Genera un reporte de ventas sin necesidad de filtrar por fecha.
+    Genera un reporte de ventas con los campos requeridos.
     """
     try:
-        # Conexión a la base de datos
         conexion = get_connection()
         cursor = conexion.cursor(DictCursor)
 
-        # Consultar todas las ventas
         cursor.execute("""
-            SELECT v.id_venta, v.total_venta, v.fecha_venta, c.nombre AS cliente, e.nombre AS empleado
+            SELECT v.id_venta, v.fecha_venta, v.total_venta, dv.nombre_producto
             FROM ventas v
-            JOIN clientes c ON v.id_cliente = c.id_cliente
-            JOIN empleados e ON v.id_empleado = e.id_empleado
+            JOIN detalle_ventas dv ON v.id_venta = dv.id_venta
         """)
         ventas = cursor.fetchall()
 
         if not ventas:
             return jsonify({"mensaje": "No se encontraron ventas registradas."}), 200
 
-        # Procesar cada venta y obtener detalles
-        reporte = []
-        for venta in ventas:
-            cursor.execute("""
-                SELECT nombre_producto, precio_unitario, cantidad
-                FROM detalle_ventas
-                WHERE id_venta = %s
-            """, (venta["id_venta"],))
-            detalles = cursor.fetchall()
-
-            reporte.append({
-                "id_venta": venta["id_venta"],
-                "total_venta": venta["total_venta"],
-                "fecha_venta": venta["fecha_venta"],
-                "cliente": venta["cliente"],
-                "empleado": venta["empleado"],
-                "detalles": detalles,
-            })
-
-        return jsonify(reporte), 200
+        return jsonify(ventas), 200
     except Exception as e:
         return jsonify({"error": f"Error al generar el reporte de ventas: {str(e)}"}), 500
     finally:
