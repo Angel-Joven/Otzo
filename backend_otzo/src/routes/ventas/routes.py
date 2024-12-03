@@ -233,6 +233,8 @@ def devolver():
     id_inventario = int(data["id_inventario"])
     id_detalle = int(data["id_detalle"])
     codigo_producado = str(data["codigo_producto"])
+    id_cliente = int(data["id_cliente"])
+    precio_producto = float(data["precio_producto"])
 
     devuelto = detalle_venta_servicio.devolverProducto(
         id_inventario, id_detalle, codigo_producado
@@ -240,5 +242,14 @@ def devolver():
 
     if not devuelto:
         return jsonify({"Error": "No se pudo devolver el producto"}), 400
+
+    calcular_agregar_puntos_devolucion_service = (
+        CalcularAgregarPuntosDevolucionActualizarRangoService()
+    )
+
+    calcular_agregar_puntos_devolucion_service.obtener_y_asignar_nuevo_Rango(id_cliente)
+    calcular_agregar_puntos_devolucion_service.calcular_y_agregar_puntos_devolucion(
+        id_cliente, precio_producto
+    )
 
     return jsonify({"Mensaje": "Producto devuelto correctamente"}), 200

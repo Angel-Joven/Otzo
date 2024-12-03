@@ -249,12 +249,8 @@ class DetalleVentaServicio(DetalleVentaModelo):
         # lista_detalles_ventas = [{"id_venta": 1, "detalles_venta": [{}]}]
         lista_detalles_ventas = []
 
-        print(ids_ventas)
-
         for id_venta in ids_ventas:
             detalles_de_la_venta = self.listarDetallesDeVenta(id_venta)
-
-            print(detalles_de_la_venta)
 
             if not detalles_de_la_venta:
                 return None
@@ -262,7 +258,5 @@ class DetalleVentaServicio(DetalleVentaModelo):
             lista_detalles_ventas.append(
                 {"id_venta": id_venta, "detalles_venta": detalles_de_la_venta}
             )
-
-        print(lista_detalles_ventas)
 
         return lista_detalles_ventas

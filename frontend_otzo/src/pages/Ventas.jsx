@@ -316,6 +316,8 @@ export function Ventas() {
       id_inventario: detalle.id_producto,
       id_detalle: detalle.id_detalle_venta,
       codigo_producto: detalle.codigo_producto,
+      id_cliente: idCliente,
+      precio_producto: detalle.precio_unitario.toFixed(2),
     }).then((res) => {
       console.log("Producto devuelto correctamente");
     });
@@ -330,8 +332,6 @@ export function Ventas() {
           <thead>
             <tr>
               <th style={thStyle}>ID Detalle</th>
-              <th style={thStyle}>ID Venta</th>
-              <th style={thStyle}>ID Producto</th>
               <th style={thStyle}>Nombre Producto</th>
               <th style={thStyle}>Código Producto</th>
               <th style={thStyle}>Precio Unitario</th>
@@ -347,8 +347,6 @@ export function Ventas() {
                 style={index % 2 === 0 ? rowStyleEven : rowStyleOdd}
               >
                 <td style={tdStyle}>{detalle.id_detalle_venta}</td>
-                <td style={tdStyle}>{detalle.id_venta}</td>
-                <td style={tdStyle}>{detalle.id_producto}</td>
                 <td style={tdStyle}>{detalle.nombre_producto}</td>
                 <td style={tdStyle}>{detalle.codigo_producto}</td>
                 <td style={tdStyle}>{detalle.precio_unitario.toFixed(2)}</td>
