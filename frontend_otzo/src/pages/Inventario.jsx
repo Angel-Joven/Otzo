@@ -12,6 +12,8 @@ import ProductCard from "../components/inventario/ProductCard";
 import { useLocation } from "react-router-dom";
 import DataTable from "react-data-table-component";
 
+import { Toaster, toast } from "react-hot-toast";
+
 function Inventario() {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -111,11 +113,18 @@ function Inventario() {
     };
 
     try {
-      crearTipoProducto(nuevoProducto).then((res) => {
-        console.log("Producto agregado con éxito.");
-        setIsDialogOpen(false);
-        setRecargarProductos(!recargarProductos);
-      });
+      toast.promise(
+        crearTipoProducto(nuevoProducto).then((res) => {
+          console.log("Producto agregado con éxito.");
+          setIsDialogOpen(false);
+          setRecargarProductos(!recargarProductos);
+        }),
+        {
+          loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+          success: "¡Producto agregado correctamente!", // Mensaje cuando la promesa se resuelve con éxito
+          error: "Error al intentar agregar un producto nuevo", // Mensaje cuando la promesa es rechazada
+        }
+      );
     } catch (error) {
       console.error("Error al agregar el producto:", error);
     }
@@ -156,11 +165,18 @@ function Inventario() {
     console.log(productoEditado);
 
     try {
-      actualizarTipoProducto(productoEditado).then((res) => {
-        console.log("Producto actualizado con éxito.");
-        setisDialogEditTypeProductOpen(false);
-        setRecargarProductos(!recargarProductos);
-      });
+      toast.promise(
+        actualizarTipoProducto(productoEditado).then((res) => {
+          console.log("Producto actualizado con éxito.");
+          setisDialogEditTypeProductOpen(false);
+          setRecargarProductos(!recargarProductos);
+        }),
+        {
+          loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+          success: "¡Producto editado correctamente!", // Mensaje cuando la promesa se resuelve con éxito
+          error: "Error al intentar actualizar el producto", // Mensaje cuando la promesa es rechazada
+        }
+      );
     } catch (error) {
       console.error("Error al actualizar el producto:", error);
     }
@@ -186,11 +202,18 @@ function Inventario() {
     console.log(solicitud);
 
     try {
-      reabastecerProducto(solicitud).then((res) => {
-        console.log("Producto reabastecido con éxito.");
-        setIsDialogReplenishOpen(false);
-        setRecargarProductos(!recargarProductos);
-      });
+      toast.promise(
+        reabastecerProducto(solicitud).then((res) => {
+          console.log("Producto reabastecido con éxito.");
+          setIsDialogReplenishOpen(false);
+          setRecargarProductos(!recargarProductos);
+        }),
+        {
+          loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+          success: "¡Producto reabastecido correctamente!", // Mensaje cuando la promesa se resuelve con éxito
+          error: "Error al intentar reabastecer el producto", // Mensaje cuando la promesa es rechazada
+        }
+      );
     } catch (error) {
       console.error("Error al reabastecer el producto:", error);
     }
@@ -207,10 +230,20 @@ function Inventario() {
   };
 
   const viewReplenish = () => {
-    obtenerHistorialDeReabastecimientoPorDia().then((res) => {
-      setReplenishHistory(res.data);
-    });
-    setIsViewReplenishOpen(true);
+    toast
+      .promise(
+        obtenerHistorialDeReabastecimientoPorDia().then((res) => {
+          setReplenishHistory(res.data);
+        }),
+        {
+          loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+          success: "¡Historial de reabastecimientos cargado con éxito!", // Mensaje cuando la promesa se resuelve con éxito
+          error: "Algo fallo al intentar consultar los reabastecimientos.", // Mensaje cuando la promesa es rechazada
+        }
+      )
+      .finally(() => {
+        setIsViewReplenishOpen(true);
+      });
   };
 
   const columns = [
@@ -230,6 +263,7 @@ function Inventario() {
 
   return (
     <>
+      <Toaster position="top-center" />
       <div className="bg-gradient-to-r from-slate-600 to-gray-500 w-full h-full min-h-[calc(100vh-5rem)] z-0 relative">
         {/* Diálogos */}
         {isDialogAddTypeProductOpen && (
@@ -383,6 +417,8 @@ function Inventario() {
                   placeholder="Escribe aquí..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                   required
+                  minLength={2}
+                  maxLength={256}
                 />
                 <label htmlFor="edit_product_image_input" className="block">
                   Imagen del producto:
@@ -394,6 +430,9 @@ function Inventario() {
                   placeholder="Escribe aquí..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                   required
+                  minLength={2}
+                  maxLength={256}
+                  pattern="https://.*"
                 />
                 <label htmlFor="edit_product_category_input" className="block">
                   Categoria del producto:
@@ -403,6 +442,7 @@ function Inventario() {
                   name="edit_product_category_input"
                   id="category"
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  required
                 >
                   {categorias.map((categoria, index) => {
                     return (
@@ -423,7 +463,9 @@ function Inventario() {
                   id="edit_product_description_input"
                   type="text"
                   placeholder="Escribe aquí..."
-                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400 resize-none"
+                  minLength={2}
+                  maxLength={512}
                 ></textarea>
                 <label htmlFor="edit_price_unit_input" className="block">
                   Precio del producto:
@@ -436,6 +478,10 @@ function Inventario() {
                   placeholder="Introduce tu precio..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                   required
+                  maxLength={2}
+                  pattern="^\d{1,10}(\.\d{0,2})?$"
+                  min="1"
+                  max="99999999"
                 />
                 <label htmlFor="edit_amount_product_input" className="block">
                   Cantidad del producto:
@@ -460,6 +506,8 @@ function Inventario() {
                   placeholder="Introduce la cantidad máxima del producto a reabastecer..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                   required
+                  min="1"
+                  max="99999999"
                 />
                 <label htmlFor="edit_enable_input" className="hidden">
                   Activo:
@@ -469,6 +517,7 @@ function Inventario() {
                   id="edit_enable_input"
                   defaultChecked={!productoAEditar.descontinuado}
                   className="hidden"
+                  required
                 ></input>
                 <input
                   type="text"
@@ -512,6 +561,8 @@ function Inventario() {
                   placeholder="Introduce la cantidad para agregar..."
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                   required
+                  min="1"
+                  max="99999999"
                 />
                 <input
                   type="number"

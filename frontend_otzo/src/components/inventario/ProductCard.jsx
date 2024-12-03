@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { descontinuarTipoProducto } from "../../api/inventario.api";
+import { toast } from "react-hot-toast";
 
 export default function ProductCard({
   imagen,
@@ -20,48 +21,51 @@ export default function ProductCard({
   cambiarProductoAReabastecer,
 }) {
   const descontinuarProducto = () => {
-    descontinuarTipoProducto({
-      nombre_tipo_producto: String(titulo),
-      imagen_tipo_producto: String(imagen),
-      categoria_tipo_producto: String(categoria),
-      descripcion_tipo_producto: String(descripcion),
-      precio_unitario: parseFloat(precio),
-      cantidad_tipo_producto: parseInt(cantidad),
-      cantidad_maxima_producto: parseInt(cantidad_maxima_producto),
-      descontinuado: true,
-      id_inventario: parseInt(id),
-    })
-      .then((res) => {
+    toast.promise(
+      descontinuarTipoProducto({
+        nombre_tipo_producto: String(titulo),
+        imagen_tipo_producto: String(imagen),
+        categoria_tipo_producto: String(categoria),
+        descripcion_tipo_producto: String(descripcion),
+        precio_unitario: parseFloat(precio),
+        cantidad_tipo_producto: parseInt(cantidad),
+        cantidad_maxima_producto: parseInt(cantidad_maxima_producto),
+        descontinuado: true,
+        id_inventario: parseInt(id),
+      }).then((res) => {
         console.log(res.data);
         setRecargar(!recargar);
-      })
-      .catch((error) => {
-        console.error(
-          "No se pudo descontinuar el producto por un error: ",
-          error
-        );
-      });
+      }),
+      {
+        loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+        success: "¡Producto descontinuado correctamente!", // Mensaje cuando la promesa se resuelve con éxito
+        error: "Error al intentar descontinuar el producto", // Mensaje cuando la promesa es rechazada
+      }
+    );
   };
 
   const reactivarProducto = () => {
-    descontinuarTipoProducto({
-      nombre_tipo_producto: titulo,
-      imagen_tipo_producto: imagen,
-      categoria_tipo_producto: categoria,
-      descripcion_tipo_producto: descripcion,
-      precio_unitario: precio,
-      cantidad_tipo_producto: cantidad,
-      cantidad_maxima_producto: cantidad_maxima_producto,
-      descontinuado: false,
-      id_inventario: id,
-    })
-      .then((res) => {
+    toast.promise(
+      descontinuarTipoProducto({
+        nombre_tipo_producto: titulo,
+        imagen_tipo_producto: imagen,
+        categoria_tipo_producto: categoria,
+        descripcion_tipo_producto: descripcion,
+        precio_unitario: precio,
+        cantidad_tipo_producto: cantidad,
+        cantidad_maxima_producto: cantidad_maxima_producto,
+        descontinuado: false,
+        id_inventario: id,
+      }).then((res) => {
         console.log(res.data);
         setRecargar(!recargar);
-      })
-      .catch((error) => {
-        console.error("No se pudo reactivar el producto por un error: ", error);
-      });
+      }),
+      {
+        loading: "Cargando...", // Mensaje mientras la promesa está pendiente
+        success: "¡Producto reactivado correctamente!", // Mensaje cuando la promesa se resuelve con éxito
+        error: "Error al intentar reactivar el producto", // Mensaje cuando la promesa es rechazada
+      }
+    );
   };
 
   const activarModalEditar = () => {

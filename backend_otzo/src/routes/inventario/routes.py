@@ -111,14 +111,14 @@ def agregar_tipo_producto():
     inventario_servicio = InventarioServicio()
 
     nuevo_tipo_producto = InventarioDTO(
-        data["nombre_tipo_producto"],
-        data["imagen_tipo_producto"],
-        data["categoria_tipo_producto"],
-        data["descripcion_tipo_producto"],
-        data["precio_unitario"],
+        str(data["nombre_tipo_producto"]),
+        str(data["imagen_tipo_producto"]),
+        str(data["categoria_tipo_producto"]),
+        str(data["descripcion_tipo_producto"]),
+        float(data["precio_unitario"]),
         0,
         False,
-        data["cantidad_maxima_producto"],
+        int(data["cantidad_maxima_producto"]),
     )
 
     resultado = inventario_servicio.agregarTipoProducto(nuevo_tipo_producto)
@@ -138,15 +138,15 @@ def actualizar_tipo_producto():
     inventario_servicio = InventarioServicio()
 
     nuevo_tipo_producto = InventarioDTO(
-        data["nombre_tipo_producto"],
-        data["imagen_tipo_producto"],
-        data["categoria_tipo_producto"],
-        data["descripcion_tipo_producto"],
-        data["precio_unitario"],
-        data["cantidad_tipo_producto"],
-        data["descontinuado"],
-        data["cantidad_maxima_producto"],
-        data["id_inventario"],
+        str(data["nombre_tipo_producto"]),
+        str(data["imagen_tipo_producto"]),
+        str(data["categoria_tipo_producto"]),
+        str(data["descripcion_tipo_producto"]),
+        float(data["precio_unitario"]),
+        int(data["cantidad_tipo_producto"]),
+        bool(data["descontinuado"]),
+        int(data["cantidad_maxima_producto"]),
+        int(data["id_inventario"]),
     )
 
     resultado = inventario_servicio.actualizarTipoProducto(nuevo_tipo_producto)
@@ -166,15 +166,15 @@ def descontinuar_tipo_producto():
     inventario_servicio = InventarioServicio()
 
     producto_a_descontinuar = InventarioDTO(
-        data["nombre_tipo_producto"],
-        data["imagen_tipo_producto"],
-        data["categoria_tipo_producto"],
-        data["descripcion_tipo_producto"],
-        data["precio_unitario"],
-        data["cantidad_tipo_producto"],
-        data["descontinuado"],
-        data["cantidad_maxima_producto"],
-        data["id_inventario"],
+        str(data["nombre_tipo_producto"]),
+        str(data["imagen_tipo_producto"]),
+        str(data["categoria_tipo_producto"]),
+        str(data["descripcion_tipo_producto"]),
+        float(data["precio_unitario"]),
+        int(data["cantidad_tipo_producto"]),
+        bool(data["descontinuado"]),
+        int(data["cantidad_maxima_producto"]),
+        int(data["id_inventario"]),
     )
 
     resultado = inventario_servicio.eliminarTipoProducto(producto_a_descontinuar)
@@ -194,7 +194,7 @@ def reabastecer():
     inventario_servicio = DetalleInventarioServicio()
 
     resultado = inventario_servicio.agregarProducto(
-        data["id_inventario"], data["cantidad"]
+        int(data["id_inventario"]), int(data["cantidad"])
     )
 
     if resultado:
