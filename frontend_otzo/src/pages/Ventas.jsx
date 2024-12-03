@@ -13,7 +13,7 @@ import RowCarrito from "../components/ventas/RowCarrito";
 import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function Ventas() {
-  const { clienteActual, idCliente } = ObtenerTipoUsuario();
+  const { idCliente } = ObtenerTipoUsuario();
 
   const [administrador, setAdministrador] = useState();
 
@@ -265,8 +265,6 @@ export function Ventas() {
   const [isViewPurchaseHistory, setIsViewPurchaseHistory] = useState(false);
   const [purchaseHistory, setPurchaseHistory] = useState([]);
 
-  const [historialDetalles, setHistorialDetalles] = useState([]);
-
   const handleModalViewPurchaseHistory = (e) => {
     // Cierra el diálogo si se hace clic fuera del recuadro
     if (e.target.id === "modalViewPurchaseHistory") {
@@ -410,7 +408,7 @@ export function Ventas() {
           <dialog
             id="modalCompra"
             className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
-            onClick={manejarAbrirModalCompra}
+            onMouseDown={manejarAbrirModalCompra}
           >
             <div
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
@@ -456,7 +454,7 @@ export function Ventas() {
           <dialog
             id="modalViewPurchaseHistory"
             className="absolute top-0 right-0 left-0 bottom-0 z-10 w-full h-full bg-slate-900/80 flex justify-center items-center"
-            onClick={handleModalViewPurchaseHistory}
+            onMouseDown={handleModalViewPurchaseHistory}
           >
             <div
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
