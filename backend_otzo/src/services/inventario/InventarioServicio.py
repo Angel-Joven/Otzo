@@ -322,12 +322,6 @@ class DetalleInventarioServicio(DetalleInventarioModelo):
         finally:
             conexion.close()
 
-    def actualizarProducto(self):
-        pass
-
-    def devolverProducto(self):
-        pass
-
     def listarReabastecimientosPorDia(self):
         try:
             conexion = get_connection()

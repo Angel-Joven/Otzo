@@ -45,16 +45,6 @@ class DetalleInventarioModelo(ABC):
         pass
 
     @abstractmethod
-    def actualizarProducto(self):
-        """ "Funcion para actualizar un producto del detalle de inventario"""
-        pass
-
-    @abstractmethod
-    def devolverProducto(self):
-        """Funcion para devolver un producto al detalle de inventario"""
-        pass
-
-    @abstractmethod
     def generarCodigoProducto(self):
         """Función para generar un código de producto único"""
         pass
