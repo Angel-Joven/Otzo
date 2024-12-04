@@ -57,10 +57,6 @@ export function IndexAdministradores() {
             animation_delay={1.1}
           />
           <Card
-            title={"Módulo de lógistica y reabastecimiento"}
-            animation_delay={1.2}
-          />
-          <Card
             title={"Módulo de clientes"}
             image={"clientes.png"}
             route={"/clientesadmin"}

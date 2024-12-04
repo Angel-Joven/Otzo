@@ -26,15 +26,15 @@ export function NavbarAdministradores() {
 
   return (
     <motion.nav className="bg-gray-900 h-20">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
         <motion.a
           initial={{ scale: 0 }}
           animate={{ scale: 1, transition: { delay: 0.8 } }}
           href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
+          className="flex items-center space-x-3 rtl:space-x-reverse sm:hidden lg:flex"
         >
           <img src="store.png" className="h-12" alt="" />
-          <span className="self-center text-2xl font-bold whitespace-nowrap text-white">
+          <span className="self-center text-2xl font-bold whitespace-nowrap text-white ">
             Otzo
           </span>
         </motion.a>
@@ -42,7 +42,7 @@ export function NavbarAdministradores() {
           onClick={() => setIsNavbarVisible(!isNavbarVisible)}
           data-collapse-toggle="navbar-default"
           type="button"
-          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm rounded-lg md:hidden focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
+          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm rounded-lg sm:hidden focus:outline-none focus:ring-2 text-gray-400 hover:bg-gray-700 focus:ring-gray-600"
           aria-controls="navbar-default"
           aria-expanded={isNavbarVisible}
         >
@@ -66,7 +66,7 @@ export function NavbarAdministradores() {
         <div
           className={`${
             isNavbarVisible ? "block" : "hidden"
-          } w-full md:block md:w-auto zIndex`}
+          } w-full md:block md:w-auto z-10`}
           id="navbar-default"
         >
           <ul className="font-medium flex flex-col p-4 md:p-2 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 bg-gray-800 md:bg-gray-900 border-gray-700 w-full">
