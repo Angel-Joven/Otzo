@@ -196,7 +196,9 @@ class InventarioServicio(InventarioModelo):
 
                 cantidad_actual = int(cursor.fetchone()["cantidad_producto"])
 
-                if not cantidad_actual:
+                cantidad_requerida = int(producto["cantidad"])
+
+                if cantidad_actual < cantidad_requerida:
                     return False
 
             return True
