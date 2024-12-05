@@ -54,22 +54,6 @@ def productosVender():
     return Response(json_data, content_type="application/json; charset=utf-8")
 
 
-@inventario_bp.route("/<int:id>", methods=["GET"])
-def obtener_producto(id):
-
-    inventario_servicio = InventarioServicio()
-
-    tipos_productos = inventario_servicio.obtenerTipoProducto(id)
-
-    # Convierte el resultado a JSON usando el conversor personalizado
-    json_data = json.dumps(
-        tipos_productos,
-        ensure_ascii=False,
-        default=custom_json_serializer,
-    )
-    return Response(json_data, content_type="application/json; charset=utf-8")
-
-
 @inventario_bp.route("/categorias", methods=["GET"])
 def listar_categorias():
 
