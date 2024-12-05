@@ -50,6 +50,12 @@ export function IndexClientes() {
             route={"/ventas"}
             animation_delay={0.8}
           />
+          <Card
+            title={"Módulo de atención al cliente"}
+            image={"customer-service.png"}
+            route={"/atencioncliente"}
+            animation_delay={0.8}
+          />
         </div>
       </div>
     </>

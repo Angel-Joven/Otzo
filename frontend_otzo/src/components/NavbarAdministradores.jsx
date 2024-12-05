@@ -137,9 +137,9 @@ export function NavbarAdministradores() {
             </li>
             <li>
               <Link
-                to={"/atencion"}
+                to={"/atencionadministrador"}
                 className={`block py-2 px-3 mb-2 ${
-                  location.pathname === "/atencion"
+                  location.pathname === "/atencionadministrador"
                     ? "text-black font-bold md:text-blue-500 underline"
                     : "text-white"
                 } bg-blue-600 rounded md:bg-transparent md:p-0`}

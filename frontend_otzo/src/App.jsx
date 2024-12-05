@@ -11,7 +11,8 @@ import { Reportes } from "./pages/Reportes";
 import { Clientes } from "./pages/Clientes"; //Clientes - Para solo clientes
 import { ClientesAdministracion } from "./pages/ClientesAdministracion"; //Clientes - Para solo administradores
 import { Administracion } from "./pages/Administracion";
-import { Atencion } from "./pages/Atencion";
+import { AtencionClientes } from "./pages/AtencionClientes";
+import { AtencionAdmin } from "./pages/AtencionAdmin";
 import { LoginClientes } from "./pages/loginClientes"; //Login Clientes
 import { LoginAdministradores } from "./pages/loginAdministradores"; //Login Administradores
 import { IndexClientes } from "./pages/IndexClientes"; //Index Para Clientes
@@ -109,11 +110,20 @@ function AppContent() {
           }
         />
         <Route
-          path="/atencion"
+          path="/atencioncliente"
+          element={
+            <RutaProtegida allowedUserTypes={["cliente"]}>
+              {" "}
+              <AtencionClientes />{" "}
+            </RutaProtegida>
+          }
+        />
+        <Route
+          path="/atencionadministrador"
           element={
             <RutaProtegida allowedUserTypes={["administrador"]}>
               {" "}
-              <Atencion />{" "}
+              <AtencionAdmin />{" "}
             </RutaProtegida>
           }
         />
