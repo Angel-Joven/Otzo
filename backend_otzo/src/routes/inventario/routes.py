@@ -211,4 +211,9 @@ def reabastecer():
 def verHistorialReabastecimiento():
     detalleInventarioServicio = DetalleInventarioServicio()
 
-    return detalleInventarioServicio.listarReabastecimientosPorDia()
+    reabastecimientos = detalleInventarioServicio.listarReabastecimientosPorDia()
+
+    if not reabastecimientos:
+        return jsonify({"error": "No hay historial de reabastecimientos"}), 404
+    else:
+        return reabastecimientos
