@@ -25,5 +25,9 @@ class SugerenciasModelo(ABC):
         pass
 
     @abstractmethod
-    def actualizarEstado(self):
+    def actualizarSugerencia(self):
+        pass
+    
+    @abstractmethod
+    def listarSugerenciasPendientes(self):
         pass

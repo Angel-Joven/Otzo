@@ -40,7 +40,6 @@ def obtener_quejas_pendientes():
     )
     return Response(json_data, content_type="application/json; charset=utf-8")
 
-
 @atencion_bp.route("/quejas/crear", methods=["POST"])
 def agregar_queja():
 
@@ -118,7 +117,42 @@ def agregar_sugerencia():
     else:
         return jsonify({"message": "Error al registrar la sugerencia"})
 
+@atencion_bp.route("/sugerencias/pendientes", methods=["GET"])
+def obtener_sugerencias_pendientes():
 
+    sugerencias_servicio = SugerenciasService()
+
+    sugerencias_cliente = sugerencias_servicio.listarSugerenciasPendientes()
+
+    json_data = json.dumps(
+        sugerencias_cliente, ensure_ascii=False, default=custom_json_serializer
+    )
+    return Response(json_data, content_type="application/json; charset=utf-8")
+
+@atencion_bp.route("/quejas/responder", methods=["PATCH"])
+def actualizar_sugerencia():
+
+    data = request.json
+
+    sugerencias_servicio = SugerenciasService()
+
+    sugerencia = SugerenciasDTO(
+        None,
+        data["id_empleado"],
+        None,
+        None,
+        None,
+        data["estado"],
+        data["comentarioSeguimiento"],
+        data["id_sugerencia"],
+    )
+
+    sugerencias_cliente = sugerencias_servicio.actualizarSugerencia(sugerencia)
+
+    if sugerencias_cliente:
+        return jsonify({"message": "Sugerencia actualizada con éxito"})
+    else:
+        return jsonify({"message": "Error al actualizar la sugerencia"})
 # @atencion_bp.route("/qagregar", methods=["POST"])
 # def add_complaint():
 #     # Lógica para agregar una nueva queja

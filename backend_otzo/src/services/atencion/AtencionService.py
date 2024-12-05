@@ -139,25 +139,48 @@ class SugerenciasService(SugerenciasModelo):
         finally:
             conexion.close()
     
-    def actualizarEstado(self):
-        pass
+    def listarSugerenciasPendientes(self):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
 
-    """def crearSugerencia(self):
-        connection = get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO sugerencias (id_cliente, id_trabajador, descripcion) VALUES (%s, %s, %s)",
-                (self.id_cliente, self.id_trabajador, self.descripcion),
-            )
-            connection.commit()
-        connection.close()
+            conexion.begin()
 
-    def actualizarEstado(self, id_sugerencia: int):
-        connection = get_connection()
-        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM sugerencias WHERE estado = 'Pendiente' OR estado = 'Activa'")
+
+            return cursor.fetchall()
+
+        except Exception as e:
+            print("No se pudo consultar las sugerencias, error:", e)
+            conexion.rollback()
+            return False
+        finally:
+            conexion.close()
+    
+    def actualizarSugerencia(self, queja: SugerenciasDTO):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            conexion.begin()
+
             cursor.execute(
-                "UPDATE sugerencias SET estado = 'Resuelta' WHERE id_sugerencia = (%s)",
-                (id_sugerencia),
+                "UPDATE sugerencias SET estado = %s, comentarioSeguimiento = %s, id_empleado = %s WHERE idSugerencia = %s",
+                (
+                    queja.estado,
+                    queja.comentarioSeguimiento,
+                    queja.idEmpleado,
+                    queja.idSugerencia,
+                ),
             )
-            connection.commit()
-        connection.close()"""
+
+            conexion.commit()
+
+            return True
+
+        except Exception as e:
+            print("No se pudo actualizar la Sugerencia, error:", e)
+            conexion.rollback()
+            return False
+        finally:
+            conexion.close()

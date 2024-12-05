@@ -12,12 +12,20 @@ export const obtenerQuejasPendientes = () => {
     return axios.get("http://localhost:5000/api/atencion/quejas/pendientes");
 }
 
+export const obtenerSugerenciasPendientes = () => {
+    return axios.get("http://localhost:5000/api/atencion/sugerencias/pendientes");
+}
+
 export const crearQueja = (queja) => {
     return axios.post(`http://localhost:5000/api/atencion/quejas/crear`, queja);
 }
 
 export const responderQueja = (respuesta) => {
     return axios.patch(`http://localhost:5000/api/atencion/quejas/responder`, respuesta);
+}
+
+export const responderSugerencia = (respuesta) => {
+    return axios.patch(`http://localhost:5000/api/atencion/sugerencias/responder`, respuesta);
 }
 
 export const crearSugerencia = (sugerencia) => {
