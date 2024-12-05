@@ -4,9 +4,8 @@ import DataTable from "react-data-table-component";
 import { Toaster, toast } from "react-hot-toast";
 
 import {
-  crearQueja,
-  obtenerQuejasCliente,
   obtenerQuejasPendientes,
+  responderQueja,
 } from "../api/atencionData.api";
 import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
@@ -14,13 +13,13 @@ export function AtencionAdmin() {
   const { idEmpleado } = ObtenerTipoUsuario();
   const [quejas, setQuejas] = useState([]);
   const [recargarQuejas, setRecargarQuejas] = useState(false);
-  const [quejaAEditar, setQuejaAEditar] = useState();
+  const [quejaAEditar, setQuejaAEditar] = useState({});
 
   useEffect(() => {
     obtenerQuejasPendientes().then((res) => {
       setQuejas(res.data);
     });
-  }, []);
+  }, [recargarQuejas]);
 
   const columnasQuejas = [
     {
@@ -58,12 +57,12 @@ export function AtencionAdmin() {
           whileHover={{ scale: 1.1 }}
           onClick={() => {
             setAbrirModalQueja(true);
-            setQuejaAEditar(row.idQueja);
+            setQuejaAEditar(row);
             // TODO: Llenar los campos del formulario con los datos de la queja
           }}
           className="bg-blue-500 text-white p-2"
         >
-          Responder {row.idQueja}, {idEmpleado}
+          Responder
         </motion.button>
       ),
     },
@@ -79,17 +78,22 @@ export function AtencionAdmin() {
   };
   const manejarResponderQueja = async (e) => {
     e.preventDefault();
-
-    /* const queja = {
-      id_cliente: idCliente,
-      id_empleado: 0,
-      rango_usuario: 0,
-      descripcion: e.target.add_queja_descripcion.value,
-      categoria: e.target.add_queja_categoria.value,
-      estado: "Pendiente",
-      prioridad: 1,
-      comentario_seguimiento: "",
+    const queja = {
+      id_empleado: idEmpleado,
+      estado: e.target.add_queja_categoria.value,
+      comentarioSeguimiento: e.target.add_queja_descripcion.value,
+      id_queja: e.target.id_queja.value,
     };
+
+    toast.promise(responderQueja(queja).then(() => {
+      setRecargarQuejas(!recargarQuejas);
+      setAbrirModalQueja(false);
+    }), {
+      loading: "Cargando...",
+      success: "¡Operación exitosa!",
+      error: "Error al realizar la operación",
+    })
+    /*
 
     toast
       .promise(crearQueja(queja), {
@@ -117,10 +121,10 @@ export function AtencionAdmin() {
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
               onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
             >
-              <p className="font-bold text-xl">Agrega un producto:</p>
+              <p className="font-bold text-xl">Responder una queja</p>
               <form onSubmit={manejarResponderQueja}>
                 <label htmlFor="add_queja_descripcion" className="block">
-                  Describa su queja:
+                  Respuesta a la queja
                 </label>
                 <textarea
                   id="add_queja_descripcion"
@@ -131,10 +135,9 @@ export function AtencionAdmin() {
                   minLength={2}
                   maxLength={512}
                 >
-                  {quejaAEditar}
                 </textarea>
                 <label htmlFor="add_queja_categoria" className="block">
-                  Categoria de la queja:
+                  Estado de la queja
                 </label>
                 <select
                   name="add_queja_categoria"
@@ -142,23 +145,19 @@ export function AtencionAdmin() {
                   className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
                   required
                 >
-                  <option value="" disabled selected>
-                    Selecciona una categoría
+                  <option defaultValue={quejaAEditar.estado} disabled>
+                    Selecciona estado
                   </option>
-                  <option value="Servicio al cliente">
-                    Servicio al cliente
+                  <option value="Pendiente">
+                    Pendiente
                   </option>
-                  <option value="Instalaciones">Instalaciones</option>
-                  <option value="Productos">Productos</option>
-                  <option value="Otros">Otros</option>
-                  <option value="Servicio al cliente">
-                    Servicio al cliente
-                  </option>
-                  <option value="Cobros indebidos">Cobros indebidos</option>
+                  <option value="Activa">Activa</option>
+                  <option value="Finalizada">Finalizada</option>
                 </select>
+                <input type="text" id="id_queja" hidden value={quejaAEditar.idQueja}/>
                 <input
                   type="submit"
-                  value="Crear producto"
+                  value="Actualizar queja"
                   className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
                 />
               </form>
@@ -186,17 +185,10 @@ export function AtencionAdmin() {
                 <h2 className="font-bold text-white">
                   <i className="align-middle fi fi-sr-document"></i> Quejas
                 </h2>
-                <button
-                  className="text-white bg-blue-500 rounded-xl p-2"
-                  onClick={() => setAbrirModalQueja(true)}
-                >
-                  + Agregar queja
-                </button>
               </div>
               <div className="overflow-x-auto">
-                <DataTable columns={columnasQuejas} data={quejas} />
+                <DataTable columns={columnasQuejas} data={quejas} pagination/>
               </div>
-              <div className="h-[calc(25vh)] md:h-[calc(50vh)]"></div>
             </motion.div>
           </div>
 
@@ -241,7 +233,6 @@ export function AtencionAdmin() {
                   <tbody></tbody>
                 </table>
               </div>
-              <div className="h-[calc(25vh)] md:h-[calc(50vh)]"></div>
             </motion.div>
           </div>
         </div>

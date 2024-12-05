@@ -51,7 +51,6 @@ def agregar_queja():
     queja = QuejasDTO(
         data["id_cliente"],
         data["id_empleado"],
-        data["rango_usuario"],
         datetime.now(),
         data["descripcion"],
         data["categoria"],
@@ -67,6 +66,33 @@ def agregar_queja():
     else:
         return jsonify({"message": "Error al registrar la queja"})
 
+@atencion_bp.route("/quejas/responder", methods=["PATCH"])
+def actualizar_queja():
+
+    data = request.json
+
+    quejas_servicio = QuejasService()
+
+    queja = QuejasDTO(
+        None,
+        data["id_empleado"],
+        None,
+        None,
+        None,
+        data["estado"],
+        None,
+        data["comentarioSeguimiento"],
+        data["id_queja"],
+    )
+    
+    print(queja)
+
+    quejas_cliente = quejas_servicio.actualizarQueja(queja)
+
+    if quejas_cliente:
+        return jsonify({"message": "Queja actualizada con éxito"})
+    else:
+        return jsonify({"message": "Error al actualizar la queja"})
 
 @atencion_bp.route("/sugerencias/crear", methods=["POST"])
 def agregar_sugerencia():
@@ -75,19 +101,17 @@ def agregar_sugerencia():
 
     sugerencia_servicio = SugerenciasService()
 
-    sugrencia = SugerenciasDTO(
+    sugerencia = SugerenciasDTO(
         data["id_cliente"],
         data["id_empleado"],
-        data["rango_usuario"],
         datetime.now(),
         data["descripcion"],
         data["categoria"],
         data["estado"],
-        data["prioridad"],
         data["comentario_seguimiento"],
     )
 
-    sugerencia_cliente = sugerencia_servicio.crearSugerencia(sugrencia)
+    sugerencia_cliente = sugerencia_servicio.crearSugerencia(sugerencia)
 
     if sugerencia_cliente:
         return jsonify({"message": "Sugerencia registrada con éxito"})

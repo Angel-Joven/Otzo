@@ -17,5 +17,9 @@ export const crearQueja = (queja) => {
 }
 
 export const responderQueja = (respuesta) => {
-    return axios.post(`http://localhost:5000/api/atencion/quejas/responder`, respuesta);
+    return axios.patch(`http://localhost:5000/api/atencion/quejas/responder`, respuesta);
+}
+
+export const crearSugerencia = (sugerencia) => {
+    return axios.post(`http://localhost:5000/api/atencion/sugerencias/crear`, sugerencia);
 }
