@@ -27,7 +27,6 @@ def obtener_quejas(id):
     )
     return Response(json_data, content_type="application/json; charset=utf-8")
 
-
 @atencion_bp.route("/quejas/pendientes", methods=["GET"])
 def obtener_quejas_pendientes():
 
