@@ -129,12 +129,14 @@ def obtener_sugerencias_pendientes():
     )
     return Response(json_data, content_type="application/json; charset=utf-8")
 
-@atencion_bp.route("/quejas/responder", methods=["PATCH"])
+@atencion_bp.route("/sugerencias/responder", methods=["PATCH"])
 def actualizar_sugerencia():
 
     data = request.json
 
     sugerencias_servicio = SugerenciasService()
+    
+    print(data)
 
     sugerencia = SugerenciasDTO(
         None,

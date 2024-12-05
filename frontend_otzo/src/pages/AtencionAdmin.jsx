@@ -165,7 +165,7 @@ export function AtencionAdmin() {
       id_empleado: idEmpleado,
       estado: e.target.add_sugerencia_categoria.value,
       comentarioSeguimiento: e.target.add_sugerencia_descripcion.value,
-      id_queja: e.target.id_sugerencia.value,
+      id_sugerencia: e.target.id_sugerencia.value,
     };
 
     toast.promise(responderSugerencia(sugerencia).then(() => {

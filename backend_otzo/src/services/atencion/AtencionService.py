@@ -157,7 +157,7 @@ class SugerenciasService(SugerenciasModelo):
         finally:
             conexion.close()
     
-    def actualizarSugerencia(self, queja: SugerenciasDTO):
+    def actualizarSugerencia(self, sugerencia: SugerenciasDTO):
         try:
             conexion = get_connection()
             cursor = conexion.cursor(DictCursor)
@@ -167,10 +167,10 @@ class SugerenciasService(SugerenciasModelo):
             cursor.execute(
                 "UPDATE sugerencias SET estado = %s, comentarioSeguimiento = %s, id_empleado = %s WHERE idSugerencia = %s",
                 (
-                    queja.estado,
-                    queja.comentarioSeguimiento,
-                    queja.idEmpleado,
-                    queja.idSugerencia,
+                    sugerencia.estado,
+                    sugerencia.comentarioSeguimiento,
+                    sugerencia.idEmpleado,
+                    sugerencia.idSugerencia,
                 ),
             )
 
