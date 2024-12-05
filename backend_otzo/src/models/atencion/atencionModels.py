@@ -7,7 +7,7 @@ class QuejasModelo(ABC):
         pass
 
     @abstractmethod
-    def actualizarEstado(self):
+    def actualizarQueja(self):
         pass
 
     @abstractmethod

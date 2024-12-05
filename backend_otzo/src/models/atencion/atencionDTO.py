@@ -6,7 +6,6 @@ from datetime import datetime
 class QuejasDTO:
     _idCliente: int
     _idEmpleado: int
-    _rangoUsuario: int
     _fechaHora: datetime
     _descripcion: str
     _categoria: str
@@ -38,14 +37,6 @@ class QuejasDTO:
     @idEmpleado.setter
     def idEmpleado(self, value: int):
         self._idEmpleado = value
-
-    @property
-    def rangoUsuario(self) -> int:
-        return self._rangoUsuario
-
-    @rangoUsuario.setter
-    def rangoUsuario(self, value: int):
-        self._rangoUsuario = value
 
     @property
     def fechaHora(self) -> datetime:
@@ -98,13 +89,14 @@ class QuejasDTO:
 
 @dataclass
 class SugerenciasDTO:
-    _idSugerencia: int
     _idCliente: int
+    _idEmpleado: int
     _fechaHora: datetime
     _descripcion: str
     _categoria: str
     _estado: str
     _comentarioSeguimiento: str
+    _idSugerencia: int = None
 
     @property
     def idSugerencia(self) -> int:
@@ -121,6 +113,14 @@ class SugerenciasDTO:
     @idCliente.setter
     def idCliente(self, value: int):
         self._idCliente = value
+
+    @property
+    def idEmpleado(self) -> int:
+        return self._idEmpleado
+
+    @idEmpleado.setter
+    def idEmpleado(self, value: int):
+        self._idEmpleado = value
 
     @property
     def fechaHora(self) -> datetime:

@@ -34,7 +34,7 @@ class QuejasService(QuejasModelo):
 
             conexion.begin()
 
-            cursor.execute("SELECT * FROM quejas WHERE estado = 'Pendiente'")
+            cursor.execute("SELECT * FROM quejas WHERE estado = 'Pendiente' OR estado = 'Activa'")
 
             return cursor.fetchall()
 
@@ -53,11 +53,10 @@ class QuejasService(QuejasModelo):
             conexion.begin()
 
             cursor.execute(
-                "INSERT INTO quejas (id_cliente, id_empleado, rangoUsuario, fechaHora, descripcion, categoria, estado, prioridad, comentarioSeguimiento) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                "INSERT INTO quejas (id_cliente, id_empleado, fechaHora, descripcion, categoria, estado, prioridad, comentarioSeguimiento) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 (
                     queja.idCliente,
                     queja.idEmpleado,
-                    queja.rangoUsuario,
                     datetime.now(),
                     queja.descripcion,
                     queja.categoria,
@@ -78,24 +77,69 @@ class QuejasService(QuejasModelo):
         finally:
             conexion.close()
 
-    def actualizarEstado(self):
-        pass
+    def actualizarQueja(self, queja: QuejasDTO):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
 
-    """ def actualizarEstado(self, id_queja: int):
-        connection = get_connection()
-        with connection.cursor() as cursor:
+            conexion.begin()
+
             cursor.execute(
-                "UPDATE quejas SET estado = 'Resuelta' WHERE id_queja = (%s)",
-                (id_queja),
+                "UPDATE quejas SET estado = %s, comentarioSeguimiento = %s, id_empleado = %s WHERE idQueja = %s",
+                (
+                    queja.estado,
+                    queja.comentarioSeguimiento,
+                    queja.idEmpleado,
+                    queja.idQueja,
+                ),
             )
-            connection.commit()
-        connection.close() """
 
+            conexion.commit()
+
+            return True
+
+        except Exception as e:
+            print("No se pudo actualizar la queja, error:", e)
+            conexion.rollback()
+            return False
+        finally:
+            conexion.close()
 
 @dataclass
 class SugerenciasService(SugerenciasModelo):
 
-    def crearSugerencia(self):
+    def crearSugerencia(self, sugerencia: SugerenciasDTO):
+        try:
+            conexion = get_connection()
+            cursor = conexion.cursor(DictCursor)
+
+            conexion.begin()
+
+            cursor.execute(
+                "INSERT INTO sugerencias (id_cliente, id_empleado, fechaHora, descripcion, categoria, estado, comentarioSeguimiento) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (
+                    sugerencia.idCliente,
+                    sugerencia.idEmpleado,
+                    datetime.now(),
+                    sugerencia.descripcion,
+                    sugerencia.categoria,
+                    sugerencia.estado,
+                    sugerencia.comentarioSeguimiento,
+                ),
+            )
+
+            conexion.commit()
+
+            return True
+
+        except Exception as e:
+            print("No se pudo agregar la sugerencia, error:", e)
+            conexion.rollback()
+            return False
+        finally:
+            conexion.close()
+    
+    def actualizarEstado(self):
         pass
 
     """def crearSugerencia(self):

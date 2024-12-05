@@ -3,13 +3,14 @@ import { motion } from "framer-motion";
 import DataTable from "react-data-table-component";
 import { Toaster, toast } from "react-hot-toast";
 
-import { crearQueja, obtenerQuejasCliente } from "../api/atencionData.api";
+import { crearQueja, obtenerQuejasCliente, crearSugerencia } from "../api/atencionData.api";
 import { ObtenerTipoUsuario } from "../context/obtenerUsuarioTipo";
 
 export function AtencionClientes() {
   const { idCliente } = ObtenerTipoUsuario();
   const [quejasCliente, setQuejasCliente] = useState([]);
   const [recargarQuejas, setRecargarQuejas] = useState(false);
+  const [recargarSugerencia, setRecargarSugerencia] = useState(false);
 
   useEffect(() => {
     if (idCliente) {
@@ -29,12 +30,9 @@ export function AtencionClientes() {
       selector: (row) => row.idQueja,
     },
     {
-      name: "ID empleado",
-      selector: (row) => row.id_empleado,
-    },
-    {
       name: "Fecha y hora",
       selector: (row) => row.fechaHora,
+      sortable: true,
     },
     {
       name: "Descripción",
@@ -43,10 +41,12 @@ export function AtencionClientes() {
     {
       name: "Categoria",
       selector: (row) => row.categoria,
+      sortable: true,
     },
     {
       name: "Estado",
       selector: (row) => row.estado,
+      sortable: true,
     },
     {
       name: "Respuesta",
@@ -66,11 +66,10 @@ export function AtencionClientes() {
     e.preventDefault();
 
     const queja = {
-      id_cliente: idCliente,
+      id_cliente: parseInt(idCliente),
       id_empleado: 0,
-      rango_usuario: 0,
-      descripcion: e.target.add_queja_descripcion.value,
-      categoria: e.target.add_queja_categoria.value,
+      descripcion:String(e.target.add_queja_descripcion.value),
+      categoria: String(e.target.add_queja_categoria.value),
       estado: "Pendiente",
       prioridad: 1,
       comentario_seguimiento: "",
@@ -99,25 +98,23 @@ export function AtencionClientes() {
     e.preventDefault();
 
     const sugerencia = {
-      id_cliente: idCliente,
+      id_cliente: parseInt(idCliente),
       id_empleado: 0,
-      rango_usuario: 0,
-      descripcion: e.target.add_queja_descripcion.value,
-      categoria: e.target.add_queja_categoria.value,
+      descripcion: String(e.target.add_sugerencia_descripcion.value),
+      categoria: String(e.target.add_sugerencia_categoria.value),
       estado: "Pendiente",
-      prioridad: 1,
       comentario_seguimiento: "",
     };
 
     toast
-      .promise(crearQueja(queja), {
+      .promise(crearSugerencia(sugerencia), {
         loading: "Cargando...", // Mensaje mientras la promesa está pendiente
         success: "¡Operación exitosa!", // Mensaje cuando la promesa se resuelve con éxito
         error: "Error al realizar la operación", // Mensaje cuando la promesa es rechazada
       })
       .finally(() => {
-        setRecargarQuejas(!recargarQuejas);
-        setAbrirModalQueja(false);
+        setRecargarSugerencia(!recargarSugerencia);
+        setabrirModalSugerencia(false);
       });
   };
 
@@ -135,7 +132,7 @@ export function AtencionClientes() {
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
               onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
             >
-              <p className="font-bold text-xl">Agrega un producto:</p>
+              <p className="font-bold text-xl">Agrega una queja</p>
               <form onSubmit={manejarAddQueja}>
                 <label htmlFor="add_queja_descripcion" className="block">
                   Describa su queja:
@@ -166,15 +163,12 @@ export function AtencionClientes() {
                   </option>
                   <option value="Instalaciones">Instalaciones</option>
                   <option value="Productos">Productos</option>
-                  <option value="Otros">Otros</option>
-                  <option value="Servicio al cliente">
-                    Servicio al cliente
-                  </option>
                   <option value="Cobros indebidos">Cobros indebidos</option>
+                  <option value="Otros">Otros</option>
                 </select>
                 <input
                   type="submit"
-                  value="Crear producto"
+                  value="Crear queja"
                   className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
                 />
               </form>
@@ -192,10 +186,10 @@ export function AtencionClientes() {
               className="min-h-[50%] min-w-[50%] bg-white rounded-xl p-4 flex flex-col gap-4"
               onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro del recuadro
             >
-              <p className="font-bold text-xl">Agrega un producto:</p>
+              <p className="font-bold text-xl">Agrega una sugerencia</p>
               <form onSubmit={manejarAddSugerencia}>
                 <label htmlFor="add_sugerencia_descripcion" className="block">
-                  Describa su queja:
+                  Describa su sugerencia:
                 </label>
                 <textarea
                   id="add_sugerencia_descripcion"
@@ -207,7 +201,7 @@ export function AtencionClientes() {
                   maxLength={512}
                 ></textarea>
                 <label htmlFor="add_sugerencia_categoria" className="block">
-                  Categoria de la queja:
+                  Categoria de la sugerencia:
                 </label>
                 <select
                   name="add_sugerencia_categoria"
@@ -224,14 +218,10 @@ export function AtencionClientes() {
                   <option value="Instalaciones">Instalaciones</option>
                   <option value="Productos">Productos</option>
                   <option value="Otros">Otros</option>
-                  <option value="Servicio al cliente">
-                    Servicio al cliente
-                  </option>
-                  <option value="Cobros indebidos">Cobros indebidos</option>
                 </select>
                 <input
                   type="submit"
-                  value="Crear producto"
+                  value="Crear sugerencia"
                   className="block bg-blue-500 rounded-lg p-2 text-white font-bold my-2 cursor-pointer"
                 />
               </form>
@@ -249,11 +239,11 @@ export function AtencionClientes() {
           </motion.h1>
         </div>
         <div className="grid grid-cols-1 grid-rows-1 gap-x-2.5 md:grid-cols-1">
-          <div className="w-full h-full p-4">
+          <div className="w-full p-4">
             <motion.div
               initial={{ x: 200, opacity: 0 }}
               animate={{ x: 0, opacity: 1, transition: { delay: 0.8 } }}
-              className="w-full h-full bg-white/100 rounded-lg p-4 shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)]"
+              className="w-full bg-white/100 rounded-lg p-4 shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)]"
             >
               <div className="shadow-lg rounded-lg p-4 bg-gray-900 flex justify-between items-center">
                 <h2 className="font-bold text-white">
@@ -269,16 +259,15 @@ export function AtencionClientes() {
 
                   <button
                     className="text-white bg-green-500 rounded-xl p-2"
-                    onClick={() => setAbrirModalQueja(true)}
+                    onClick={() => setabrirModalSugerencia(true)}
                   >
                     + Agregar sugerencia
                   </button>
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <DataTable columns={columnasQuejas} data={quejasCliente} />
+                <DataTable columns={columnasQuejas} data={quejasCliente} pagination/>
               </div>
-              <div className="h-[calc(25vh)] md:h-[calc(50vh)]"></div>
             </motion.div>
           </div>
         </div>
