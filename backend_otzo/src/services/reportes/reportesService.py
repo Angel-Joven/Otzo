@@ -20,14 +20,22 @@ class ReportesService(ReportesModelo):
         datos_puntos = ObtenerInfoClientesPuntosService().obtener_info_clientes_puntos()
 
         if isinstance(datos_puntos, list):
-            reporte = [
-                {
+            reporte = []
+            for dato in datos_puntos:
+                # Convertir la fecha al formato YYYY-MM-DD
+                ultima_actualizacion = dato.get("ultima_actualizacionPuntos")
+                if ultima_actualizacion:
+                    try:
+                        # Asegurarse de que sea un objeto datetime antes de convertir
+                        fecha_iso = datetime.fromisoformat(ultima_actualizacion).date().isoformat()
+                    except ValueError:
+                        fecha_iso = ultima_actualizacion.split("T")[0]  # Fallback si no es válida
+
+                reporte.append({
                     "idcliente_puntos": dato["idcliente_puntos"],
                     "total_puntos": dato["total_puntos"],
-                    "ultima_actualizacionPuntos": dato["ultima_actualizacionPuntos"].split("T")[0],
-                }
-                for dato in datos_puntos
-            ]
+                    "ultima_actualizacionPuntos": fecha_iso,
+                })
 
             return reporte
         else:
