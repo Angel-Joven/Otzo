@@ -17,7 +17,7 @@ export function Reportes() {
     const obtenerReportePuntos = async () => {
         resetReportes();
         try {
-            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-puntos");
+            const response = await axios.get("http://api.otzo.angeljovenfes.mx/api/reportes/reporte-puntos");
             setReportePuntos(response.data);
         } catch (error) {
             manejarError("puntos");
@@ -28,7 +28,7 @@ export function Reportes() {
         resetReportes(); // Reiniciar los reportes previos
         try {
             // Solicitar datos al backend
-            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-ventas");
+            const response = await axios.get("http://api.otzo.angeljovenfes.mx/api/reportes/reporte-ventas");
             setReporteVentas(response.data);
         } catch (error) {
             manejarError("ventas");
@@ -38,7 +38,7 @@ export function Reportes() {
     const obtenerReporteRangos = async () => {
         resetReportes();
         try {
-            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-rangos");
+            const response = await axios.get("http://api.otzo.angeljovenfes.mx/api/reportes/reporte-rangos");
             setReporteRangos(response.data);
         } catch (error) {
             manejarError("rangos");
@@ -48,7 +48,7 @@ export function Reportes() {
     const obtenerReporteAdministracion = async () => {
         resetReportes();
         try {
-            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-administracion");
+            const response = await axios.get("http://api.otzo.angeljovenfes.mx/api/reportes/reporte-administracion");
             setReporteAdministracion(response.data);
         } catch (error) {
             manejarError("administración");
@@ -58,7 +58,7 @@ export function Reportes() {
     const obtenerReporteQuejas = async () => {
         resetReportes();
         try {
-            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-quejas");
+            const response = await axios.get("http://api.otzo.angeljovenfes.mx/api/reportes/reporte-quejas");
             const datos = Array.isArray(response.data) ? response.data : [];
             setReporteQuejas(datos);
         } catch (error) {
@@ -69,7 +69,7 @@ export function Reportes() {
     const obtenerReporteInventario = async () => {
         resetReportes();
         try {
-            const response = await axios.get("http://127.0.0.1:5000/api/reportes/reporte-inventario");
+            const response = await axios.get("http://api.otzo.angeljovenfes.mx/api/reportes/reporte-inventario");
             setReporteInventario(response.data);
         } catch (error) {
             manejarError("inventario");
